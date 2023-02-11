@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="ShopifyEasyShirtPrinting.Views.ScanPrintView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="572.667" d:DesignWidth="442.667">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+
+        <Grid Margin="4,4,4,4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox mah:TextBoxHelper.Watermark="QR Data"
+                Text="{Binding QrData}" Margin="2,0,2,0"/>
+            <Button Grid.Column="1" Content="To Hot Folder" Margin="2,0,2,0"/>
+
+        </Grid>
+
+
+        <DataGrid Grid.Row="1" Margin="4" ItemsSource="{Binding PrintItems}"/>
+    </Grid>
+</UserControl>

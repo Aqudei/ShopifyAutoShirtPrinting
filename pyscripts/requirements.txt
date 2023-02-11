@@ -1,0 +1,4 @@
+ShopifyAPI
+python-dotenv
+pandas
+openpyxl
