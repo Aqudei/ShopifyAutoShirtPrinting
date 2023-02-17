@@ -22,5 +22,17 @@ namespace ShopifyEasyShirtPrinting.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string HotFoldersConfig {
+            get {
+                return ((string)(this["HotFoldersConfig"]));
+            }
+            set {
+                this["HotFoldersConfig"] = value;
+            }
+        }
     }
 }

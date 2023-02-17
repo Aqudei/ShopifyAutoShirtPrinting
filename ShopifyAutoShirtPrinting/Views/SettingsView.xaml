@@ -18,13 +18,14 @@
                     Content="Save Settings"/>
         </StackPanel>
         <DataGrid Grid.Row="1" 
+                  FontSize="14"
                   Margin="4"
                   ItemsSource="{Binding AppSettings}"
                   AutoGenerateColumns="False">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Setting Key" Binding="{Binding Name}"/>
-                <DataGridTextColumn Header="Value" Binding="{Binding Value}"/>
-                <DataGridTemplateColumn Header="" >
+                <DataGridTextColumn Width="2*" Header="Setting Key" Binding="{Binding Name}"/>
+                <DataGridTextColumn Width="4*" Header="Value" Binding="{Binding Value}"/>
+                <DataGridTemplateColumn Width="*" Header="" >
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Content="Delete" Command="{Binding DataContext.DeleteCommand, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}"

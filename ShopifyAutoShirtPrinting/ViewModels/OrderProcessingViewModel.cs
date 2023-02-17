@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -58,12 +59,27 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             foreach (var orderItem in _lineItems)
             {
                 var variant = await _productVariantService.GetAsync(orderItem.VariantId.Value);
-                if (variant.ImageId != null)
-                {
-                    var image = await _productImageService.GetAsync(variant.ProductId.Value, variant.ImageId.Value);
-                    orderItem.ProductImage = image.Src;
-                }
+                if (variant.ImageId == null) continue;
+                var image = await _productImageService.GetAsync(variant.ProductId.Value, variant.ImageId.Value);
+
+                orderItem.ProductImage = DownloadImage(image.Src, orderItem);
             }
+        }
+
+        private string DownloadImage(string imageSource, OrderItem orderItem)
+        {
+            var dataDir = Path.Combine(Path.GetTempPath(), "ShopifyImages");
+            if (!Directory.Exists(dataDir))
+            {
+                Directory.CreateDirectory(dataDir);
+            }
+
+            var tempFile = Path.Combine(dataDir, orderItem.VariantId.ToString());
+            if (File.Exists(tempFile)) return tempFile;
+            using var client = new WebClient();
+            client.DownloadFile(imageSource, tempFile);
+
+            return tempFile;
         }
 
         private async Task FetchOderItems()

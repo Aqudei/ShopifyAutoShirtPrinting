@@ -71,7 +71,7 @@
                        Source="{Binding CurrentImage, Mode=OneWay}" 
                        Stretch="UniformToFill"/>
             </GroupBox>
-            <GroupBox 
+            <!--<GroupBox 
                 Margin="4,4,4,4"
                 Header="Scan Print"
                 Grid.Row="1" >
@@ -80,7 +80,7 @@
                     VerticalScrollBarVisibility="Visible">
                     <ItemsControl Width="350" prism:RegionManager.RegionName="ScanPrintRegion"/>
                 </ScrollViewer>
-            </GroupBox>
+            </GroupBox>-->
         </Grid>
     </Grid>
 </UserControl>
