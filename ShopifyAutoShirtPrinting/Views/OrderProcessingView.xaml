@@ -4,8 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:prism="http://prismlibrary.com/"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             mah:DialogParticipation.Register="{Binding}"
              prism:ViewModelLocator.AutoWireViewModel="True"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -19,12 +21,21 @@
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Horizontal">
-            <Button Content="Process Selected" Margin="4" Width="150"
-                    Command="{Binding ProcessSelectedCommand}" />
+            <Button Content="Uncheck All" Margin="4" Width="150"
+                    Command="{Binding UncheckedAllCommand}" />
+            <Button Content="Check Highlighted" Margin="4" Width="150"
+                    Command="{Binding CheckHighlightedCommand}" 
+                    CommandParameter="{Binding SelectedItems, ElementName=OrdersDataGrid}"/>
+            <Button Content="Uncheck Highlighted" Width="150" Margin="4"
+                    Command="{Binding UncheckHighlightedCommand}" 
+                    CommandParameter="{Binding SelectedItems, ElementName=OrdersDataGrid}"/>
+            <!--<Button Content="Process Selected" Margin="4" Width="150"
+                    Command="{Binding ProcessSelectedCommand}" />-->
             <Button Content="Generate  QR" Width="150" Margin="4"
                     Command="{Binding GenerateQrCommand}" />
             <Button Content="QR Scanner" Width="150" Margin="4"
                     Command="{Binding OpenQrScannerCommand}" />
+            
         </StackPanel>
 
         <DataGrid ItemsSource="{Binding OrdersView}"

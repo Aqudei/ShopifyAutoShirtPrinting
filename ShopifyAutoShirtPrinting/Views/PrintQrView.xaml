@@ -1,0 +1,44 @@
+﻿<UserControl x:Class="ShopifyEasyShirtPrinting.Views.PrintQrView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             mah:DialogParticipation.Register="{Binding}"
+             xmlns:local="clr-namespace:ShopifyEasyShirtPrinting.Views"
+             Width="800" Height="600"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <prism:Dialog.WindowStyle>
+        <Style TargetType="mah:MetroWindow">
+            <Setter Property="prism:Dialog.WindowStartupLocation" Value="CenterScreen" />
+            <Setter Property="ResizeMode" Value="NoResize"/>
+            <Setter Property="ShowInTaskbar" Value="False"/>
+            <Setter Property="SizeToContent" Value="WidthAndHeight"/>
+            <Setter Property="Title" Value="PrintQR Codes"/>
+
+        </Style>
+    </prism:Dialog.WindowStyle>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <ComboBox ItemsSource="{Binding Printers}" 
+                  SelectedItem="{Binding SelectedPrinter}"
+                  Margin="5,5,0,5"/>
+        <DataGrid Grid.Row="1" 
+                  Margin="5" 
+                  CanUserAddRows="False"
+                  ItemsSource="{Binding SelectedOrderItems}"/>
+        <StackPanel Grid.Row="2" Orientation="Horizontal">
+            <Button Width="150" Margin="5" 
+                    Command="{Binding SaveQrCodesCommand}"
+                    Content="Save QR Codes"/>
+            <!--<Button Width="150" Margin="5,5,5,5">Send to Printer</Button>-->
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -1,8 +1,16 @@
-﻿namespace ShopifyEasyShirtPrinting.Models
+﻿using Prism.Mvvm;
+
+namespace ShopifyEasyShirtPrinting.Models
 {
-    public class OrderItem
+    public class OrderItem : BindableBase
     {
-        public bool IsSelected { get; set; }
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set => SetProperty(ref _isSelected, value);
+        }
+
         public int? OrderNumber { get; set; }
         public string Sku { get; set; }
         public string Name { get; set; }

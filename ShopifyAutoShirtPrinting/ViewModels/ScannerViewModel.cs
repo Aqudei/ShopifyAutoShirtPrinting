@@ -55,6 +55,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                     var quantity = parts[3];
                     var sku = parts[4];
                     var variantId = parts[5];
+                    var variantTitle = parts[6];
 
                     //LineItemId = lineItemId;
                     //Name = name;
@@ -70,7 +71,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                         Sku = sku,
                         Status = "Pending",
                         VariantId = variantId,
-                        VariantName = name
+                        VariantName = name,
+                        VariantTitle = variantTitle
                     });
 
                     DetectedQr = "";
@@ -78,35 +80,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             }
         }
 
-        //public string VariantId
-        //{
-        //    get => _variantId;
-        //    set => SetProperty(ref _variantId, value);
-        //}
-
-        //public string Sku
-        //{
-        //    get => _sku;
-        //    set => SetProperty(ref _sku, value);
-        //}
-
-        //public string OrderNumber
-        //{
-        //    get => _orderNumber;
-        //    set => SetProperty(ref _orderNumber, value);
-        //}
-
-        //public string Name
-        //{
-        //    get => _name;
-        //    set => SetProperty(ref _name, value);
-        //}
-
-        //public string LineItemId
-        //{
-        //    get => _lineItemId;
-        //    set => SetProperty(ref _lineItemId, value);
-        //}
+       
 
         public bool CanCloseDialog()
         {

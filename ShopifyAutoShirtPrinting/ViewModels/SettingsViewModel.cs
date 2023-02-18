@@ -2,6 +2,9 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
+using MahApps.Metro.Controls.Dialogs;
+using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
 using Prism.Commands;
 using Prism.Mvvm;
 using ShopifyEasyShirtPrinting.Models;
@@ -11,11 +14,13 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 {
     public class SettingsViewModel : BindableBase
     {
+        private readonly IDialogCoordinator _dialogCoordinator;
         public ObservableCollection<SettingItem> AppSettings { get; set; } = new();
 
         public string Title => "Settings";
-        public SettingsViewModel()
+        public SettingsViewModel(IDialogCoordinator dialogCoordinator)
         {
+            _dialogCoordinator = dialogCoordinator;
             foreach (DictionaryEntry environmentVariable in Environment.GetEnvironmentVariables(EnvironmentVariableTarget.User))
             {
                 if (environmentVariable.Key.ToString().StartsWith("SHOPIFY_"))
@@ -46,9 +51,9 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         private DelegateCommand _saveCommand;
 
-        public DelegateCommand SaveCommand => _saveCommand ??= new DelegateCommand(SaveSettings);
+        public DelegateCommand SaveCommand => _saveCommand ??= new DelegateCommand(() => Task.Run(SaveSettings));
 
-        private void SaveSettings()
+        private async void SaveSettings()
         {
             foreach (var settingItem in AppSettings.Where(item => item.SettingType == SettingItem.SettingItemType.Environment))
             {
@@ -60,13 +65,13 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
             foreach (var settingItem in AppSettings.Where(item => item.SettingType == SettingItem.SettingItemType.App))
             {
-                if (nameof(Properties.Settings.Default.HotFoldersConfig) == settingItem.Name)
-                {
-                    Properties.Settings.Default.HotFoldersConfig = settingItem.Value;
-                }
+                Properties.Settings.Default[settingItem.Name] = settingItem.Value;
             }
 
             Properties.Settings.Default.Save();
+
+
+            await _dialogCoordinator.ShowMessageAsync(this, "Success", "Settings successfully saved!");
         }
 
         private DelegateCommand<SettingItem> _deleteCommand;
@@ -88,12 +93,9 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             }
             else
             {
-                if (settingItem.Name == nameof(Properties.Settings.Default.HotFoldersConfig))
-                {
-                    settingItem.Value = "";
-                }
-
+                Properties.Settings.Default[settingItem.Name] = "";
                 Properties.Settings.Default.Save();
+                settingItem.Value = "";
             }
         }
     }

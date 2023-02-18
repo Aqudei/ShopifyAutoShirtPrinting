@@ -13,6 +13,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using MahApps.Metro.Controls.Dialogs;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -42,16 +43,74 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             set => SetProperty(ref _currentImage, value);
         }
 
-        public OrderProcessingViewModel(IDialogService dialogService, OrderService orderService, ProductVariantService productVariantService, ProductImageService productImageService)
+        public OrderProcessingViewModel(IDialogService dialogService, OrderService orderService,
+            ProductVariantService productVariantService, ProductImageService productImageService,
+            IDialogCoordinator dialogCoordinator)
         {
             _dialogService = dialogService;
             _orderService = orderService;
             _productVariantService = productVariantService;
             _productImageService = productImageService;
+            _dialogCoordinator = dialogCoordinator;
 
             _currentDispatcher = Application.Current.Dispatcher;
             OrdersView = CollectionViewSource.GetDefaultView(_lineItems);
             Task.Run(FetchOderItems).ContinueWith(FetchProductImages);
+        }
+
+
+        private DelegateCommand<IEnumerable<object>> _checkHighlightedCommand;
+
+        public DelegateCommand<IEnumerable<object>> CheckHighlightedCommand
+        {
+            get { return _checkHighlightedCommand ??= new DelegateCommand<IEnumerable<object>>(CheckHighlighted); }
+        }
+
+
+        private DelegateCommand<IEnumerable<object>> _uncheckHighlightedCommand;
+
+        public DelegateCommand<IEnumerable<object>> UncheckHighlightedCommand
+        {
+            get { return _uncheckHighlightedCommand ??= new DelegateCommand<IEnumerable<object>>(UncheckHighlighted); }
+        }
+
+        private void UncheckHighlighted(IEnumerable<object> highlighted)
+        {
+            foreach (var item in highlighted)
+            {
+                if (item is OrderItem orderItem)
+                {
+                    orderItem.IsSelected = false;
+                }
+            }
+        }
+
+
+        private void CheckHighlighted(IEnumerable<object> highlighted)
+        {
+            foreach (var item in highlighted)
+            {
+                if (item is OrderItem orderItem)
+                {
+                    orderItem.IsSelected = true;
+                }
+            }
+        }
+
+
+        private DelegateCommand _uncheckedAllCommand;
+
+        public DelegateCommand UncheckedAllCommand
+        {
+            get { return _uncheckedAllCommand ??= new DelegateCommand(UncheckAll); }
+        }
+
+        private void UncheckAll()
+        {
+            foreach (var orderItem in _lineItems)
+            {
+                orderItem.IsSelected = false;
+            }
         }
 
         private async void FetchProductImages(Task previous)
@@ -130,6 +189,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         private readonly OrderService _orderService;
         private readonly ProductVariantService _productVariantService;
         private readonly ProductImageService _productImageService;
+        private readonly IDialogCoordinator _dialogCoordinator;
 
 
         private DelegateCommand _openQrScannerCommand;
@@ -146,94 +206,22 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         public DelegateCommand GenerateQrCommand => _generateQrCommand ??= new DelegateCommand(GenerateQr);
 
-        private string EncodeText(string input)
-        {
-            // Encode
-            var plainText = input;
-            var plainTextBytes = Encoding.UTF8.GetBytes(plainText);
-            var encodedText = Convert.ToBase64String(plainTextBytes);
-            Debug.WriteLine("Encoded text: " + encodedText);
-            return encodedText;
-        }
 
-        private void GenerateQr()
+        private async void GenerateQr()
         {
-            var dlg = new CommonOpenFileDialog
+            if (!_lineItems.Any(l => l.IsSelected))
             {
-                IsFolderPicker = true
-            };
-            var result = dlg.ShowDialog();
-            if (result == CommonFileDialogResult.Ok != true)
+                await _dialogCoordinator.ShowMessageAsync(this, "Error", "Please select items to generate QR for!");
                 return;
+            }
 
-            Task.Run(() =>
+            var dlgParams = new DialogParameters { { "selectedItems", _lineItems.Where(i => i.IsSelected) } };
+
+            _dialogService.ShowDialog("PrintQrView", dlgParams, result =>
             {
-                var barcodeWriter = new BarcodeWriterSvg();
-                var selectedItems = _lineItems.Where(l => l.IsSelected);
-                foreach (var orderItem in selectedItems)
-                {
-                    var qrData = new[]
-                    {
-                        $"{orderItem.LineItemId}",
-                        $"{orderItem.Name}",
-                        $"{orderItem.OrderNumber}",
-                        $"{orderItem.Quantity}",
-                        $"{orderItem.Sku}",
-                        $"{orderItem.VariantId}"
-                    };
 
-                    var qrDataText = EncodeText(string.Join(Environment.NewLine, qrData));
-
-                    var outputName = Path.Combine(dlg.FileName, orderItem.VariantTitle.Replace("/", "-")
-                        .Replace(" ", "") + $"-{orderItem.OrderNumber}-{orderItem.LineItemId}" + ".png");
-
-                    var bitmapQr = GenerateBitmapQr(qrDataText, orderItem.Name);
-
-                    SaveQrToFile(bitmapQr, outputName);
-                }
-
-                Process.Start("explorer.exe", $"\"{dlg.FileName}\"");
             });
         }
-
-        private static void SaveQrToFile(Bitmap qrInput, string output)
-        {
-            // Save Bitmap to PNG
-            var qrCodeImage = new BitmapImage();
-            using var stream = new System.IO.FileStream(output, FileMode.Create);
-            qrInput.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-            stream.Position = 0;
-            qrCodeImage.BeginInit();
-            qrCodeImage.CacheOption = BitmapCacheOption.OnLoad;
-            qrCodeImage.StreamSource = stream;
-            qrCodeImage.EndInit();
-            stream.Flush();
-        }
-
-        private static Bitmap GenerateBitmapQr(string data, string bottomText)
-        {
-            var barcodeWriter = new BarcodeWriter
-            {
-                Format = BarcodeFormat.QR_CODE,
-                Options = new EncodingOptions
-                {
-                    Width = 600,
-                    Height = 600,
-                    Margin = 5,
-                }
-            };
-
-            var qrCode = barcodeWriter.Write(data);
-            // Add text at the bottom of the QR code image
-
-            using var graphics = Graphics.FromImage(qrCode);
-            var measure = graphics.MeasureString(bottomText, new Font("Arial", 8), qrCode.Size);
-            graphics.DrawString(bottomText, new Font("Arial", 8), Brushes.Black,
-                new PointF(0 + (qrCode.Width - measure.Width) / 2, qrCode.Height - 30));
-
-            return qrCode;
-        }
-
 
         public OrderItem SelectedVariant
         {

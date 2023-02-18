@@ -19,5 +19,6 @@ namespace ShopifyEasyShirtPrinting.Models
         public string Quantity { get; set; }
         public string Sku { get; set; }
         public string VariantId { get; set; }
+        public string VariantTitle { get; set; }
     }
 }

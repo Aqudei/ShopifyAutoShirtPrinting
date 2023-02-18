@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using MahApps.Metro.Controls.Dialogs;
 using Prism.DryIoc;
 using Prism.Ioc;
 using Prism.Regions;
@@ -36,10 +37,13 @@ namespace ShopifyAutoShirtPrinting
 
 
             containerRegistry.RegisterDialog<ScannerView, ScannerViewModel>();
+            containerRegistry.RegisterDialog<PrintQrView, PrintQrViewModel>();
+            containerRegistry.RegisterDialogWindow<MetroDialogWindow>();
 
             containerRegistry.RegisterInstance(orderService);
             containerRegistry.RegisterInstance(productVariantService);
             containerRegistry.RegisterInstance(productImageService);
+            containerRegistry.RegisterInstance(DialogCoordinator.Instance);
 
             var regionManager = Container.Resolve<IRegionManager>();
             regionManager.RegisterViewWithRegion("MainRegion", typeof(OrderProcessingView));

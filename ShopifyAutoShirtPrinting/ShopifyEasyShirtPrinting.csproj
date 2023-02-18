@@ -341,7 +341,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Views\MetroDialogWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\OrderProcessingView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PrintQrView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -370,12 +378,19 @@
     <Compile Include="Models\SettingItem.cs" />
     <Compile Include="Models\OrderItem.cs" />
     <Compile Include="ViewModels\OrderProcessingViewModel.cs" />
+    <Compile Include="ViewModels\PrintQrViewModel.cs" />
     <Compile Include="ViewModels\ScannerViewModel.cs" />
     <Compile Include="ViewModels\ScanPrintViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
+    <Compile Include="Views\MetroDialogWindow.xaml.cs">
+      <DependentUpon>MetroDialogWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\OrderProcessingView.xaml.cs">
       <DependentUpon>OrderProcessingView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PrintQrView.xaml.cs">
+      <DependentUpon>PrintQrView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ScannerView.xaml.cs">
       <DependentUpon>ScannerView.xaml</DependentUpon>

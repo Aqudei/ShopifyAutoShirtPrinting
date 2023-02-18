@@ -4,6 +4,6 @@ namespace ShopifyEasyShirtPrinting.Models
 {
     public class PrintItem2 : PrintItem
     {
-        
+       
     }
 }
