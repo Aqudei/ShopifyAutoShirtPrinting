@@ -17,6 +17,7 @@ using MahApps.Metro.Controls.Dialogs;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Prism.Commands;
 using Prism.Mvvm;
+using Prism.Regions;
 using Prism.Services.Dialogs;
 using ShopifyEasyShirtPrinting.Models;
 using ShopifySharp;
@@ -26,7 +27,7 @@ using Brushes = System.Drawing.Brushes;
 
 namespace ShopifyEasyShirtPrinting.ViewModels
 {
-    public class OrderProcessingViewModel : BindableBase
+    public class OrderProcessingViewModel : BindableBase, INavigationAware
     {
         private readonly ObservableCollection<OrderItem> _lineItems = new();
 
@@ -231,6 +232,22 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 SetProperty(ref _selectedVariant, value);
                 CurrentImage = _selectedVariant.ProductImage;
             }
+        }
+
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            Debug.WriteLine(navigationContext.Parameters);
+        }
+
+        public bool IsNavigationTarget(NavigationContext navigationContext)
+        {
+            return true;
+        }
+
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
+            Debug.WriteLine(navigationContext.Parameters);
+
         }
     }
 }

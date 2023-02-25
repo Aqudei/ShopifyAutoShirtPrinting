@@ -34,5 +34,17 @@ namespace ShopifyEasyShirtPrinting.Properties {
                 this["HotFoldersConfig"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Users\\aqudei\\Downloads")]
+        public string DestinationPath {
+            get {
+                return ((string)(this["DestinationPath"]));
+            }
+            set {
+                this["DestinationPath"] = value;
+            }
+        }
     }
 }

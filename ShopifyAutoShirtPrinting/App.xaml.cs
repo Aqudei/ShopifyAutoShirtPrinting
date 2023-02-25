@@ -48,6 +48,7 @@ namespace ShopifyAutoShirtPrinting
             var regionManager = Container.Resolve<IRegionManager>();
             regionManager.RegisterViewWithRegion("MainRegion", typeof(OrderProcessingView));
             regionManager.RegisterViewWithRegion("MainRegion", typeof(SettingsView));
+            regionManager.RegisterViewWithRegion("MainRegion", typeof(OrganizerView));
             regionManager.RegisterViewWithRegion("ScanPrintRegion", typeof(ScanPrintView));
         }
 

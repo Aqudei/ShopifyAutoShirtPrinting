@@ -5,5 +5,8 @@
     <Setting Name="HotFoldersConfig" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="DestinationPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\Users\aqudei\Downloads</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

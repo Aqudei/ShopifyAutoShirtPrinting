@@ -30,7 +30,7 @@
     <ProductName>ShopifyEasyShirtPrinting</ProductName>
     <PublisherName>Aqudei</PublisherName>
     <SuiteName>Tools</SuiteName>
-    <ApplicationRevision>3</ApplicationRevision>
+    <ApplicationRevision>4</ApplicationRevision>
     <ApplicationVersion>11.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -166,6 +166,9 @@
     </Reference>
     <Reference Include="ShopifySharp, Version=5.19.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ShopifySharp.5.19.1\lib\netstandard2.0\ShopifySharp.dll</HintPath>
+    </Reference>
+    <Reference Include="SixLabors.ImageSharp, Version=2.0.0.0, Culture=neutral, PublicKeyToken=d998eea7b14cab13, processorArchitecture=MSIL">
+      <HintPath>..\packages\SixLabors.ImageSharp.2.1.3\lib\net472\SixLabors.ImageSharp.dll</HintPath>
     </Reference>
     <Reference Include="Sprache, Version=2.3.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sprache.2.3.1\lib\net45\Sprache.dll</HintPath>
@@ -303,6 +306,9 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Text.Encoding.CodePages, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encoding.CodePages.5.0.0\lib\net461\System.Text.Encoding.CodePages.dll</HintPath>
+    </Reference>
     <Reference Include="System.Text.RegularExpressions, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Text.RegularExpressions.4.3.0\lib\net463\System.Text.RegularExpressions.dll</HintPath>
       <Private>True</Private>
@@ -349,6 +355,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\OrganizerView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\PrintQrView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -373,11 +383,14 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Models\OrgFile.cs" />
     <Compile Include="Models\PrintItem2.cs" />
     <Compile Include="Models\PrintItem.cs" />
     <Compile Include="Models\SettingItem.cs" />
     <Compile Include="Models\OrderItem.cs" />
+    <Compile Include="Models\Sku.cs" />
     <Compile Include="ViewModels\OrderProcessingViewModel.cs" />
+    <Compile Include="ViewModels\OrganizerViewModel.cs" />
     <Compile Include="ViewModels\PrintQrViewModel.cs" />
     <Compile Include="ViewModels\ScannerViewModel.cs" />
     <Compile Include="ViewModels\ScanPrintViewModel.cs" />
@@ -388,6 +401,9 @@
     </Compile>
     <Compile Include="Views\OrderProcessingView.xaml.cs">
       <DependentUpon>OrderProcessingView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\OrganizerView.xaml.cs">
+      <DependentUpon>OrganizerView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\PrintQrView.xaml.cs">
       <DependentUpon>PrintQrView.xaml</DependentUpon>

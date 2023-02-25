@@ -19,7 +19,7 @@
         </Style>
     </mah:MetroWindow.Resources>
     <Grid>
-        <mah:MetroAnimatedSingleRowTabControl prism:RegionManager.RegionName="MainRegion"
+        <mah:MetroAnimatedSingleRowTabControl x:Name="MainRegionTabControl" prism:RegionManager.RegionName="MainRegion"
                                               Margin="32"/>
     </Grid>
 </mah:MetroWindow>
