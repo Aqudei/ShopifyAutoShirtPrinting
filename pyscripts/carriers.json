@@ -1,0 +1,22 @@
+[
+ {
+  "name": "Australia Post",
+  "code": "australia_post",
+  "accountNumber": "0007798399",
+  "requiresFundedAccount": false,
+  "balance": 0.0,
+  "nickname": null,
+  "shippingProviderId": 331980,
+  "primary": true
+ },
+ {
+  "name": "DHL Express Australia",
+  "code": "dhl_express_australia",
+  "accountNumber": "962611755",
+  "requiresFundedAccount": false,
+  "balance": 0.0,
+  "nickname": null,
+  "shippingProviderId": 245387,
+  "primary": true
+ }
+]

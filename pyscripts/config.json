@@ -1,0 +1,17 @@
+{
+    "product_types": {
+        "Tee": "TEE",
+        "Jumper": "JPR",
+        "Hoodie": "HOD",
+        "Shorts": "SHO",
+        "Tank": "TNK"
+    },
+    "colors": {
+        "BLACK": "BLK",
+        "WHITE": "WHT"
+    },
+    "fits": {
+        "Crop Top": "CRP",
+        "Long Sleeve": "LS"
+    }
+}
