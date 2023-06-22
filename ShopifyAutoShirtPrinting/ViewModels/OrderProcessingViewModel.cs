@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
+using EasyNetQ;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using Netco.Extensions;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Regions;
 using Prism.Services.Dialogs;
 using ShopifyEasyShirtPrinting.Data;
+using ShopifyEasyShirtPrinting.Helpers;
+using ShopifyEasyShirtPrinting.Messages;
 using ShopifyEasyShirtPrinting.Models;
 using ShopifyEasyShirtPrinting.Services;
 using ShopifyEasyShirtPrinting.Services.ShipStation;
@@ -95,6 +97,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     private readonly IOrderRepository _orderRepository;
     private readonly BinService _binService;
     private readonly DbService _dbService;
+    private readonly IBus _bus;
     private readonly IEventAggregator _eventAggregator;
     private DelegateCommand _openQrScannerCommand;
     private string _searchText;
@@ -104,6 +107,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     public ObservableCollection<Log> Logs { get; set; } = new();
     public ObservableCollection<KeyValuePair<string, string>> ScanInfo { set; get; } = new();
     public string Notes { get => _notes; set => SetProperty(ref _notes, value); }
+
     public string[] Tags => new string[] {
         "Pending",
         "Processed",
@@ -157,6 +161,11 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 ChangeDate = dateNow,
                 ChangeStatus = tag,
                 MyLineItemId = myLineItem.Id
+            });
+
+            _bus.PubSub.Publish(new TagUpdated
+            {
+                Id = myLineItem.Id
             });
         }
     }
@@ -221,6 +230,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private Bitmap GenerateQrImageForItem(MyLineItem orderItem)
     {
+
         var qrData = new[]
                         {
                     $"{orderItem.OrderId}",
@@ -229,9 +239,12 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 };
 
         var qrDataText = EncodeText(string.Join($"{Environment.NewLine}", qrData));
-        using var qrImage = GenerateBitmapQr(qrDataText);
-        using var textImage = DrawTextImage(orderItem.Name, qrImage);
-        var combinedImage = CombineImage(qrImage, textImage);
+
+        var qrHelper = new QrHelper();
+
+        using var qrImage = qrHelper.GenerateBitmapQr(qrDataText);
+        using var textImage = qrHelper.DrawTextImage(orderItem.Name, qrImage);
+        var combinedImage = qrHelper.CombineImage(qrImage, textImage);
 
         return combinedImage;
     }
@@ -257,7 +270,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     public OrderProcessingViewModel(IDialogService dialogService, OrderService orderService, ShipStationApi shipStationApi, IShipStationBrowserService browserService,
         ProductVariantService productVariantService, ProductImageService productImageService, GlobalVariables globalVariables, IDialogCoordinator dialogCoordinator,
         IEventAggregator eventAggregator, LogRespository logRespository, IMapper mapper, ILineRepository lineRepository, MyPrintService myPrintService,
-        IOrderRepository orderRepository, BinService binService, DbService dbService)
+        IOrderRepository orderRepository, BinService binService, DbService dbService, IBus bus)
     {
         _dispatcher = Application.Current.Dispatcher;
 
@@ -274,13 +287,30 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         _myPrintService = myPrintService;
         _lineRepository = lineRepository;
         _orderRepository = orderRepository;
+        _eventAggregator = eventAggregator;
         _binService = binService;
         _dbService = dbService;
-        _eventAggregator = eventAggregator;
+        _bus = bus;
+
 
         LineItemsView = CollectionViewSource.GetDefaultView(_lineItems);
 
-        Task.Run(FetchLineItems);
+        Task.Run(FetchLineItems).ContinueWith(t =>
+        {
+            _bus.PubSub.Subscribe<TagUpdated>("tag.updated", (e) =>
+            {
+                var dbLineItem = _lineRepository.GetById(e.Id);
+                var currentLineItem = _lineItems.SingleOrDefault(l => l.Id == e.Id);
+
+                if (dbLineItem != null && currentLineItem != null)
+                {
+                    if (currentLineItem.Notes != dbLineItem.Notes)
+                    {
+                        _dispatcher.Invoke(() => { currentLineItem.Notes = dbLineItem.Notes; });
+                    }
+                }
+            });
+        });
         PropertyChanged += OrderProcessingViewModel_PropertyChanged;
     }
 
@@ -846,22 +876,6 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
     }
 
-    private Bitmap CombineImage(Bitmap bmp1, Bitmap bmp2)
-    {
-        var result = new Bitmap(bmp1.Width + bmp2.Width, Math.Max(bmp1.Height, bmp2.Height));
-
-        // Create a graphics object from the result bitmap
-        using (var graphics = Graphics.FromImage(result))
-        {
-            graphics.Clear(Color.White);
-            // Draw the first bitmap on the left side of the result bitmap
-            graphics.DrawImage(bmp1, 0, 0);
-            graphics.DrawImage(bmp2, bmp1.Width, 0);
-        }
-
-        return result;
-    }
-
     public MyLineItem SelectedLineItem
     {
         get => _selectedLineItem;
@@ -887,116 +901,5 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     public void OnNavigatedFrom(NavigationContext navigationContext)
     {
         Debug.WriteLine(navigationContext.Parameters);
-    }
-
-    public List<string> SplitTextForWordWrap(Graphics graphics, string text, Font font, float maxWidth)
-    {
-        var lines = new List<string>();
-
-        var words = text.Trim().Split(' ');
-        var currentLine = string.Empty;
-
-        foreach (var word in words)
-        {
-            if (string.IsNullOrEmpty(currentLine))
-            {
-                currentLine = word;
-            }
-            else
-            {
-                string testLine = currentLine + " " + word;
-                SizeF size = graphics.MeasureString(testLine, font);
-
-                if (size.Width <= maxWidth)
-                {
-                    currentLine = testLine;
-                }
-                else
-                {
-                    lines.Add(currentLine);
-                    currentLine = word;
-                }
-            }
-        }
-
-        lines.Add(currentLine);
-
-        return lines;
-    }
-
-    public Bitmap DrawTextImage(string text, Bitmap refImage)
-    {
-        var aspectRatio = Properties.Settings.Default.PaperWidth / Properties.Settings.Default.PaperHeight;
-        var width = (int)(aspectRatio * refImage.Height) - refImage.Width;
-        var height = refImage.Height;
-        using var font = new Font("Microsoft Sans Serif", Properties.Settings.Default.FontSize, FontStyle.Bold);
-
-        // Create a new bitmap with the specified width and height
-        var textImage = new Bitmap(width, height);
-
-        // Create a graphics object from the result bitmap
-        using var graphics = Graphics.FromImage(textImage);
-
-        graphics.Clear(Color.White);
-        // Create a new font and brush for the text
-
-        var brush = Brushes.Black;
-
-        // Measure the size of the text and check if it exceeds the width of the image
-        var textSize = graphics.MeasureString(text, font);
-        if (textSize.Width > width)
-        {
-            var lines = SplitTextForWordWrap(graphics, text, font, width);
-
-            // Calculate the total height of the text
-            var totalTextHeight = graphics.MeasureString(text, font, width).Height;
-
-            // Draw each line of text with the specified font and brush
-            var y = (height - totalTextHeight) / 2; // center vertically
-
-            foreach (string line in lines)
-            {
-                // Calculate the x-coordinate to center the text horizontally
-                var x = (width - graphics.MeasureString(line, font).Width) / 2;
-
-                graphics.DrawString(line, font, brush, new RectangleF(x, y, width, height));
-                y += graphics.MeasureString(line, font).Height;
-            }
-        }
-        else
-        {
-            // Calculate the y-coordinate to center the text vertically
-            var y = (height - textSize.Height) / 2;
-            // Calculate the x-coordinate to center the text horizontally
-            var x = (width - textSize.Width) / 2;
-            // Draw the entire text on a single line with the specified font and brush
-            graphics.DrawString(text, font, brush, new RectangleF(x, y, width, height));
-        }
-
-
-        return textImage;
-    }
-
-    private Bitmap GenerateBitmapQr(string data)
-    {
-        var qrMargin = 2;
-        var qrWidth = 600;
-        var qrHeight = 600;
-
-        var barcodeWriter = new BarcodeWriter
-        {
-            Format = BarcodeFormat.QR_CODE,
-            Options = new EncodingOptions
-            {
-                Width = qrWidth,
-                Height = qrHeight,
-                Margin = qrMargin,
-                PureBarcode = true
-            }
-        };
-
-        var qrCode = barcodeWriter.Write(data);
-
-        return qrCode;
     }
 }

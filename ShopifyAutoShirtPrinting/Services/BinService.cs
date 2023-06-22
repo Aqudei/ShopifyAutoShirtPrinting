@@ -23,7 +23,7 @@ namespace ShopifyEasyShirtPrinting.Services
             var orders = _orderInfoRepository.Find(o => o.BinNumber != 0 && o.Active).OrderBy(o => o.BinNumber).ToList();
             foreach (var order in orders)
             {
-                var lines = _lineRepository.Find(b => b.BinNumber != 0 && b.OrderId == order.OrderId);
+                var lines = _lineRepository.Find(b=> b.OrderId == order.OrderId);
                 var bin = new Bin
                 {
                     BinNumber = order.BinNumber,

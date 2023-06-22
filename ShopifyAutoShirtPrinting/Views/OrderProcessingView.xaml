@@ -154,6 +154,10 @@
             </Grid.RowDefinitions>
 
             <DataGrid ItemsSource="{Binding LineItemsView}"
+                      mah:ScrollViewerHelper.IsHorizontalScrollWheelEnabled="True"
+                      ScrollViewer.CanContentScroll="True"
+                      ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                      
                       FrozenColumnCount="1"
                       IsSynchronizedWithCurrentItem="True"
                       SelectedItem="{Binding SelectedLineItem}"
@@ -161,7 +165,9 @@
                       Margin="5"
                       x:Name="OrdersDataGrid"
                       AutoGenerateColumns="False" 
-                      Grid.Column="0" CanUserAddRows="False" CanUserDeleteRows="False">
+                      Grid.Column="0" 
+                      CanUserAddRows="False" 
+                      CanUserDeleteRows="False">
 
                 <DataGrid.RowStyle>
                     <Style TargetType="DataGridRow">

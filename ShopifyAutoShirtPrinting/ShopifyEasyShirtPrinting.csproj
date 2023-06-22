@@ -33,7 +33,7 @@
     <ProductName>ShopifyEasyShirtPrinting</ProductName>
     <PublisherName>Aqudei</PublisherName>
     <SuiteName>Tools</SuiteName>
-    <ApplicationRevision>2</ApplicationRevision>
+    <ApplicationRevision>4</ApplicationRevision>
     <ApplicationVersion>13.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -98,6 +98,12 @@
     </Reference>
     <Reference Include="CuttingEdge.Conditions, Version=1.2.0.11174, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
       <HintPath>..\packages\CuttingEdge.Conditions.1.2.0.0\lib\NET35\CuttingEdge.Conditions.dll</HintPath>
+    </Reference>
+    <Reference Include="DeviceId, Version=6.2.0.0, Culture=neutral, PublicKeyToken=f755c371b5c59c52, processorArchitecture=MSIL">
+      <HintPath>..\packages\DeviceId.6.2.0\lib\net40\DeviceId.dll</HintPath>
+    </Reference>
+    <Reference Include="DeviceId.Windows, Version=6.2.0.0, Culture=neutral, PublicKeyToken=f755c371b5c59c52, processorArchitecture=MSIL">
+      <HintPath>..\packages\DeviceId.Windows.6.2.0\lib\net40\DeviceId.Windows.dll</HintPath>
     </Reference>
     <Reference Include="DotNetEnv, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\DotNetEnv.2.5.0\lib\netstandard1.3\DotNetEnv.dll</HintPath>
@@ -588,6 +594,8 @@
     <Compile Include="Data\PGSQLRepositoryBase.cs" />
     <None Include="Data\LiteDbRepositoryBase.cs" />
     <Compile Include="Events\DoneFetchingLines.cs" />
+    <Compile Include="Helpers\QrHelper.cs" />
+    <Compile Include="Messages\TagUpdated.cs" />
     <Compile Include="Migrations\202306211103590_initial.cs" />
     <Compile Include="Migrations\202306211103590_initial.designer.cs">
       <DependentUpon>202306211103590_initial.cs</DependentUpon>
