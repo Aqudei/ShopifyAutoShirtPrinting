@@ -102,6 +102,9 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     private DelegateCommand _openQrScannerCommand;
     private string _searchText;
     private string _detectedQr;
+
+    public ObservableCollection<string> ShippingLines { get; set; } = new();
+
     private DelegateCommand _saveQrTagsCommand;
     private DelegateCommand<string> _appplyTagCommand;
     public ObservableCollection<Log> Logs { get; set; } = new();
@@ -313,6 +316,9 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                     }
                 }
             });
+
+            _dispatcher.Invoke(() => ShippingLines.AddRange(_lineItems.Select(l => l.Shipping).Distinct().ToList()));
+
         });
         PropertyChanged += OrderProcessingViewModel_PropertyChanged;
     }
@@ -427,8 +433,9 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                             {
                                 var sku = o1.Sku ?? "";
                                 var orderNumber = o1.OrderNumber?.ToString() ?? "";
+                                var shippingLines = o1.Shipping?.ToLower() ?? "";
                                 return orderNumber.Contains(SearchText) || sku.Contains(SearchText) ||
-                                                          o1.Name.ToLower().Contains(SearchText.ToLower());
+                                                          o1.Name.ToLower().Contains(SearchText.ToLower()) || shippingLines.Contains(SearchText.ToLower());
                             }
 
                             return true;
@@ -754,7 +761,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 {
                     waitDialog.SetMessage($"Fetching Orders @ Page # {currentPage + 1}...");
 
-               
+
 
                     foreach (var orderLineItem in order.LineItems)
                     {
@@ -774,13 +781,13 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                             Customer = $"{order.Customer.FirstName} {order.Customer.LastName}",
                             CustomerEmail = order.Customer.Email,
                             Notes = order.Note,
-                            Shipping = order.ShippingLines.FirstOrDefault()?.Code
+                            Shipping = order.ShippingLines.FirstOrDefault()?.Code.Split(' ')[0],
                         };
 
-                        var localLineItem = localOrders.SingleOrDefault(o =>
+                        var localLineItems = localOrders.Where(o =>
                             o.OrderId == order.Id && o.LineItemId == orderLineItem.Id);
 
-                        if (localLineItem == null)
+                        if (!localLineItems.Any())
                         {
                             toAdd.Add(myLineItem);
                         }

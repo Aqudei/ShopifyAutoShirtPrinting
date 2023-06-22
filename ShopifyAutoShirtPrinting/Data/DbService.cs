@@ -18,7 +18,7 @@ namespace ShopifyEasyShirtPrinting.Data
             {
                 _connection.Open();
                 var cmd = _connection.CreateCommand();
-                cmd.CommandText = "call dbo.reset_database()";
+                cmd.CommandText = "call public.reset_database()";
                 cmd.CommandType = System.Data.CommandType.Text;
                 cmd.ExecuteNonQuery();
                 _connection.Close();
