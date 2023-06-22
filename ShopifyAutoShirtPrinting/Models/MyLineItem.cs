@@ -68,6 +68,8 @@ namespace ShopifyEasyShirtPrinting.Models
 
         public bool HasNotes => !string.IsNullOrWhiteSpace(Notes);
 
+        public string Shipping { get;  set; }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
 

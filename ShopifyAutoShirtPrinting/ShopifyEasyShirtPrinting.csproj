@@ -596,9 +596,9 @@
     <Compile Include="Events\DoneFetchingLines.cs" />
     <Compile Include="Helpers\QrHelper.cs" />
     <Compile Include="Messages\TagUpdated.cs" />
-    <Compile Include="Migrations\202306211103590_initial.cs" />
-    <Compile Include="Migrations\202306211103590_initial.designer.cs">
-      <DependentUpon>202306211103590_initial.cs</DependentUpon>
+    <Compile Include="Migrations\202306220321441_initial.cs" />
+    <Compile Include="Migrations\202306220321441_initial.designer.cs">
+      <DependentUpon>202306220321441_initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Services\BinService.cs" />
@@ -690,8 +690,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <EmbeddedResource Include="Migrations\202306211103590_initial.resx">
-      <DependentUpon>202306211103590_initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202306220321441_initial.resx">
+      <DependentUpon>202306220321441_initial.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

@@ -754,6 +754,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 {
                     waitDialog.SetMessage($"Fetching Orders @ Page # {currentPage + 1}...");
 
+               
+
                     foreach (var orderLineItem in order.LineItems)
                     {
                         var myLineItem = new MyLineItem
@@ -772,6 +774,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                             Customer = $"{order.Customer.FirstName} {order.Customer.LastName}",
                             CustomerEmail = order.Customer.Email,
                             Notes = order.Note,
+                            Shipping = order.ShippingLines.FirstOrDefault()?.Code
                         };
 
                         var localLineItem = localOrders.SingleOrDefault(o =>

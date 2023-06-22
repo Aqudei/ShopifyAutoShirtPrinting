@@ -65,7 +65,7 @@
                               ItemsSource="{Binding Tags}"
                               mah:TextBoxHelper.Watermark="Filter By Status" 
                               Margin="2,0,2,0"/>
-                    
+
                     <Button Content="Apply" 
                             Command="{Binding AppplyStatusFilterCommand}"
                             CommandParameter="{Binding SelectedItem, ElementName=comboBoxStatus}"
@@ -195,9 +195,20 @@
                     <DataGridTemplateColumn Header="Actions">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Content="Open in Browser"
-                                        CommandParameter="{Binding}"
-                                        Command="{Binding DataContext.OpenInBrowserCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}"/>
+                                <Button CommandParameter="{Binding}"
+                                        Command="{Binding DataContext.OpenInBrowserCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Open in"/>
+                                        <iconPacks:PackIconMaterial Kind="MicrosoftInternetExplorer"
+                                                                    Grid.Column="1"
+                                                                    Margin="5,0,0,0"/>
+                                    </Grid>
+
+                                </Button>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -223,6 +234,7 @@
                     <DataGridTextColumn Header="SKU" Binding="{Binding Sku}"/>
                     <DataGridTextColumn Header="Qty" Binding="{Binding Quantity}"/>
                     <DataGridTextColumn Header="Status" Binding="{Binding Status}"/>
+                    <DataGridTextColumn Header="Shipping" Binding="{Binding Shipping}"/>
                     <DataGridTextColumn Header="Bin" Binding="{Binding BinNumber}"/>
                     <DataGridTextColumn Header="Printed Qty" Binding="{Binding PrintedQuantity}"/>
                     <DataGridTextColumn Header="Date Modified" Binding="{Binding DateModified}"/>

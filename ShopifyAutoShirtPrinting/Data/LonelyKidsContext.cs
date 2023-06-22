@@ -18,7 +18,7 @@ namespace ShopifyEasyShirtPrinting.Data
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.HasDefaultSchema(string.Empty);
+            modelBuilder.HasDefaultSchema("public");
 
             modelBuilder.Entity<MyLineItem>()
                 .HasKey(x => x.Id)
