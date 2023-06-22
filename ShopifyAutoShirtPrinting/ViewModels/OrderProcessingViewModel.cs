@@ -299,6 +299,9 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         {
             _bus.PubSub.Subscribe<TagUpdated>("tag.updated", (e) =>
             {
+                if (e.Id == 0)
+                    return;
+
                 var dbLineItem = _lineRepository.GetById(e.Id);
                 var currentLineItem = _lineItems.SingleOrDefault(l => l.Id == e.Id);
 
