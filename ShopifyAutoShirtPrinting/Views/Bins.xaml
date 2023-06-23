@@ -25,12 +25,19 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition />
                     </Grid.RowDefinitions>
-                    
+
                     <TextBlock FontWeight="Bold" FontSize="14"><Run Text="Bin Number"/><Run Text=" "/><Run Text="#"/><Run Text=" "/><Run Text="{Binding BinNumber}"/></TextBlock>
+                    <TextBlock Grid.Row="1" 
+                               FontSize="14">
+                        <Run Text="Order"/><Run Text=" "/>
+                        <Run Text="#"/>
+                        <Run Text="{Binding OrderNumber}"/>
+                    </TextBlock>
                     <DataGrid x:Name="dataGrid" 
-                            Grid.Row="1"
+                            Grid.Row="2"
                             IsReadOnly="True"
                             Margin="5"
                             AutoGenerateColumns="False"
@@ -41,7 +48,7 @@
                             <DataGridTextColumn Header="Qty" Binding="{Binding Quantity}"/>
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Button Grid.Row="2" 
+                    <Button Grid.Row="3" 
                             HorizontalAlignment="Center"
                             VerticalAlignment="Bottom"
                             CommandParameter="{Binding}"
@@ -66,7 +73,15 @@
     </UserControl.Resources>
 
     <Grid>
-        <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <TextBox mah:TextBoxHelper.Watermark="Search"
+                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                 Margin="5"
+                 mah:TextBoxHelper.ClearTextButton="True"/>
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
             <ItemsControl ItemsPanel="{DynamicResource BinsListViewItemsPanel}" 
                 x:Name="BinsItemsControl"
                 ItemTemplate="{DynamicResource BinsListViewItemTemplate}" 

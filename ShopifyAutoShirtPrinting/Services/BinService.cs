@@ -24,9 +24,10 @@ namespace ShopifyEasyShirtPrinting.Services
             foreach (var order in orders)
             {
                 var lines = _lineRepository.Find(b=> b.OrderId == order.OrderId);
-                var bin = new Bin
+                var bin = new Bin   
                 {
                     BinNumber = order.BinNumber,
+                    OrderNumber = lines.FirstOrDefault()?.OrderNumber,
                     Items = new List<MyLineItem>(lines)
                 };
 

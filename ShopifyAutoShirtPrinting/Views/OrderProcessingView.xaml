@@ -228,6 +228,7 @@
                                                                 Foreground="Black"
                                                                 Margin="5,0,5,0"/>
                                     <TextBlock Text="{Binding Name}"
+                                               VerticalAlignment="Top"
                                                Grid.Column="1"/>
                                 </Grid>
                             </DataTemplate>
@@ -235,10 +236,10 @@
                     </DataGridTemplateColumn>
                     <DataGridTextColumn Header="SKU" Binding="{Binding Sku}"/>
                     <DataGridTextColumn Header="Qty" Binding="{Binding Quantity}"/>
+                    <DataGridTextColumn Header="Printed Qty" Binding="{Binding PrintedQuantity}"/>
                     <DataGridTextColumn Header="Status" Binding="{Binding Status}"/>
                     <DataGridTextColumn Header="Shipping" Binding="{Binding Shipping}"/>
                     <DataGridTextColumn Header="Bin" Binding="{Binding BinNumber}"/>
-                    <DataGridTextColumn Header="Printed Qty" Binding="{Binding PrintedQuantity}"/>
                     <DataGridTextColumn Header="Date Modified" Binding="{Binding DateModified}"/>
                     <DataGridTextColumn Header="Notes" Width="200" 
                         Binding="{Binding Notes}">

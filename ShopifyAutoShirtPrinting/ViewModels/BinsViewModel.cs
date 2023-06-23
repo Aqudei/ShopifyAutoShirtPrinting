@@ -3,7 +3,9 @@ using Prism.Commands;
 using Prism.Regions;
 using ShopifyEasyShirtPrinting.Services;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Windows.Data;
 
 namespace ShopifyEasyShirtPrinting.ViewModels
 {
@@ -14,9 +16,20 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         private DelegateCommand<Bin> clearBinCommand;
 
         public override string Title => "Bins";
-        public ObservableCollection<Bin> Bins { get; set; } = new();
+        private ObservableCollection<Bin> _bins = new();
+
+
+        public ICollectionView Bins { get => bins; set => SetProperty(ref bins, value); }
 
         public DelegateCommand<Bin> ClearBinCommand { get => clearBinCommand ??= new DelegateCommand<Bin>(HandleClearBin); }
+        private string _searchText;
+        private ICollectionView bins;
+
+        public string SearchText
+        {
+            get { return _searchText; }
+            set { SetProperty(ref _searchText, value); }
+        }
 
         private async void HandleClearBin(Bin bin)
         {
@@ -34,12 +47,42 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         {
             _dialogCoordinator = dialogCoordinator;
             _binService = binService;
+
+            Bins = CollectionViewSource.GetDefaultView(_bins);
+
+
+            PropertyChanged += (s, e) =>
+            {
+                switch (e.PropertyName)
+                {
+                    case nameof(SearchText):
+                        {
+                            if (SearchText.Count() >= 3)
+                            {
+                                Bins.Filter = (e) =>
+                                {
+                                    var bin = e as Bin;
+                                    var nameMatched = bin.Items.Any(x => x.Name.ToLower().Contains(SearchText.ToLower()));
+                                    return bin.BinNumber.ToString().Contains(SearchText) || bin.OrderNumber.ToString().Contains(SearchText) || nameMatched;
+                                };
+                            }
+                            else
+                            {
+                                Bins.Filter = null;
+                            }
+
+                            break;
+                        }
+                    default:
+                        break;
+                }
+            };
         }
 
         private void LoadBins()
         {
-            Bins.Clear();
-            Bins.AddRange(_binService.ListBins().ToList());
+            _bins.Clear();
+            _bins.AddRange(_binService.ListBins().ToList());
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)
