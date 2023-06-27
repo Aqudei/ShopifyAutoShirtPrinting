@@ -71,8 +71,7 @@ class Updater:
         self.process_orders(orders_response)
 
         while (orders_response.has_next_page()):
-            orders_response = shopify.Order.find(
-                fulfillment_status='unfulfilled', financial_status='paid')
+            orders_response = orders_response.next_page()
             self.process_orders(orders_response)
 
     def cleanup(self):
