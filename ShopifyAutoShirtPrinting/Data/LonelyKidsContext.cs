@@ -1,5 +1,7 @@
 ﻿using ShopifyEasyShirtPrinting.Models;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure.Annotations;
 
 namespace ShopifyEasyShirtPrinting.Data
 {
@@ -22,8 +24,10 @@ namespace ShopifyEasyShirtPrinting.Data
 
             modelBuilder.Entity<MyLineItem>()
                 .HasKey(x => x.Id)
-                .Ignore(x => x.IsSelected);
-
+                .Ignore(x => x.IsSelected)
+                .Property(x => x.LineItemId)
+                .HasColumnAnnotation(
+                     IndexAnnotation.AnnotationName, new IndexAnnotation(new IndexAttribute() { IsUnique = true }));
 
             modelBuilder.Entity<Log>()
                 .HasKey(x => x.Id)

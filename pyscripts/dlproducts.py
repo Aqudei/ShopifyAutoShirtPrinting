@@ -12,7 +12,7 @@ SHOPIFY_SHOP_URL = os.environ.get("SHOPIFY_SHOP_URL")
 SHOPIFY_TOKEN = os.environ.get("SHOPIFY_TOKEN")
 SHOPIFY_API_KEY = os.environ.get("SHOPIFY_API_KEY")
 SHOPIFY_API_SECRET = os.environ.get("SHOPIFY_API_SECRET")
-API_VERSION = "2022-01"
+API_VERSION = "2023-01"
 
 
 def get_variants():

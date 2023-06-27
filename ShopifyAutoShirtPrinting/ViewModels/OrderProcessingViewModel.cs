@@ -761,8 +761,6 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 {
                     waitDialog.SetMessage($"Fetching Orders @ Page # {currentPage + 1}...");
 
-
-
                     foreach (var orderLineItem in order.LineItems)
                     {
                         var myLineItem = new MyLineItem
@@ -784,8 +782,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                             Shipping = order.ShippingLines.FirstOrDefault()?.Code.Split(' ')[0],
                         };
 
-                        var localLineItems = localOrders.Where(o =>
-                            o.OrderId == order.Id && o.LineItemId == orderLineItem.Id);
+                        var localLineItems = localOrders.Where(o => o.LineItemId == orderLineItem.Id);
 
                         if (!localLineItems.Any())
                         {
