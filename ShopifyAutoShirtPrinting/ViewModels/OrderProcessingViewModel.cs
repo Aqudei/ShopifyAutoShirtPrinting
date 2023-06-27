@@ -13,7 +13,6 @@ using ShopifyEasyShirtPrinting.Models;
 using ShopifyEasyShirtPrinting.Services;
 using ShopifyEasyShirtPrinting.Services.ShipStation;
 using ShopifySharp;
-using ShopifySharp.Filters;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -32,7 +31,6 @@ using System.Windows.Data;
 using ZXing;
 using ZXing.Common;
 using Application = System.Windows.Application;
-using Brushes = System.Drawing.Brushes;
 using Order = ShopifySharp.Order;
 using Path = System.IO.Path;
 using PrintDocument = System.Drawing.Printing.PrintDocument;
@@ -182,7 +180,6 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     {
         get { return _resetDatabaseCommand ??= new DelegateCommand(HandleResetDatabase); }
     }
-
 
     private DelegateCommand _refreshCommand;
 
@@ -738,76 +735,6 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
         try
         {
-            var filter = new OrderListFilter
-            {
-                FinancialStatus = "paid",
-                FulfillmentStatus = "unfulfilled",
-            };
-
-            var orders = await _orderService.ListAsync(filter);
-            var ids = orders.Items.Select(x => x.Id).ToArray();
-            var localOrders = _lineRepository.Find(l => ids.Contains(l.OrderId));
-
-            await _dispatcher.InvokeAsync(_lineItems.Clear);
-
-
-            while (true)
-            {
-                var currentPage = 1;
-
-                var toAdd = new HashSet<MyLineItem>();
-
-                foreach (var order in orders.Items)
-                {
-                    waitDialog.SetMessage($"Fetching Orders @ Page # {currentPage + 1}...");
-
-                    foreach (var orderLineItem in order.LineItems)
-                    {
-                        var myLineItem = new MyLineItem
-                        {
-                            OrderId = order.Id,
-                            IsSelected = false,
-                            Name = orderLineItem.Name,
-                            OrderNumber = order.OrderNumber.ToString(),
-                            Sku = orderLineItem.SKU,
-                            VariantId = orderLineItem.VariantId,
-                            VariantTitle = orderLineItem.VariantTitle,
-                            LineItemId = orderLineItem.Id,
-                            Quantity = orderLineItem.Quantity,
-                            FulfillmentStatus = orderLineItem.FulfillmentStatus,
-                            FinancialStatus = order.FinancialStatus,
-                            Customer = $"{order.Customer.FirstName} {order.Customer.LastName}",
-                            CustomerEmail = order.Customer.Email,
-                            Notes = order.Note,
-                            Shipping = order.ShippingLines.FirstOrDefault()?.Code.Split(' ')[0],
-                        };
-
-                        var localLineItems = localOrders.Where(o => o.LineItemId == orderLineItem.Id);
-
-                        if (!localLineItems.Any())
-                        {
-                            toAdd.Add(myLineItem);
-                        }
-
-                        // await _dispatcher.InvokeAsync(() => _lineItems.Add(myLineItem));
-                    }
-                }
-
-                if (toAdd.Any())
-                    _lineRepository.AddRange(toAdd);
-
-                if (orders.HasNextPage)
-                {
-                    var nextPageFilter = orders.GetNextPageFilter();
-                    orders = await _orderService.ListAsync(nextPageFilter);
-                    localOrders = _lineRepository.Find(l => ids.Contains(l.OrderId));
-                    currentPage++;
-                    continue;
-                }
-
-                break;
-            }
-
             // Update UI
             await _dispatcher.InvokeAsync(() => _lineItems.Clear());
             var lineItems = _lineRepository.Find(x => x.Status != "Archived");
