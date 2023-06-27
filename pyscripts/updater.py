@@ -73,6 +73,8 @@ class Updater:
         while (orders_response.has_next_page()):
             orders_response = orders_response.next_page()
             self.process_orders(orders_response)
+        
+        self.conn.commit()
 
     def cleanup(self):
         """
