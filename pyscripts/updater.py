@@ -19,7 +19,7 @@ class Updater:
             shop_url, api_version, private_app_password)
         shopify.ShopifyResource.activate_session(self.session)
         self.conn = psycopg2.connect(database="thelonelykids", user="postgres",
-                                     password="Espelimbergo_122289", host="170.64.158.123", port="5432")
+                                     password="Espelimbergo_122289", host="localhost", port="5432")
         self.cursor = self.conn.cursor()
         self.cursor.execute("SET search_path TO public")
 
@@ -59,8 +59,9 @@ class Updater:
                       order_item.financial_status, f"{order_item.customer.first_name} {order_item.customer.last_name}",
                       order_item.customer.email, order_item.note or '', order.id,  "Pending", shipping_line)
             q = """INSERT INTO public."MyLineItems" ("OrderNumber", "BinNumber", "Sku", "Name", "VariantId", "VariantTitle", "LineItemId", "Quantity", "PrintedQuantity","FulfillmentStatus", "FinancialStatus", "Customer", "CustomerEmail", "Notes", "OrderId", "Status", "Shipping") VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
-            print(values)
+            print("Parameter values: ", values)
             self.cursor.execute(q, values)
+            print("Row count: ", self.cursor.rowcount)
 
     def fetch_orders(self):
         """
