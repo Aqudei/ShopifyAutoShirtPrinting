@@ -2,8 +2,16 @@ from datetime import datetime
 import psycopg2
 import shopify
 from decouple import config
+
 shop_url, api_version, private_app_password = config(
     'SHOPIFY_SHOP_URL'),  config('SHOPIFY_API_VERSION'), config('SHOPIFY_TOKEN')
+
+
+DB_HOST = config('DB_HOST')
+DB_PORT = config('DB_PORT')
+DB_NAME = config('DB_NAME')
+DB_USER = config('DB_USER')
+DB_PASS = config('DB_PASS')
 
 
 class Updater:
@@ -18,19 +26,19 @@ class Updater:
         self.session = shopify.Session(
             shop_url, api_version, private_app_password)
         shopify.ShopifyResource.activate_session(self.session)
-        self.conn = psycopg2.connect(database="thelonelykids", user="postgres",
-                                     password="Espelimbergo_122289", host="localhost", port="5432")
+        self.conn = psycopg2.connect(database=DB_NAME, user=DB_USER,
+                                     password=DB_PASS, host=DB_HOST, port=DB_PORT)
         self.main_cursor = self.conn.cursor()
         self.main_cursor.execute("SET search_path TO public")
 
-    def fetch_existing_lines(self, order_id):
+    def fetch_existing_lines(self, order_number):
         """
         docstring
         """
-        q = 'SELECT * FROM "MyLineItems" WHERE "OrderId"=%s'
         localcursor = self.conn.cursor()
         localcursor.execute("SET search_path TO public")
-        localcursor.execute(q, (order_id,))
+        q = '''SELECT * FROM "MyLineItems" WHERE "OrderNumber"=%s'''
+        localcursor.execute(q, (f"{order_number}",))
         columns = list([c[0] for c in localcursor.description])
         items = localcursor.fetchall()
 
@@ -49,8 +57,7 @@ class Updater:
         to_add = []
         for order in orders_response:
             existing_lines = dict(
-                {k: v for k, v in self.fetch_existing_lines(order.id)})
-
+                {k: v for k, v in self.fetch_existing_lines(order.order_number)})
             for line in order.line_items:
                 if not line.id in existing_lines:
                     to_add.append((order, line))
