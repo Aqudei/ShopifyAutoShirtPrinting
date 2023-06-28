@@ -21,7 +21,7 @@
 
     <Grid>
         <StackPanel Orientation="Vertical">
-            <TextBlock FontSize="30"  Text="Ready to print shipping label. Print now?"/>
+            <TextBlock FontSize="30"  Text="{Binding Message}"/>
 
             <Grid>
                 <Grid.ColumnDefinitions>

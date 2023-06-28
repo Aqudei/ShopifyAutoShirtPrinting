@@ -176,7 +176,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             MyLineItemId = myLineItem.Id
         });
 
-        _bus.PubSub.Publish(new TagUpdated
+        _bus.PubSub.Publish(new ItemUpdated
         {
             MyLineItemDatabaseId = myLineItem.Id
         });
@@ -308,19 +308,39 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
         Task.Run(FetchLineItems).ContinueWith(t =>
         {
-            _bus.PubSub.Subscribe<TagUpdated>("tag.updated", (e) =>
+            _bus.PubSub.Subscribe<ItemUpdated>("item.updated", (e) =>
             {
                 if (e.MyLineItemDatabaseId == 0)
                     return;
 
                 var dbLineItem = _lineRepository.GetById(e.MyLineItemDatabaseId);
-                var currentLineItem = _lineItems.SingleOrDefault(l => l.Id == e.MyLineItemDatabaseId);
+                var displayLineItem = _lineItems.SingleOrDefault(l => l.Id == e.MyLineItemDatabaseId);
 
-                if (dbLineItem != null && currentLineItem != null)
+                if (dbLineItem != null && displayLineItem != null)
                 {
-                    if (currentLineItem.Notes != dbLineItem.Notes)
+                    if (displayLineItem.Notes != dbLineItem.Notes)
                     {
-                        _dispatcher.Invoke(() => { currentLineItem.Notes = dbLineItem.Notes; });
+                        _dispatcher.Invoke(() => { displayLineItem.Notes = dbLineItem.Notes; });
+                    }
+
+                    if (displayLineItem.Status != dbLineItem.Status)
+                    {
+                        _dispatcher.Invoke(() => { displayLineItem.Status = dbLineItem.Status; });
+                    }
+
+                    if (displayLineItem.DateModified != dbLineItem.DateModified)
+                    {
+                        _dispatcher.Invoke(() => { displayLineItem.DateModified = dbLineItem.DateModified; });
+                    }
+
+                    if (displayLineItem.BinNumber != dbLineItem.BinNumber)
+                    {
+                        _dispatcher.Invoke(() => { displayLineItem.DateModified = dbLineItem.DateModified; });
+                    }
+
+                    if (displayLineItem.PrintedQuantity != dbLineItem.PrintedQuantity)
+                    {
+                        _dispatcher.Invoke(() => { displayLineItem.DateModified = dbLineItem.DateModified; });
                     }
                 }
             });
@@ -516,6 +536,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     {
         try
         {
+
             var orderItemResult = await _myPrintService.PrintItem(lineItem);
 
             //await _dispatcher.InvokeAsync(() =>
@@ -525,34 +546,78 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
             await ShowLineItem(orderItemResult);
 
-            var lineItems = _lineItems.Where(l => l.OrderId == orderItemResult.OrderId);
 
+            var lineItems = _lineRepository.Find(l => l.OrderId == lineItem.OrderId);
             var allItemsPrinted = _myPrintService.AreAllItemsPrinted(orderItemResult.OrderId.Value, lineItems);
+
             if (allItemsPrinted)
+            {
                 await _dispatcher.InvokeAsync(new Action(() =>
+                                    {
+                                        var dlgParams = new DialogParameters
+                                        {
+                                            { "OrderId", lineItem.OrderId },
+                                            { "Message", "Ready to Print Shipping Labels?" }
+                                        };
+
+                                        _dialogService.ShowDialog("LabelPrintingDialog", dlgParams, result =>
+                                        {
+                                            if (result.Result == ButtonResult.Yes)
+                                            {
+                                                foreach (var lineItem in lineItems)
+                                                {
+                                                    ApplyTagForLineItem(lineItem, "LabelPrinted");
+                                                    lineItem.BinNumber = 0;
+                                                }
+
+                                                _binService.EmptyBin(orderItemResult.BinNumber);
+
+                                                Task.Run(() => _browserService.NavigateToOrder(lineItem.OrderNumber));
+                                                FocusChrome();
+                                            }
+                                        });
+                                    }));
+            }
+            else
+            {
+                var orderInfo = _orderRepository.FindOne(o => o.OrderId == lineItem.OrderId);
+
+                if (lineItems.Where(l => l.BinNumber > 0 && l.OrderId == lineItem.OrderId).Sum(x => x.PrintedQuantity) > 1)
                 {
-                    var dlgParams = new DialogParameters
+                    await _dispatcher.InvokeAsync(new Action(() =>
                     {
-                        { "OrderId", lineItem.OrderId }
-                    };
+                        var dlgParams = new DialogParameters
+                                        {
+                                            { "LineItemId", lineItem.LineItemId },
+                                            { "Message", "Added item to exisiting bin:" },
+                                            { "Title", "BIN NUMBER ASSIGNED" }
+                                        };
 
-                    _dialogService.ShowDialog("LabelPrintingDialog", dlgParams, result =>
+                        _dialogService.ShowDialog("AfterScanDialog", dlgParams, result => { });
+
+                    }));
+                }
+                else
+                {
+                    await _dispatcher.InvokeAsync(new Action(() =>
                     {
-                        if (result.Result == ButtonResult.Yes)
-                        {
-                            foreach (var lineItem in lineItems)
-                            {
-                                ApplyTagForLineItem(lineItem, "LabelPrinted");
-                                lineItem.BinNumber = 0;
-                            }
+                        var dlgParams = new DialogParameters
+                                        {
+                                            { "LineItemId", lineItem.LineItemId },
+                                            { "Message", "This item goes into new bin:" },
+                                            { "Title", "NEW BIN CREATED" }
+                                        };
 
-                            _binService.EmptyBin(orderItemResult.BinNumber);
+                        _dialogService.ShowDialog("AfterScanDialog", dlgParams, result => { });
 
-                            Task.Run(() => _browserService.NavigateToOrder(lineItem.OrderNumber));
-                            FocusChrome();
-                        }
-                    });
-                }));
+                    }));
+                }
+            }
+
+            _bus.PubSub.Publish(new ItemUpdated
+            {
+                MyLineItemDatabaseId = lineItem.Id
+            });
         }
         catch (Exception exception)
         {

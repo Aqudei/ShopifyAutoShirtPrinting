@@ -107,6 +107,7 @@ namespace ShopifyEasyShirtPrinting
                 });
                 containerRegistry.RegisterInstance(config.CreateMapper());
                 containerRegistry.RegisterDialog<LabelPrintingDialog, LabelPrintingDialogViewModel>();
+                containerRegistry.RegisterDialog<AfterScanDialog, AfterScanDialogViewModel>();
 
 
                 containerRegistry.RegisterSingleton<ILineRepository, LineRepository>();

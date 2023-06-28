@@ -33,7 +33,7 @@
     <ProductName>ShopifyEasyShirtPrinting</ProductName>
     <PublisherName>Aqudei</PublisherName>
     <SuiteName>Tools</SuiteName>
-    <ApplicationRevision>11</ApplicationRevision>
+    <ApplicationRevision>12</ApplicationRevision>
     <ApplicationVersion>13.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -544,6 +544,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Dialogs\AfterScanDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\Main.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -595,7 +599,7 @@
     <None Include="Data\LiteDbRepositoryBase.cs" />
     <Compile Include="Events\DoneFetchingLines.cs" />
     <Compile Include="Helpers\QrHelper.cs" />
-    <Compile Include="Messaging\TagUpdated.cs" />
+    <Compile Include="Messaging\ItemUpdated.cs" />
     <Compile Include="Migrations\202306220321441_initial.cs" />
     <Compile Include="Migrations\202306220321441_initial.designer.cs">
       <DependentUpon>202306220321441_initial.cs</DependentUpon>
@@ -640,6 +644,7 @@
     <Compile Include="Services\MyPrintService.cs" />
     <Compile Include="Services\ShipStation\ShipStationApi.cs" />
     <Compile Include="ViewModels\BinsViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\AfterScanDialogViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\PageBase.cs" />
     <Compile Include="ViewModels\ShippedViewModel.cs" />
@@ -650,6 +655,9 @@
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="Views\Bins.xaml.cs">
       <DependentUpon>Bins.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialogs\AfterScanDialog.xaml.cs">
+      <DependentUpon>AfterScanDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Main.xaml.cs">
       <DependentUpon>Main.xaml</DependentUpon>

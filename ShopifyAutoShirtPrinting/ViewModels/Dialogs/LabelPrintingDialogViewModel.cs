@@ -12,17 +12,18 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 {
     internal class LabelPrintingDialogViewModel : BindableBase, IDialogAware
     {
+        public string Message { get => _message; set => SetProperty(ref _message, value); }
         private DelegateCommand<string> _dialogCommand;
         private int? _binNumber;
         private string _orderNumber;
         private string _customerName;
         private string _customerEmail;
+        private string _message;
         private readonly ILineRepository _lineRepository;
 
         public ObservableCollection<MyLineItem> Orders { get; set; } = new();
 
         public DelegateCommand<string> DialogCommand => _dialogCommand ??= new DelegateCommand<string>(OnCommand);
-
 
         private void OnCommand(string cmd)
         {
@@ -53,10 +54,14 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
         public void OnDialogOpened(IDialogParameters parameters)
         {
-            parameters.TryGetValue<long?>("OrderId", out var orderId);
-            if (orderId.HasValue)
+            if (parameters.TryGetValue<string>("Message", out var message))
             {
+                Message = message;
+            }
 
+            
+            if (parameters.TryGetValue<long?>("OrderId", out var orderId))
+            {
                 Orders.Clear();
 
                 var lineItems = _lineRepository.Find(l => l.OrderId == orderId).ToList();
