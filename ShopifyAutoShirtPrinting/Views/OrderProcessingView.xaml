@@ -156,10 +156,10 @@
             </Grid.RowDefinitions>
 
             <DataGrid ItemsSource="{Binding LineItemsView}"
+                      FontSize="16"
                       mah:ScrollViewerHelper.IsHorizontalScrollWheelEnabled="True"
                       ScrollViewer.CanContentScroll="True"
                       ScrollViewer.HorizontalScrollBarVisibility="Visible"
-                      
                       FrozenColumnCount="1"
                       IsSynchronizedWithCurrentItem="True"
                       SelectedItem="{Binding SelectedLineItem}"
@@ -170,7 +170,18 @@
                       Grid.Column="0" 
                       CanUserAddRows="False" 
                       CanUserDeleteRows="False">
+                <DataGrid.CellStyle>
+                    <Style TargetType="DataGridCell">
+                        <!--<Setter Property="VerticalAlignment" Value="Top"/>-->
+                        <Setter Property="VerticalContentAlignment" Value="Top"/>
 
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent}" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.CellStyle>
                 <DataGrid.RowStyle>
                     <Style TargetType="DataGridRow">
                         <Setter Property="Background" Value="{Binding Path=Status, Converter={StaticResource StatusToColorConverter}}" />
@@ -178,9 +189,7 @@
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Background"  Value="{DynamicResource MahApps.Brushes.Accent2}"/>
                             </Trigger>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent}" />
-                            </Trigger>
+                          
                         </Style.Triggers>
                     </Style>
                 </DataGrid.RowStyle>
@@ -198,6 +207,7 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Button CommandParameter="{Binding}"
+                                        VerticalAlignment="Top"
                                         Command="{Binding DataContext.OpenInBrowserCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -218,12 +228,14 @@
                     <DataGridTemplateColumn Header="Name" >
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Grid>
+                                <Grid VerticalAlignment="Top">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition/>
                                     </Grid.ColumnDefinitions>
                                     <iconPacks:PackIconMaterial Kind="Note"
+                                                                VerticalAlignment="Top"
+                                                                VerticalContentAlignment="Top"
                                                                 Visibility="{Binding HasNotes, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                                 Foreground="Black"
                                                                 Margin="5,0,5,0"/>
@@ -241,10 +253,10 @@
                     <DataGridTextColumn Header="Shipping" Binding="{Binding Shipping}"/>
                     <DataGridTextColumn Header="Bin" Binding="{Binding BinNumber}"/>
                     <DataGridTextColumn Header="Date Modified" Binding="{Binding DateModified}"/>
-                    <DataGridTextColumn Header="Notes" Width="200" 
-                        Binding="{Binding Notes}">
+                    <DataGridTextColumn Header="Notes" Width="200" Binding="{Binding Notes}">
                         <DataGridTextColumn.ElementStyle>
-                            <Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="VerticalAlignment" Value="Top"/>
                                 <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
                             </Style>
                         </DataGridTextColumn.ElementStyle>
