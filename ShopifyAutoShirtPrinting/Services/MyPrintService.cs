@@ -40,6 +40,7 @@ namespace ShopifyEasyShirtPrinting.Services
 
                 // Do actual printing
                 myLineItem.PrintedQuantity += 1;
+                myLineItem.Status = "Processed";
                 myLineItem.BinNumber = GetBin(myLineItem.OrderId.Value);
                 _lineRepository.Update(myLineItem);
             }

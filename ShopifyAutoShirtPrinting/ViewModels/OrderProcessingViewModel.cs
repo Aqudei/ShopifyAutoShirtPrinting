@@ -8,7 +8,7 @@ using Prism.Regions;
 using Prism.Services.Dialogs;
 using ShopifyEasyShirtPrinting.Data;
 using ShopifyEasyShirtPrinting.Helpers;
-using ShopifyEasyShirtPrinting.Messages;
+using ShopifyEasyShirtPrinting.Messaging;
 using ShopifyEasyShirtPrinting.Models;
 using ShopifyEasyShirtPrinting.Services;
 using ShopifyEasyShirtPrinting.Services.ShipStation;
@@ -28,6 +28,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Windows.Documents;
 using ZXing;
 using ZXing.Common;
 using Application = System.Windows.Application;
@@ -150,25 +151,35 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private void ApplyTagForLineItem(MyLineItem myLineItem, string tag)
     {
-        if (myLineItem.Status != tag)
+        if (myLineItem.Status == tag)
         {
-            myLineItem.Status = tag;
-            var dateNow = DateTime.Now;
-            myLineItem.DateModified = dateNow;
-            _lineRepository.Update(myLineItem);
-
-            _logRespository.Add(new Log
-            {
-                ChangeDate = dateNow,
-                ChangeStatus = tag,
-                MyLineItemId = myLineItem.Id
-            });
-
-            _bus.PubSub.Publish(new TagUpdated
-            {
-                Id = myLineItem.Id
-            });
+            return;
         }
+
+        myLineItem.Status = tag;
+        var dateNow = DateTime.Now;
+
+        if (tag == "Pending") // Reset
+        {
+            myLineItem.DateModified = null;
+            myLineItem.BinNumber = 0;
+            myLineItem.PrintedQuantity = 0;
+        }
+
+        myLineItem.DateModified = dateNow;
+        _lineRepository.Update(myLineItem);
+
+        _logRespository.Add(new Log
+        {
+            ChangeDate = dateNow,
+            ChangeStatus = tag,
+            MyLineItemId = myLineItem.Id
+        });
+
+        _bus.PubSub.Publish(new TagUpdated
+        {
+            MyLineItemDatabaseId = myLineItem.Id
+        });
     }
 
     public DelegateCommand SaveQrTagsCommand => _saveQrTagsCommand ??= new DelegateCommand(HandleSaveQrTag);
@@ -299,11 +310,11 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         {
             _bus.PubSub.Subscribe<TagUpdated>("tag.updated", (e) =>
             {
-                if (e.Id == 0)
+                if (e.MyLineItemDatabaseId == 0)
                     return;
 
-                var dbLineItem = _lineRepository.GetById(e.Id);
-                var currentLineItem = _lineItems.SingleOrDefault(l => l.Id == e.Id);
+                var dbLineItem = _lineRepository.GetById(e.MyLineItemDatabaseId);
+                var currentLineItem = _lineItems.SingleOrDefault(l => l.Id == e.MyLineItemDatabaseId);
 
                 if (dbLineItem != null && currentLineItem != null)
                 {
@@ -506,6 +517,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         try
         {
             var orderItemResult = await _myPrintService.PrintItem(lineItem);
+            _mapper.Map(orderItemResult, lineItem);
 
             await ShowLineItem(orderItemResult);
 

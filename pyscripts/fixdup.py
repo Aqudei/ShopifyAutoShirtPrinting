@@ -10,6 +10,7 @@ def delete_item(cursor, item_id):
     rows_deleted = cursor.rowcount
     print("Rows deleted: ", rows_deleted)
 
+
 def dl_dups_csv(conn, csv_file):
     """
     docstring
@@ -19,7 +20,7 @@ def dl_dups_csv(conn, csv_file):
 
     query = 'SELECT COUNT(*), "LineItemId" FROM public."MyLineItems" GROUP BY public."MyLineItems"."LineItemId"  HAVING COUNT(*) > 1'
     cursor.execute(query)
-    print("Duplicates count: ", cursor.rowcount )
+    print("Duplicates count: ", cursor.rowcount)
     dups = {}
     for cnt, line_item_in in cursor.fetchall():
         dups[line_item_in] = cnt
@@ -57,9 +58,15 @@ def delete_dups(conn, csv_file):
 
             id = item[0]
             delete_item(cusor, id)
-    
+
     conn.commit()
 
+
+DB_HOST = '170.64.158.123'
+DB_PORT = 5432
+DB_NAME = 'thelonelykids'
+DB_USER = 'postgres'
+DB_PASS = 'Espelimbergo_122289'
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -67,13 +74,14 @@ if __name__ == "__main__":
     parser.add_argument("--delete")
     args = parser.parse_args()
 
-    conn = psycopg2.connect(database="thelonelykids", user="postgres",
-                            password="Espelimbergo_122289", host="170.64.158.123", port="5432")
+    conn = psycopg2.connect(
+        database=DB_NAME, user=DB_USER,
+        password=DB_PASS, host=DB_HOST, port=DB_PORT)
 
     if args.download:
         dl_dups_csv(conn, args.download)
 
     if args.delete:
         delete_dups(conn, args.delete)
-    
+
     conn.close()

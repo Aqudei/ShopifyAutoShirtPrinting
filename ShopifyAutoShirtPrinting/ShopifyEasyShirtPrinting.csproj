@@ -595,7 +595,7 @@
     <None Include="Data\LiteDbRepositoryBase.cs" />
     <Compile Include="Events\DoneFetchingLines.cs" />
     <Compile Include="Helpers\QrHelper.cs" />
-    <Compile Include="Messages\TagUpdated.cs" />
+    <Compile Include="Messaging\TagUpdated.cs" />
     <Compile Include="Migrations\202306220321441_initial.cs" />
     <Compile Include="Migrations\202306220321441_initial.designer.cs">
       <DependentUpon>202306220321441_initial.cs</DependentUpon>

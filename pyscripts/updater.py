@@ -68,7 +68,7 @@ class Updater:
             values.append((f"{order_item.order_number}", 0, line_item.sku, line_item.name, line_item.variant_id,
                            line_item.variant_title, line_item.id, line_item.quantity, 0, line_item.fulfillment_status or '',
                            order_item.financial_status, f"{order_item.customer.first_name} {order_item.customer.last_name}",
-                           order_item.customer.email, order_item.note or '', order.id,  "Pending", shipping_line))
+                           order_item.customer.email, order_item.note or '', order_item.id,  "Pending", shipping_line))
 
         q = """INSERT INTO public."MyLineItems" ("OrderNumber", "BinNumber", "Sku", "Name", "VariantId", "VariantTitle", "LineItemId", "Quantity", "PrintedQuantity","FulfillmentStatus", "FinancialStatus", "Customer", "CustomerEmail", "Notes", "OrderId", "Status", "Shipping") VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
         self.main_cursor.executemany(q, values)
