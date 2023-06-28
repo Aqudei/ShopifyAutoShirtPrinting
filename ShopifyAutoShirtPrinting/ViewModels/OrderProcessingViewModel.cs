@@ -517,7 +517,11 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         try
         {
             var orderItemResult = await _myPrintService.PrintItem(lineItem);
-            _mapper.Map(orderItemResult, lineItem);
+
+            //await _dispatcher.InvokeAsync(() =>
+            //{
+            //    _mapper.Map(orderItemResult, lineItem);
+            //});
 
             await ShowLineItem(orderItemResult);
 
@@ -569,6 +573,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             {
                 existingOrderItem.BinNumber = orderItemResult.BinNumber;
                 existingOrderItem.PrintedQuantity = orderItemResult.PrintedQuantity;
+                existingOrderItem.Status = orderItemResult.Status;
                 SelectedLineItem = existingOrderItem;
             }
         }));

@@ -199,6 +199,7 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <CheckBox VerticalAlignment="Top" 
+                                          Margin="4"
                                           HorizontalAlignment="Center"
                                           IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" />
                             </DataTemplate>
@@ -209,6 +210,7 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Button CommandParameter="{Binding}"
+                                        Margin="4"
                                         VerticalAlignment="Top"
                                         Command="{Binding DataContext.OpenInBrowserCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}">
                                     <Grid>
@@ -230,7 +232,8 @@
                     <DataGridTemplateColumn Header="Name" >
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Grid VerticalAlignment="Top">
+                                <Grid VerticalAlignment="Top"
+                                      Margin="4">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition/>
@@ -240,7 +243,7 @@
                                                                 VerticalContentAlignment="Top"
                                                                 Visibility="{Binding HasNotes, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                                 Foreground="Black"
-                                                                Margin="5,0,5,0"/>
+                                                                Margin="4"/>
                                     <TextBlock Text="{Binding Name}"
                                                VerticalAlignment="Top"
                                                Grid.Column="1"/>
@@ -259,6 +262,7 @@
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="VerticalAlignment" Value="Top"/>
+                                <Setter Property="Margin" Value="4"/>
                                 <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
                             </Style>
                         </DataGridTextColumn.ElementStyle>

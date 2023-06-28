@@ -14,11 +14,14 @@ namespace ShopifyEasyShirtPrinting.Services
         private readonly ShipStationApi _shipStationApi;
         private readonly IOrderRepository _orderInfoRepository;
         private readonly ILineRepository _lineRepository;
+        private readonly LogRespository _logRespository;
+
         //private readonly ILiteCollection<MyLineItem> _lineItemsCollection;
 
-        public MyPrintService(ShipStationApi shipStationApi, IOrderRepository orderRepository, ILineRepository lineRepository)
+        public MyPrintService(ShipStationApi shipStationApi, IOrderRepository orderRepository, ILineRepository lineRepository, LogRespository logRespository)
         {
             _lineRepository = lineRepository;
+            _logRespository = logRespository;
             _shipStationApi = shipStationApi;
             _orderInfoRepository = orderRepository;
         }
@@ -43,6 +46,13 @@ namespace ShopifyEasyShirtPrinting.Services
                 myLineItem.Status = "Processed";
                 myLineItem.BinNumber = GetBin(myLineItem.OrderId.Value);
                 _lineRepository.Update(myLineItem);
+
+                _logRespository.Add(new Log
+                {
+                    ChangeDate = DateTime.Now,
+                    ChangeStatus = "Processed",
+                    MyLineItemId = myLineItem.Id
+                });
             }
 
             return _lineRepository.Get(l => l.Id == myLineItem.Id);
