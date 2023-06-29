@@ -7,7 +7,7 @@ import pytz
 
 # Configure the logging
 logging.basicConfig(
-    level=logging.DEBUG,  # Set the desired logging level
+    level=logging.INFO,  # Set the desired logging level
     format='%(asctime)s [%(levelname)s] %(message)s',  # Define the log message format
     filename='app.log',  # Specify the log file name
     filemode='w'  # Set the mode for opening the log file (default is 'a' for append)
