@@ -25,9 +25,7 @@ namespace ShopifyEasyShirtPrinting.Data
             modelBuilder.Entity<MyLineItem>()
                 .HasKey(x => x.Id)
                 .Ignore(x => x.IsSelected)
-                .Property(x => x.LineItemId)
-                .HasColumnAnnotation(
-                     IndexAnnotation.AnnotationName, new IndexAnnotation(new IndexAttribute() { IsUnique = true }));
+                .Property(x => x.LineItemId);
 
             modelBuilder.Entity<Log>()
                 .HasKey(x => x.Id)
