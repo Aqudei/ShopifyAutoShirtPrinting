@@ -2,10 +2,23 @@ from datetime import datetime
 import psycopg2
 import shopify
 from decouple import config
+import logging
+import pytz
+
+# Configure the logging
+logging.basicConfig(
+    level=logging.DEBUG,  # Set the desired logging level
+    format='%(asctime)s [%(levelname)s] %(message)s',  # Define the log message format
+    filename='app.log',  # Specify the log file name
+    filemode='w'  # Set the mode for opening the log file (default is 'a' for append)
+)
+# Create a logger
+logger = logging.getLogger()
+
+mytimezone = pytz.timezone("Asia/Manila")
 
 shop_url, api_version, private_app_password = config(
     'SHOPIFY_SHOP_URL'),  config('SHOPIFY_API_VERSION'), config('SHOPIFY_TOKEN')
-
 
 DB_HOST = config('DB_HOST')
 DB_PORT = config('DB_PORT')
@@ -56,7 +69,6 @@ class Updater:
         """
         to_add = []
         for order in orders_response:
-            print("Processing ", order.name)
             existing_lines = dict(
                 {k: v for k, v in self.fetch_existing_lines(order.order_number)})
             for line in order.line_items:
@@ -96,6 +108,12 @@ class Updater:
 
 
 if __name__ == "__main__":
-    updater = Updater()
-    updater.fetch_orders()
-    updater.cleanup()
+    try:
+        updater = Updater()
+        updater.fetch_orders()
+        updater.cleanup()
+    except Exception as e:
+        logger.exception(e)
+
+    last_run_date = mytimezone.fromutc(datetime.utcnow())
+    logger.info(f"Last Run: {last_run_date}")
