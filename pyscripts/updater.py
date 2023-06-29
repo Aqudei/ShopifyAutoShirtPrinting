@@ -56,6 +56,7 @@ class Updater:
         """
         to_add = []
         for order in orders_response:
+            print("Processing ", order.name)
             existing_lines = dict(
                 {k: v for k, v in self.fetch_existing_lines(order.order_number)})
             for line in order.line_items:
