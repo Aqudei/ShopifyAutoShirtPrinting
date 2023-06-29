@@ -72,9 +72,9 @@ namespace ShopifyEasyShirtPrinting
 
                 var connectionString = "";
 
-                if (System.Environment.MachineName.Contains("LAPTOP-DB8A9BOL"))
-                    connectionString = $"Server=localhost;Port=5432;Database=thelonelykids;User Id=postgres;Password=Espelimbergo;";
-                else
+                //if (System.Environment.MachineName.Contains("LAPTOP-DB8A9BOL"))
+                //    connectionString = $"Server=localhost;Port=5432;Database=thelonelykids;User Id=postgres;Password=Espelimbergo;";
+                //else
                     connectionString = $"Server={databaseHost};Port={databasePort};Database={databaseName};User Id={databaseUser};Password={databasePass};";
 
                 Database.SetInitializer(new MigrateDatabaseToLatestVersion<LonelyKidsContext, Migrations.Configuration>(useSuppliedContext: true));

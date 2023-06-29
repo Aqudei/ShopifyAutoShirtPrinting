@@ -116,6 +116,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         "LabelPrinted",
         "Shipped",
         "Archived",
+        "Issues",
         "Need To Order From Supplier",
         "Have Ordered From Supplier"
     };

@@ -178,6 +178,7 @@
                         <Style.Triggers>
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Accent2}" />
                             </Trigger>
                         </Style.Triggers>
                     </Style>
@@ -243,7 +244,7 @@
                                                                 VerticalContentAlignment="Top"
                                                                 Visibility="{Binding HasNotes, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                                 Foreground="Black"
-                                                                Margin="4"/>
+                                                                Margin="4,4,8,4"/>
                                     <TextBlock Text="{Binding Name}"
                                                VerticalAlignment="Top"
                                                Grid.Column="1"/>
@@ -258,7 +259,9 @@
                     <DataGridTextColumn Header="Shipping" Binding="{Binding Shipping}"/>
                     <DataGridTextColumn Header="Bin" Binding="{Binding BinNumber}"/>
                     <DataGridTextColumn Header="Date Modified" Binding="{Binding DateModified}"/>
-                    <DataGridTextColumn Header="Notes" Width="200" Binding="{Binding Notes}">
+                    <DataGridTextColumn Header="Notes" 
+                                        Width="300" 
+                                        Binding="{Binding Notes}">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="VerticalAlignment" Value="Top"/>
