@@ -37,11 +37,16 @@
 
                 <StackPanel Orientation="Horizontal">
                     <Button Content="Print  QR Tags" Width="100" Margin="4"
-                        Command="{Binding GenerateQrCommand}" />
-                    <Button Content="Save Qr Tag/s" Width="100" Margin="4"
-                        Command="{Binding SaveQrTagsCommand}" />
-                    <Button Content="Reset Database" Width="100" Margin="4"
-                        Command="{Binding ResetDatabaseCommand}"/>
+                            Command="{Binding GenerateQrCommand}" 
+                            VerticalAlignment="Bottom"/>
+                    <Button Content="Save Qr Tag/s" Width="100" 
+                            VerticalAlignment="Bottom"
+                            Margin="4"
+                            Command="{Binding SaveQrTagsCommand}"/>
+                    <Button Content="Change Printed Quantity" 
+                            VerticalAlignment="Bottom"
+                            Margin="4"
+                            Command="{Binding ChangePrintedQuantity}"/>
 
                     <!--<Button Content="QR Scanner" Width="150" Margin="4"
                         Command="{Binding OpenQrScannerCommand}" />-->
@@ -50,40 +55,57 @@
                 <StackPanel Grid.Column="1" 
                             Margin="4"
                             Orientation="Horizontal">
-                    <ComboBox x:Name="comboBox" Width="200"
-                              ItemsSource="{Binding Tags}"
-                              mah:TextBoxHelper.Watermark="Mark Order As" Margin="2,0,2,0"/>
+                    <StackPanel Orientation="Vertical" 
+                                VerticalAlignment="Bottom">
+                        <Label Content="Mark Order As:" 
+                               FontWeight="SemiBold"
+                               FontSize="10"
+                               VerticalContentAlignment="Bottom"/>
+                        <ComboBox x:Name="comboBox" 
+                                  Width="200"
+                                  VerticalAlignment="Bottom"
+                                  ItemsSource="{Binding Tags}"
+                                  mah:TextBoxHelper.Watermark="Mark Order As"/>
+                    </StackPanel>
                     <Button Content="Apply" 
+                            VerticalAlignment="Bottom"
                             Command="{Binding AppplyTagCommand}"
                             CommandParameter="{Binding SelectedItem, ElementName=comboBox}"
                             Margin="2,0,2,0" 
                             Width="64"/>
+                    <StackPanel Orientation="Vertical" 
+                                VerticalAlignment="Bottom">
+                        
+                        <Label Content="Filter By Status:"
+                               FontSize="10"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Bottom"/>
+                        <ComboBox Width="200"
+                                  VerticalAlignment="Bottom"
+                                  IsReadOnly="True"
+                                  x:Name="comboBoxStatus"
+                                  ItemsSource="{Binding Tags}"
+                                  SelectedItem="{Binding SelectedTagFilter}"
+                                  mah:TextBoxHelper.Watermark="Filter By Status" />
 
 
-                    <ComboBox Width="200"
-                              x:Name="comboBoxStatus"
-                              ItemsSource="{Binding Tags}"
-                              mah:TextBoxHelper.Watermark="Filter By Status" 
-                              Margin="2,0,2,0"/>
 
-                    <Button Content="Apply" 
-                            Command="{Binding AppplyStatusFilterCommand}"
-                            CommandParameter="{Binding SelectedItem, ElementName=comboBoxStatus}"
-                            Margin="2,0,2,0" 
-                            Width="64"/>
+                    </StackPanel>
 
                     <Button Content="Clear" 
+                            VerticalAlignment="Bottom"
                             Command="{Binding ClearStatusFilterCommand}"
                             Margin="2,0,2,0" 
                             Width="64"/>
 
-                    
-                    
+
+
                 </StackPanel>
             </Grid>
 
             <Grid Margin="5">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
@@ -96,7 +118,8 @@
                         ToolTip="Uncheck All"
                         Command="{Binding UncheckedAllCommand}">
                     <StackPanel Orientation="Horizontal">
-                        <Image Height="25" 
+                        <Image Height="16"
+                               VerticalAlignment="Center"
                                Source="pack://application:,,,/ShopifyEasyShirtPrinting;component/Resources/uncheckall.png"/>
                         <TextBlock Width="60"
                                        Margin="4"
@@ -111,33 +134,56 @@
                         Command="{Binding CheckHighlightedCommand}"
                         CommandParameter="{Binding SelectedItems, ElementName=OrdersDataGrid}">
                     <StackPanel Orientation="Horizontal">
-                        <Image Height="25" Source="pack://application:,,,/ShopifyEasyShirtPrinting;component/Resources/check-all.png"/>
+                        <Image Height="16" Source="pack://application:,,,/ShopifyEasyShirtPrinting;component/Resources/check-all.png"/>
                         <TextBlock VerticalAlignment="Center"
                                        TextWrapping="Wrap"
-                                       Width="60"
                                        Margin="4"><Run Text="Check Highlighted"/></TextBlock>
                     </StackPanel>
                 </Button>
 
 
                 <Button Grid.Column="2"
-                        Width="150" Margin="4"
+                        Margin="4"
                         Command="{Binding UncheckHighlightedCommand}"
                         CommandParameter="{Binding SelectedItems, ElementName=OrdersDataGrid}">
                     <StackPanel Orientation="Horizontal">
-                        <Image Height="25" Source="pack://application:,,,/ShopifyEasyShirtPrinting;component/Resources/uncheck2.png"/>
+                        <Image Height="16" 
+                               Source="pack://application:,,,/ShopifyEasyShirtPrinting;component/Resources/uncheck2.png"/>
                         <TextBlock VerticalAlignment="Center"
                                        TextWrapping="Wrap"
-                                       Width="60"
                                        Margin="4"><Run Text="Uncheck Highlighted"/></TextBlock>
                     </StackPanel>
                 </Button>
-                <Button Content="Refresh"
-                        Width="100" 
-                        Grid.Column="3"
+
+                <Button Grid.Column="3"
                         Margin="4"
-                        Command="{Binding RefreshCommand}"/>
-                <TextBox Grid.Column="4" 
+                        Command="{Binding RefreshCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconMaterial Kind="Refresh"
+                                                    Height="16"
+                                                    VerticalAlignment="Center"/>
+                        <TextBlock VerticalAlignment="Center"
+                                       TextWrapping="Wrap"
+                                       Margin="4">
+                            <Run Text="Refresh"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button Margin="4"
+                        Grid.Column="4"
+                        Command="{Binding ResetDatabaseCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconMaterial Kind="DatabaseRefresh"
+                                                    Height="16"
+                                                    VerticalAlignment="Center"/>                        
+                        <TextBlock VerticalAlignment="Center"
+                                       TextWrapping="Wrap"
+                                       Margin="4">
+                            <Run Text="Reset Database"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+                <TextBox Grid.Column="5" 
                          FontSize="20"
                          VerticalContentAlignment="Center"
                          Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -190,7 +236,7 @@
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Background"  Value="{DynamicResource MahApps.Brushes.Accent2}"/>
                             </Trigger>
-                          
+
                         </Style.Triggers>
                     </Style>
                 </DataGrid.RowStyle>
@@ -297,10 +343,14 @@
                 </Button>
 
                 <TextBox DockPanel.Dock="Left" 
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         ScrollViewer.CanContentScroll="True"
                          FontSize="18"
                          Text="{Binding Notes}"
                          TextWrapping="Wrap"
-                         MinLines="3"/>
+                         MaxLines="3"
+                         Height="100"/>
             </DockPanel>
         </Grid>
 

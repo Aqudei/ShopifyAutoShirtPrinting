@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using EasyNetQ;
+using ImTools;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Prism.Commands;
@@ -7,11 +8,13 @@ using Prism.Events;
 using Prism.Regions;
 using Prism.Services.Dialogs;
 using ShopifyEasyShirtPrinting.Data;
+using ShopifyEasyShirtPrinting.Extensions;
 using ShopifyEasyShirtPrinting.Helpers;
 using ShopifyEasyShirtPrinting.Messaging;
 using ShopifyEasyShirtPrinting.Models;
 using ShopifyEasyShirtPrinting.Services;
 using ShopifyEasyShirtPrinting.Services.ShipStation;
+using ShopifyEasyShirtPrinting.ViewModels.Dialogs;
 using ShopifySharp;
 using System;
 using System.Collections.Generic;
@@ -116,10 +119,54 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         "LabelPrinted",
         "Shipped",
         "Archived",
-        "Issues",
+        "Issue Needs Resolving",
         "Need To Order From Supplier",
         "Have Ordered From Supplier"
     };
+    private string _selectedTagFilter;
+
+    public string SelectedTagFilter
+    {
+        get { return _selectedTagFilter; }
+        set { SetProperty(ref _selectedTagFilter, value); }
+    }
+
+    private DelegateCommand _changePrintedQuantity;
+
+    public DelegateCommand ChangePrintedQuantity
+    {
+        get { return _changePrintedQuantity ??= new DelegateCommand(HandleChangePrintedQuantity); }
+    }
+
+    private void HandleChangePrintedQuantity()
+    {
+        var parameters = new DialogParameters() {
+            {"LineItemsIds", _lineItems.Where(l=>l.IsSelected).Select(l=>l.Id).Distinct().ToList() },
+        };
+        _dialogService.ShowDialog("QuantityChangerDialog", parameters, r =>
+        {
+            if (r.Result == ButtonResult.OK)
+            {
+                if (r.Parameters.TryGetValue<IEnumerable<MyLineItem>>("LineItems", out var lineItems))
+                {
+                    foreach (var item in lineItems)
+                    {
+                        _lineRepository.Update(item);
+                        var uiItem = _lineItems.SingleOrDefault(l => l.Id == item.Id);
+                        if (uiItem != null)
+                        {
+                            _mapper.Map(item, uiItem);
+                        }
+                    }
+                }
+
+                _bus.PubSub.Publish(new ItemsUpdated
+                {
+                    MyLineItemDatabaseIds = lineItems.Select(x => x.Id).ToArray()
+                });
+            }
+        });
+    }
 
     public DelegateCommand<string> AppplyTagCommand
     {
@@ -177,9 +224,9 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             MyLineItemId = myLineItem.Id
         });
 
-        _bus.PubSub.Publish(new ItemUpdated
+        _bus.PubSub.Publish(new ItemsUpdated
         {
-            MyLineItemDatabaseId = myLineItem.Id
+            MyLineItemDatabaseIds = new int[] { myLineItem.Id }
         });
     }
 
@@ -306,42 +353,46 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
 
         LineItemsView = CollectionViewSource.GetDefaultView(_lineItems);
+        LineItemsView.SortDescriptions.Add(new SortDescription("OrderNumber", ListSortDirection.Descending));
 
         Task.Run(FetchLineItems).ContinueWith(t =>
         {
-            _bus.PubSub.Subscribe<ItemUpdated>("item.updated", (e) =>
+            _bus.PubSub.Subscribe<ItemsUpdated>("item.updated", (e) =>
             {
-                if (e.MyLineItemDatabaseId == 0)
+                if (e.MyLineItemDatabaseIds == null || e.MyLineItemDatabaseIds.Length <= 0)
                     return;
 
-                var dbLineItem = _lineRepository.GetById(e.MyLineItemDatabaseId);
-                var displayLineItem = _lineItems.SingleOrDefault(l => l.Id == e.MyLineItemDatabaseId);
-
-                if (dbLineItem != null && displayLineItem != null)
+                foreach (var lineItemDbId in e.MyLineItemDatabaseIds)
                 {
-                    if (displayLineItem.Notes != dbLineItem.Notes)
-                    {
-                        _dispatcher.Invoke(() => { displayLineItem.Notes = dbLineItem.Notes; });
-                    }
+                    var dbLineItem = _lineRepository.GetById(lineItemDbId);
+                    var displayLineItem = _lineItems.SingleOrDefault(l => l.Id == lineItemDbId);
 
-                    if (displayLineItem.Status != dbLineItem.Status)
+                    if (dbLineItem != null && displayLineItem != null)
                     {
-                        _dispatcher.Invoke(() => { displayLineItem.Status = dbLineItem.Status; });
-                    }
+                        if (displayLineItem.Notes != dbLineItem.Notes)
+                        {
+                            _dispatcher.Invoke(() => { displayLineItem.Notes = dbLineItem.Notes; });
+                        }
 
-                    if (displayLineItem.DateModified != dbLineItem.DateModified)
-                    {
-                        _dispatcher.Invoke(() => { displayLineItem.DateModified = dbLineItem.DateModified; });
-                    }
+                        if (displayLineItem.Status != dbLineItem.Status)
+                        {
+                            _dispatcher.Invoke(() => { displayLineItem.Status = dbLineItem.Status; });
+                        }
 
-                    if (displayLineItem.BinNumber != dbLineItem.BinNumber)
-                    {
-                        _dispatcher.Invoke(() => { displayLineItem.DateModified = dbLineItem.DateModified; });
-                    }
+                        if (displayLineItem.DateModified != dbLineItem.DateModified)
+                        {
+                            _dispatcher.Invoke(() => { displayLineItem.DateModified = dbLineItem.DateModified; });
+                        }
 
-                    if (displayLineItem.PrintedQuantity != dbLineItem.PrintedQuantity)
-                    {
-                        _dispatcher.Invoke(() => { displayLineItem.DateModified = dbLineItem.DateModified; });
+                        if (displayLineItem.BinNumber != dbLineItem.BinNumber)
+                        {
+                            _dispatcher.Invoke(() => { displayLineItem.DateModified = dbLineItem.DateModified; });
+                        }
+
+                        if (displayLineItem.PrintedQuantity != dbLineItem.PrintedQuantity)
+                        {
+                            _dispatcher.Invoke(() => { displayLineItem.DateModified = dbLineItem.DateModified; });
+                        }
                     }
                 }
             });
@@ -394,21 +445,15 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         // QR code not found or could not be decoded
     }
 
-    private DelegateCommand<string> _appplyStatusFilterCommand;
-
-    public DelegateCommand<string> AppplyStatusFilterCommand
-    {
-        get { return _appplyStatusFilterCommand ??= new DelegateCommand<string>(HandleFilterByStatusCommand); }
-    }
-
-    private void HandleFilterByStatusCommand(string statusTag)
+    private void HandleTagFilter(string statusTag)
     {
         LineItemsView.Filter = s =>
         {
             return (s as MyLineItem)?.Status == statusTag;
         };
-
     }
+
+
 
     public DelegateCommand ApplyNotesCommand
     {
@@ -438,6 +483,11 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     {
         switch (e.PropertyName)
         {
+            case nameof(SelectedTagFilter):
+                {
+                    HandleTagFilter(SelectedTagFilter);
+                    break;
+                }
             case nameof(SelectedLineItem):
                 {
                     if (SelectedLineItem != null)
@@ -615,9 +665,9 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 }
             }
 
-            _bus.PubSub.Publish(new ItemUpdated
+            _bus.PubSub.Publish(new ItemsUpdated
             {
-                MyLineItemDatabaseId = lineItem.Id
+                MyLineItemDatabaseIds = new int[] { lineItem.Id }
             });
         }
         catch (Exception exception)
@@ -823,9 +873,11 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             var lineItems = _lineRepository.Find(x => x.Status != "Archived");
             foreach (var lineItem in lineItems)
             {
-                await _dispatcher.InvokeAsync(() => _lineItems.Add(lineItem));
+                await _dispatcher.InvokeAsync(() =>
+                {
+                    _lineItems.Add(lineItem);
+                });
             }
-
         }
         catch (Exception e)
         {

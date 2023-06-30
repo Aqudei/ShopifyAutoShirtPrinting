@@ -22,6 +22,7 @@ namespace ShopifyEasyShirtPrinting.Converters
                 ["Archived"] = new SolidColorBrush(Color.FromArgb(50, 0, 0, 0)),
                 ["Need To Order From Supplier"] = new SolidColorBrush(Color.FromArgb(50, 0xff, 0, 0)),
                 ["Have Ordered From Supplier"] = new SolidColorBrush(Color.FromArgb(50, 0, 0xf0, 0)),
+                ["Issue Needs Resolving"] = new SolidColorBrush(Color.FromArgb(50, 0xff, 0, 0xff)),
             };
 
         }
