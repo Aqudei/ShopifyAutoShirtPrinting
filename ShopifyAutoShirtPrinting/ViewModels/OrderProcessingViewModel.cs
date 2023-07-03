@@ -95,11 +95,11 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     private readonly LogRespository _logRespository;
     private readonly MyPrintService _myPrintService;
     private readonly IMapper _mapper;
-    private readonly ILineRepository _lineRepository;
     private readonly IOrderRepository _orderRepository;
     private readonly BinService _binService;
     private readonly DbService _dbService;
     private readonly IBus _bus;
+    private readonly ApiClient _apiClient;
     private readonly IEventAggregator _eventAggregator;
     private DelegateCommand _openQrScannerCommand;
     private string _searchText;
@@ -143,7 +143,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         var parameters = new DialogParameters() {
             {"LineItemsIds", _lineItems.Where(l=>l.IsSelected).Select(l=>l.Id).Distinct().ToList() },
         };
-        _dialogService.ShowDialog("QuantityChangerDialog", parameters, r =>
+        _dialogService.ShowDialog("QuantityChangerDialog", parameters, async r =>
         {
             if (r.Result == ButtonResult.OK)
             {
@@ -151,19 +151,10 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 {
                     foreach (var item in lineItems)
                     {
-                        _lineRepository.Update(item);
-                        var uiItem = _lineItems.SingleOrDefault(l => l.Id == item.Id);
-                        if (uiItem != null)
-                        {
-                            _mapper.Map(item, uiItem);
-                        }
+                        await _apiClient.UpdateLineItemAsync(item);
                     }
+                    BroadcastChanges(lineItems.Select(x => x.Id).ToArray());
                 }
-
-                _bus.PubSub.Publish(new ItemsUpdated
-                {
-                    MyLineItemDatabaseIds = lineItems.Select(x => x.Id).ToArray()
-                });
             }
         });
     }
@@ -186,18 +177,23 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         FocusChrome();
     }
 
-    private void HandleApplyTag(string tag)
+    private async void HandleApplyTag(string tag)
     {
         var selectedItems = _lineItems.Where(l => l.IsSelected);
+        var updatedItems = new List<int>();
+
         foreach (var selectedItem in selectedItems)
         {
-            ApplyTagForLineItem(selectedItem, tag);
+            await ApplyTagForLineItem(selectedItem, tag);
+            updatedItems.Add(selectedItem.Id);
         }
+
+        BroadcastChanges(updatedItems.ToArray());
     }
 
     public bool IsScanOnly { get => _isScanOnly; set => SetProperty(ref _isScanOnly, value); }
 
-    private void ApplyTagForLineItem(MyLineItem myLineItem, string tag)
+    private async Task ApplyTagForLineItem(MyLineItem myLineItem, string tag)
     {
         if (myLineItem.Status == tag)
         {
@@ -220,18 +216,13 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
 
         myLineItem.DateModified = dateNow;
-        _lineRepository.Update(myLineItem);
 
-        _logRespository.Add(new Log
+        var updatedLineItem = await _apiClient.UpdateLineItemAsync(myLineItem);
+        var newLog = await _apiClient.AddNewLogAsync(new Log
         {
             ChangeDate = dateNow,
             ChangeStatus = tag,
             MyLineItemId = myLineItem.Id
-        });
-
-        _bus.PubSub.Publish(new ItemsUpdated
-        {
-            MyLineItemDatabaseIds = new int[] { myLineItem.Id }
         });
     }
 
@@ -333,8 +324,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     public OrderProcessingViewModel(IDialogService dialogService, OrderService orderService, ShipStationApi shipStationApi, IShipStationBrowserService browserService,
         ProductVariantService productVariantService, ProductImageService productImageService, GlobalVariables globalVariables, IDialogCoordinator dialogCoordinator,
-        IEventAggregator eventAggregator, LogRespository logRespository, IMapper mapper, ILineRepository lineRepository, MyPrintService myPrintService,
-        IOrderRepository orderRepository, BinService binService, DbService dbService, IBus bus)
+        IEventAggregator eventAggregator, LogRespository logRespository, IMapper mapper, MyPrintService myPrintService,
+        IOrderRepository orderRepository, BinService binService, DbService dbService, IBus bus, ApiClient apiClient)
     {
         _dispatcher = Application.Current.Dispatcher;
 
@@ -349,58 +340,62 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         _dialogCoordinator = dialogCoordinator;
         _logRespository = logRespository;
         _myPrintService = myPrintService;
-        _lineRepository = lineRepository;
         _orderRepository = orderRepository;
         _eventAggregator = eventAggregator;
         _binService = binService;
         _dbService = dbService;
         _bus = bus;
-
-
+        _apiClient = apiClient;
         LineItemsView = CollectionViewSource.GetDefaultView(_lineItems);
         LineItemsView.SortDescriptions.Add(new SortDescription("OrderNumber", ListSortDirection.Descending));
 
         Task.Run(FetchLineItems).ContinueWith(t =>
         {
-            _bus.PubSub.Subscribe<ItemsUpdated>("item.updated", (e) =>
+            _bus.PubSub.Subscribe<string>("hello", s =>
             {
-                if (e.MyLineItemDatabaseIds == null || e.MyLineItemDatabaseIds.Length <= 0)
-                    return;
+                Debug.WriteLine(s);
+            });
 
-                foreach (var lineItemDbId in e.MyLineItemDatabaseIds)
+            if (!_globalVariables.IsOnLocalMachine)
+                _bus.PubSub.Subscribe<ItemsUpdated>("item.updated", async (e) =>
                 {
-                    var dbLineItem = _lineRepository.GetById(lineItemDbId);
-                    var displayLineItem = _lineItems.SingleOrDefault(l => l.Id == lineItemDbId);
+                    if (e.MyLineItemDatabaseIds == null || e.MyLineItemDatabaseIds.Length <= 0)
+                        return;
 
-                    if (dbLineItem != null && displayLineItem != null)
+                    foreach (var lineItemDbId in e.MyLineItemDatabaseIds)
                     {
-                        if (displayLineItem.Notes != dbLineItem.Notes)
-                        {
-                            _dispatcher.Invoke(() => { displayLineItem.Notes = dbLineItem.Notes; });
-                        }
+                        var dbLineItem = await _apiClient.GetLineItemByIdAsync(lineItemDbId);
+                        var displayLineItem = _lineItems.SingleOrDefault(l => l.Id == lineItemDbId);
 
-                        if (displayLineItem.Status != dbLineItem.Status)
+                        if (dbLineItem != null && displayLineItem != null)
                         {
-                            _dispatcher.Invoke(() => { displayLineItem.Status = dbLineItem.Status; });
-                        }
+                            if (displayLineItem.Notes != dbLineItem.Notes)
+                            {
+                                _dispatcher.Invoke(() => { displayLineItem.Notes = dbLineItem.Notes; });
+                            }
 
-                        if (displayLineItem.DateModified != dbLineItem.DateModified)
-                        {
-                            _dispatcher.Invoke(() => { displayLineItem.DateModified = dbLineItem.DateModified; });
-                        }
+                            if (displayLineItem.Status != dbLineItem.Status)
+                            {
+                                _dispatcher.Invoke(() => { displayLineItem.Status = dbLineItem.Status; });
+                            }
 
-                        if (displayLineItem.BinNumber != dbLineItem.BinNumber)
-                        {
-                            _dispatcher.Invoke(() => { displayLineItem.BinNumber = dbLineItem.BinNumber; });
-                        }
+                            if (displayLineItem.DateModified != dbLineItem.DateModified)
+                            {
+                                _dispatcher.Invoke(() => { displayLineItem.DateModified = dbLineItem.DateModified; });
+                            }
 
-                        if (displayLineItem.PrintedQuantity != dbLineItem.PrintedQuantity)
-                        {
-                            _dispatcher.Invoke(() => { displayLineItem.PrintedQuantity = dbLineItem.PrintedQuantity; });
+                            if (displayLineItem.BinNumber != dbLineItem.BinNumber)
+                            {
+                                _dispatcher.Invoke(() => { displayLineItem.BinNumber = dbLineItem.BinNumber; });
+                            }
+
+                            if (displayLineItem.PrintedQuantity != dbLineItem.PrintedQuantity)
+                            {
+                                _dispatcher.Invoke(() => { displayLineItem.PrintedQuantity = dbLineItem.PrintedQuantity; });
+                            }
                         }
                     }
-                }
-            });
+                });
 
             _dispatcher.Invoke(() => ShippingLines.AddRange(_lineItems.Select(l => l.Shipping).Distinct().ToList()));
 
@@ -458,18 +453,16 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         };
     }
 
-
-
     public DelegateCommand ApplyNotesCommand
     {
         get => applyNotesCommand ??= new DelegateCommand(HandleApplyNotes, () => SelectedLineItem != null)
             .ObservesProperty(() => SelectedLineItem);
     }
 
-    private void HandleApplyNotes()
+    private async void HandleApplyNotes()
     {
         SelectedLineItem.Notes = Notes;
-        _lineRepository.Update(SelectedLineItem);
+        await _apiClient.UpdateLineItemAsync(SelectedLineItem);
     }
 
     private DelegateCommand _clearStatusFilterCommand;
@@ -484,7 +477,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         LineItemsView.Filter = null;
     }
 
-    private void OrderProcessingViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private async void OrderProcessingViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         switch (e.PropertyName)
         {
@@ -498,11 +491,15 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                     if (SelectedLineItem != null)
                     {
                         CurrentImage = null;
-                        Task.Run(() => FetchProductImageAsync(SelectedLineItem));
+                        await Task.Run(() => FetchProductImageAsync(SelectedLineItem));
 
                         Logs.Clear();
-                        var logs = _logRespository.Find(l => l.MyLineItemId == SelectedLineItem.Id).ToList();
-                        Logs.AddRange(logs);
+                        await Task.Run(async () =>
+                        {
+                            var logs = await _apiClient.ListLogsAsync(SelectedLineItem.Id);
+                            await _dispatcher.InvokeAsync(() => Logs.AddRange(logs));
+                        });
+
 
                         Notes = SelectedLineItem.Notes;
                     }
@@ -544,7 +541,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                             // QrInfo = FetchQrInfo(parsedQr);
                             ShowScanInfo(parsedQr);
 
-                            var lineItem = _lineRepository.Get(l => l.LineItemId == parsedQr.LineItemId);
+                            var lineItem = await _apiClient.GetItemByLineItemIdAsync(parsedQr.LineItemId.Value);
 
                             if (lineItem == null)
                             {
@@ -554,11 +551,11 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
                             if (IsScanOnly)
                             {
-                                Task.Run(async () => await ShowLineItem(lineItem));
+                                await ShowLineItem(lineItem);
                             }
                             else
                             {
-                                Task.Run(() => ProcessQrForPrinting(lineItem));
+                                await ProcessQrForPrinting(lineItem);
                             }
 
                         }
@@ -588,7 +585,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     }
 
-    private async void ProcessQrForPrinting(MyLineItem lineItem)
+    private async Task ProcessQrForPrinting(MyLineItem lineItem)
     {
         try
         {
@@ -602,8 +599,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
             await ShowLineItem(orderItemResult);
 
-
-            var lineItems = _lineRepository.Find(l => l.OrderId == lineItem.OrderId);
+            var lineItems = await _apiClient.ListItemsAsync(new Dictionary<string, string> { { "OrderId", $"{lineItem.OrderId}" } });
             var allItemsPrinted = _myPrintService.AreAllItemsPrinted(orderItemResult.OrderId.Value, lineItems);
 
             if (allItemsPrinted)
@@ -670,10 +666,11 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 }
             }
 
-            _bus.PubSub.Publish(new ItemsUpdated
-            {
-                MyLineItemDatabaseIds = new int[] { lineItem.Id }
-            });
+            if (!_globalVariables.IsOnLocalMachine)
+                _bus.PubSub.Publish(new ItemsUpdated
+                {
+                    MyLineItemDatabaseIds = new int[] { lineItem.Id }
+                });
         }
         catch (Exception exception)
         {
@@ -875,7 +872,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         {
             // Update UI
             await _dispatcher.InvokeAsync(() => _lineItems.Clear());
-            var lineItems = _lineRepository.Find(x => x.Status != "Archived");
+            var lineItems = await _apiClient.ListItemsAsync();
             foreach (var lineItem in lineItems)
             {
                 await _dispatcher.InvokeAsync(() =>
@@ -941,16 +938,29 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
 
         var selectedItems = _lineItems.Where(l => l.IsSelected);
+        var updatedIds = new List<int>();
 
         foreach (var lineItem in selectedItems)
         {
             var combinedImage = GenerateQrImageForItem(lineItem);
 
-            lineItem.Status = "Processed";
-            _lineRepository.Update(lineItem);
-
             PrintQr(combinedImage);
+
+            lineItem.Status = "Processed";
+            await _apiClient.UpdateLineItemAsync(lineItem);
+            updatedIds.Add(lineItem.Id);
         }
+
+        BroadcastChanges(updatedIds.ToArray());
+    }
+
+    private void BroadcastChanges(int[] ints)
+    {
+        if (!_globalVariables.IsOnLocalMachine)
+            _bus.PubSub.Publish(new ItemsUpdated
+            {
+                MyLineItemDatabaseIds = ints,
+            });
     }
 
     public MyLineItem SelectedLineItem

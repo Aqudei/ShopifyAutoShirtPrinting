@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 
 namespace ShopifyEasyShirtPrinting.Models
 {
@@ -16,22 +17,38 @@ namespace ShopifyEasyShirtPrinting.Models
             set => SetProperty(ref _isSelected, value);
         }
 
+        [JsonPropertyName("OrderNumber")]
         public string OrderNumber { get; set; }
+
+        [JsonPropertyName("Sku")]
         public string Sku { get; set; }
+
+        [JsonPropertyName("Name")]
         public string Name { get; set; }
+        [JsonPropertyName("VariantId")]
         public long? VariantId { get; set; }
+        [JsonPropertyName("VariantTitle")]
         public string VariantTitle { get; set; }
+        [JsonPropertyName("LineItemId")]
         public long? LineItemId { get; set; }
+        [JsonPropertyName("Quantity")]
         public int? Quantity { get; set; }
+        [JsonPropertyName("FulfillmentStatus")]
         public string FulfillmentStatus { get; set; }
+        [JsonPropertyName("FinancialStatus")]
         public string FinancialStatus { get; set; }
+        [JsonPropertyName("Customer")]
         public string Customer { get; set; }
+        [JsonPropertyName("CustomerEmail")]
         public string CustomerEmail { get; set; }
 
+        [JsonPropertyName("DateModified")]
         public DateTime? DateModified { get => _dateModified; set => SetProperty(ref _dateModified, value); }
 
+        [JsonPropertyName("ProductImage")]
         public string ProductImage { get; set; }
 
+        [JsonPropertyName("Notes")]
         public string Notes
         {
             get => _notes; set
@@ -40,6 +57,9 @@ namespace ShopifyEasyShirtPrinting.Models
                 RaisePropertyChanged(nameof(HasNotes));
             }
         }
+
+
+        [JsonPropertyName("OrderId")]
         public long? OrderId { get; set; }
 
         private int _printedQuantity;
@@ -48,18 +68,21 @@ namespace ShopifyEasyShirtPrinting.Models
         private string _notes;
         private DateTime? _dateModified;
 
+        [JsonPropertyName("PrintedQuantity")]
         public int PrintedQuantity
         {
             get => _printedQuantity;
             set => SetProperty(ref _printedQuantity, value);
         }
 
+        [JsonPropertyName("BinNumber")]
         public int BinNumber
         {
             get => _binNumber;
             set => SetProperty(ref _binNumber, value);
         }
 
+        [JsonPropertyName("Status")]
         public string Status
         {
             get => _status;
@@ -68,6 +91,7 @@ namespace ShopifyEasyShirtPrinting.Models
 
         public bool HasNotes => !string.IsNullOrWhiteSpace(Notes);
 
+        [JsonPropertyName("Shipping")]
         public string Shipping { get;  set; }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -9,5 +9,6 @@
         public string PdfsPath { get; set; }
         public string QrTagsPath { get; set; }
         public string ImagesPath { get; set; }
+        public bool IsOnLocalMachine { get; set; } = false;
     }
 }

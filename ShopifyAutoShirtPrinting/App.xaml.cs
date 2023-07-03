@@ -59,6 +59,7 @@ namespace ShopifyEasyShirtPrinting
                 containerRegistry.Register<ShipStationApi>();
                 containerRegistry.Register<MyPrintService>();
                 containerRegistry.Register<BinService>();
+                containerRegistry.Register<ApiClient>();
                 containerRegistry.RegisterInstance(orderService);
                 containerRegistry.RegisterInstance(productVariantService);
                 containerRegistry.RegisterInstance(productImageService);
@@ -71,10 +72,13 @@ namespace ShopifyEasyShirtPrinting
 
                 var connectionString = "";
 
-                //if (System.Environment.MachineName.Contains("LAPTOP-DB8A9BOL"))
-                //    connectionString = $"Server=localhost;Port=5432;Database=thelonelykids;User Id=postgres;Password=Espelimbergo;";
-                //else
-                connectionString = $"Server={databaseHost};Port={databasePort};Database={databaseName};User Id={databaseUser};Password={databasePass};";
+                if (System.Environment.MachineName.Contains("LAPTOP-DB8A9BOL"))
+                {
+                    connectionString = $"Server=localhost;Port=5432;Database=thelonelykids;User Id=postgres;Password=Espelimbergo;";
+                    _globalVariables.IsOnLocalMachine = true;
+                }
+                else
+                    connectionString = $"Server={databaseHost};Port={databasePort};Database={databaseName};User Id={databaseUser};Password={databasePass};";
 
                 Database.SetInitializer(new MigrateDatabaseToLatestVersion<LonelyKidsContext, Migrations.Configuration>(useSuppliedContext: true));
                 containerRegistry.RegisterInstance(new LonelyKidsContext(connectionString));
@@ -125,6 +129,7 @@ namespace ShopifyEasyShirtPrinting
                     containerRegistry.RegisterSingleton<IShipStationBrowserService, DummyShipstatiionBrowserService>();
                 }
                 Container.Resolve<IShipStationBrowserService>().DoLogin();
+
             }
             catch (Exception e)
             {
@@ -168,6 +173,7 @@ namespace ShopifyEasyShirtPrinting
             _globalVariables.QrTagsPath = Path.Combine(dataPath, "QRs");
             _globalVariables.ImagesPath = Path.Combine(dataPath, "Images");
             _globalVariables.DbName = Path.Combine(_globalVariables.DataPath, $"{appName}.db");
+
 
             Directory.CreateDirectory(_globalVariables.DataPath);
             Directory.CreateDirectory(_globalVariables.PdfsPath);

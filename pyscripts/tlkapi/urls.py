@@ -17,11 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from rest_framework import routers
-from .views import LineItemViewSet, LogView
+from .views import LineItemViewSet, LogAPIView , OrderInfoViewSet
 router = routers.DefaultRouter()
 router.register(r'LineItems',LineItemViewSet,basename='LineItem')
+router.register(r'Orders',OrderInfoViewSet,basename='Order')
 
 urlpatterns = router.urls
 urlpatterns += [
-    path('Logs/', LogView.as_view())
+    path('Logs/', LogAPIView.as_view())
 ]

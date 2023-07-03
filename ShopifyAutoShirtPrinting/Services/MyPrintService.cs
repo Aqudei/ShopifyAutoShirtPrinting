@@ -11,19 +11,14 @@ namespace ShopifyEasyShirtPrinting.Services
 {
     public class MyPrintService
     {
-        private readonly ShipStationApi _shipStationApi;
-        private readonly IOrderRepository _orderInfoRepository;
-        private readonly ILineRepository _lineRepository;
+        private readonly ApiClient _apiClient;
         private readonly LogRespository _logRespository;
 
         //private readonly ILiteCollection<MyLineItem> _lineItemsCollection;
 
-        public MyPrintService(ShipStationApi shipStationApi, IOrderRepository orderRepository, ILineRepository lineRepository, LogRespository logRespository)
+        public MyPrintService(ApiClient apiClient)
         {
-            _lineRepository = lineRepository;
-            _logRespository = logRespository;
-            _shipStationApi = shipStationApi;
-            _orderInfoRepository = orderRepository;
+            _apiClient = apiClient;
         }
 
         public async Task<MyLineItem> PrintItem(MyLineItem myLineItem)
@@ -32,10 +27,10 @@ namespace ShopifyEasyShirtPrinting.Services
 
             if (myLineItem.PrintedQuantity < myLineItem.Quantity)
             {
-                var orderInfo = _orderInfoRepository.Get(o => o.OrderId == myLineItem.OrderId);
+                var orderInfo = await _apiClient.GetOrderInfoBy(new Dictionary<string, string> { { "OrderId", $"{myLineItem.OrderId}" } });
                 if (orderInfo == null)
                 {
-                    _orderInfoRepository.Add(new OrderInfo
+                    await _apiClient.AddOrderInfo(new OrderInfo
                     {
                         OrderId = myLineItem.OrderId.Value
                     });
@@ -44,10 +39,11 @@ namespace ShopifyEasyShirtPrinting.Services
                 // Do actual printing
                 myLineItem.PrintedQuantity += 1;
                 myLineItem.Status = "Processed";
-                myLineItem.BinNumber = GetBin(myLineItem.OrderId.Value);
-                _lineRepository.Update(myLineItem);
+                myLineItem.BinNumber = await GetBinAsync(myLineItem.OrderId.Value);
+                await _apiClient.UpdateLineItemAsync(myLineItem);
 
-                _logRespository.Add(new Log
+
+                await _apiClient.AddNewLogAsync(new Log
                 {
                     ChangeDate = DateTime.Now,
                     ChangeStatus = "Processed",
@@ -55,7 +51,7 @@ namespace ShopifyEasyShirtPrinting.Services
                 });
             }
 
-            return _lineRepository.Get(l => l.Id == myLineItem.Id);
+            return await _apiClient.GetLineItemByIdAsync(myLineItem.Id);
         }
 
 
@@ -72,23 +68,23 @@ namespace ShopifyEasyShirtPrinting.Services
             return true;
         }
 
-        private int GetBin(long orderId)
+        private async Task<int> GetBinAsync(long orderId)
         {
 
-            var orders = _lineRepository.Find(o => o.OrderId == orderId);
+            var orders = await _apiClient.ListItemsAsync(new Dictionary<string, string> { { "OrderId", $"{orderId}" } });
 
             var totalItems = orders.Sum(l => l.Quantity);
             var binNumber = 0;
 
             if (totalItems > 1)
             {
-                var orderInfo = _orderInfoRepository.Get(b => b.OrderId == orderId);
+                var orderInfo = await _apiClient.GetOrderInfoBy(new Dictionary<string, string> { { "OrderId", $"{orderId}" } });
 
                 if (orderInfo != null)
                 {
-                    binNumber = orderInfo.BinNumber != 0 ? orderInfo.BinNumber : GetNextAvailableBinNumber();
+                    binNumber = orderInfo.BinNumber != 0 ? orderInfo.BinNumber : await GetNextAvailableBinNumber();
                     orderInfo.BinNumber = binNumber;
-                    _orderInfoRepository.Update(orderInfo);
+                    await _apiClient.UpdateOrderInfo(orderInfo);
                 }
                 else
                 {
@@ -99,11 +95,12 @@ namespace ShopifyEasyShirtPrinting.Services
             return binNumber;
         }
 
-        private int GetNextAvailableBinNumber()
+        private async Task<int> GetNextAvailableBinNumber()
         {
             for (var i = 1; ; i++)
             {
-                var orderInfos = _orderInfoRepository.Find(b => b.BinNumber == i && b.Active);
+
+                var orderInfos = await _apiClient.ListOrdersInfo(new Dictionary<string, string> { { "BinNumber", $"{i}" }, { "Active", "1" } });
 
                 if (orderInfos.Any())
                 {

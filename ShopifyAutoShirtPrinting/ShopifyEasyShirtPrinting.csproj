@@ -610,6 +610,7 @@
       <DependentUpon>202306220321441_initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Services\ApiClient.cs" />
     <Compile Include="Services\BinService.cs" />
     <Compile Include="ViewModels\Bin.cs" />
     <Compile Include="Models\Log.cs" />

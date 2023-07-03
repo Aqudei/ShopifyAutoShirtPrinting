@@ -25,6 +25,7 @@ namespace ShopifyEasyShirtPrinting.Data
             modelBuilder.Entity<MyLineItem>()
                 .HasKey(x => x.Id)
                 .Ignore(x => x.IsSelected)
+                .Ignore(x => x.HasNotes)
                 .Property(x => x.LineItemId);
 
             modelBuilder.Entity<Log>()

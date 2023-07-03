@@ -12,7 +12,7 @@ class Log(models.Model):
     Id = models.AutoField(db_column='Id', primary_key=True)  # Field name made lowercase.
     ChangeDate = models.DateTimeField(db_column='ChangeDate')  # Field name made lowercase.
     ChangeStatus = models.TextField(db_column='ChangeStatus', blank=True, null=True)  # Field name made lowercase.
-    LineItem = models.ForeignKey('LineItem', models.DO_NOTHING, db_column='MyLineItemId')  # Field name made lowercase.
+    MyLineItemId = models.ForeignKey('LineItem', models.DO_NOTHING, db_column='MyLineItemId')  # Field name made lowercase.
 
     class Meta:
         managed = False
@@ -25,7 +25,7 @@ class LineItem(models.Model):
     Sku = models.TextField(db_column='Sku', blank=True, null=True)  # Field name made lowercase.
     Name = models.TextField(db_column='Name', blank=True, null=True)  # Field name made lowercase.
     VariantId = models.BigIntegerField(db_column='VariantId', blank=True, null=True)  # Field name made lowercase.
-    varianttitle = models.TextField(db_column='VariantTitle', blank=True, null=True)  # Field name made lowercase.
+    VariantTitle = models.TextField(db_column='VariantTitle', blank=True, null=True)  # Field name made lowercase.
     LineItemId = models.BigIntegerField(db_column='LineItemId', blank=True, null=True)  # Field name made lowercase.
     Quantity = models.IntegerField(db_column='Quantity', blank=True, null=True)  # Field name made lowercase.
     FulfillmentStatus = models.TextField(db_column='FulfillmentStatus', blank=True, null=True)  # Field name made lowercase.
@@ -46,7 +46,7 @@ class LineItem(models.Model):
         db_table = 'MyLineItems'
 
 
-class OrderInfo(models.Model):
+class OrderInfoViewSet(models.Model):
     Id = models.AutoField(db_column='Id', primary_key=True)  # Field name made lowercase.
     BinNumber = models.IntegerField(db_column='BinNumber')  # Field name made lowercase.
     OrderId = models.BigIntegerField(db_column='OrderId')  # Field name made lowercase.
