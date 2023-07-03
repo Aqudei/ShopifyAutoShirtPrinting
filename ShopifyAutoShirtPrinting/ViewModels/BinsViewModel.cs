@@ -5,6 +5,7 @@ using ShopifyEasyShirtPrinting.Services;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Data;
 
 namespace ShopifyEasyShirtPrinting.ViewModels
@@ -82,7 +83,13 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         private void LoadBins()
         {
             _bins.Clear();
-            _bins.AddRange(_binService.ListBins().ToList());
+            Task.Run(() =>
+            {
+                foreach (var bin in _binService.ListBins())
+                {
+                    _dispatcher.InvokeAsync(() => _bins.Add(bin));
+                }
+            });
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)

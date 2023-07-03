@@ -391,12 +391,12 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
                         if (displayLineItem.BinNumber != dbLineItem.BinNumber)
                         {
-                            _dispatcher.Invoke(() => { displayLineItem.DateModified = dbLineItem.DateModified; });
+                            _dispatcher.Invoke(() => { displayLineItem.BinNumber = dbLineItem.BinNumber; });
                         }
 
                         if (displayLineItem.PrintedQuantity != dbLineItem.PrintedQuantity)
                         {
-                            _dispatcher.Invoke(() => { displayLineItem.DateModified = dbLineItem.DateModified; });
+                            _dispatcher.Invoke(() => { displayLineItem.PrintedQuantity = dbLineItem.PrintedQuantity; });
                         }
                     }
                 }

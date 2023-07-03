@@ -74,7 +74,7 @@ namespace ShopifyEasyShirtPrinting
                 //if (System.Environment.MachineName.Contains("LAPTOP-DB8A9BOL"))
                 //    connectionString = $"Server=localhost;Port=5432;Database=thelonelykids;User Id=postgres;Password=Espelimbergo;";
                 //else
-                    connectionString = $"Server={databaseHost};Port={databasePort};Database={databaseName};User Id={databaseUser};Password={databasePass};";
+                connectionString = $"Server={databaseHost};Port={databasePort};Database={databaseName};User Id={databaseUser};Password={databasePass};";
 
                 Database.SetInitializer(new MigrateDatabaseToLatestVersion<LonelyKidsContext, Migrations.Configuration>(useSuppliedContext: true));
                 containerRegistry.RegisterInstance(new LonelyKidsContext(connectionString));
@@ -109,7 +109,7 @@ namespace ShopifyEasyShirtPrinting
                 containerRegistry.RegisterInstance(new LogRespository(connectionString, Container.Resolve<IMapper>()));
 
                 containerRegistry.RegisterSingleton<IEventAggregator, EventAggregator>();
-                
+
                 // EventBus Setup
                 var bus = RabbitHutch.CreateBus($"host={Settings.Default.DatabaseHost};username=warwick;password=warwickpass1");
                 containerRegistry.RegisterInstance(bus);
@@ -119,7 +119,7 @@ namespace ShopifyEasyShirtPrinting
                 {
                     containerRegistry.RegisterSingleton<IShipStationBrowserService, ShipStationBrowserService>();
                 }
-                
+
                 else
                 {
                     containerRegistry.RegisterSingleton<IShipStationBrowserService, DummyShipstatiionBrowserService>();
@@ -142,7 +142,17 @@ namespace ShopifyEasyShirtPrinting
         private void PrismApplication_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
             Logger.Error(e.Exception);
-            MessageBox.Show($"{e.Exception.Message}\n{e.Exception.StackTrace}");
+            var exception = e.Exception;
+
+            var errorMessage = exception.Message + Environment.NewLine;
+
+            while (exception.InnerException != null)
+            {
+                errorMessage += exception.InnerException.Message + Environment.NewLine;
+                exception = exception.InnerException;
+            }
+
+            MessageBox.Show($"{errorMessage}\n\n{exception.StackTrace}");
         }
 
 
