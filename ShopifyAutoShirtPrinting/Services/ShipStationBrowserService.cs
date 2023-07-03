@@ -60,7 +60,6 @@ namespace ShopifyEasyShirtPrinting.Services
 
         public void NavigateToOrder(string orderNumber)
         {
-
             try
             {
                 _driver.Navigate().GoToUrl("https://ship12.shipstation.com/orders/awaiting-shipment");
@@ -71,13 +70,12 @@ namespace ShopifyEasyShirtPrinting.Services
                 element.SendKeys($"#{orderNumber}");
                 Thread.Sleep(1000);
                 element.SendKeys(Keys.Enter);
-
                 Thread.Sleep(TimeSpan.FromSeconds(6));
 
                 var selector =
-                    "#app-root > div > div > div.main-content-29r3x8m > div.grid-content-24RrEJI > div.grid-and-footer-eAqjCp7 > div.grid-3F4ZAVB > div > div > div > div > div:nth-child(2) > div.non-pinned-columns-2EjEvkq > div > div > div:nth-child(1) > button";
+                    "#app-root > div > div > div.main-content-iqHMg4x > div.grid-content-NXiXfgJ > div.grid-and-footer-9QPu1j7 > div.grid-yKAZ89D > div > div > div > div > div:nth-child(2) > div.non-pinned-columns-SW8UxLR > div > div > div:nth-child(1) > button";
                 element = new WebDriverWait(_driver, TimeSpan.FromMinutes(120)).Until(
-                    ExpectedConditions.ElementExists(By.CssSelector(selector)));
+                    ExpectedConditions.ElementToBeClickable(By.CssSelector(selector)));
                 element?.Click();
             }
             catch (Exception ex)
