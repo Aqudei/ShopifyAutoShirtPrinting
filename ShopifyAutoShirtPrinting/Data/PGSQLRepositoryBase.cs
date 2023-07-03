@@ -9,41 +9,41 @@ namespace ShopifyEasyShirtPrinting.Data
 {
     public abstract class PGSQLRepositoryBase<T> : IRepository<T> where T : EntityBase
     {
-        protected readonly LonelyKidsContext _context;
         protected readonly IMapper _mapper;
+        private readonly string _connectionString;
 
-        public PGSQLRepositoryBase(LonelyKidsContext context, IMapper mapper)
+        public PGSQLRepositoryBase(string connectionString, IMapper mapper)
         {
-            _context = context;
             _mapper = mapper;
+            _connectionString = connectionString;
         }
 
         public void Add(T entity)
         {
-            _context.Set<T>().Add(entity);
-            _context.SaveChanges();
+            using var context = new LonelyKidsContext(_connectionString);
+            context.Set<T>().Add(entity);
+            context.SaveChanges();
         }
 
         public void Delete(T entity)
         {
-            var existing = _context.Set<T>().FirstOrDefault(e => e.Id == entity.Id);
+            using var context = new LonelyKidsContext(_connectionString);
+
+            var existing = context.Set<T>().FirstOrDefault(e => e.Id == entity.Id);
             if (existing != null)
             {
-                _context.Set<T>().Remove(existing);
+                context.Set<T>().Remove(existing);
             }
 
-            _context.SaveChanges();
+            context.SaveChanges();
         }
 
-        public void DeleteAll()
-        {
-            _context.Set<T>().RemoveRange(_context.Set<T>().ToArray());
-            _context.SaveChanges();
-        }
-
+    
         public IEnumerable<T> Find(Expression<Func<T, bool>> predicate)
         {
-            return _context.Set<T>()
+            using var context = new LonelyKidsContext(_connectionString);
+
+            return context.Set<T>()
                 .Where(predicate)
                 .AsNoTracking()
                 .ToArray();
@@ -51,7 +51,9 @@ namespace ShopifyEasyShirtPrinting.Data
 
         public T FindOne(Expression<Func<T, bool>> predicate)
         {
-            return _context.Set<T>()
+            using var context = new LonelyKidsContext(_connectionString);
+
+            return context.Set<T>()
                 .Where(predicate)
                 .AsNoTracking()
                 .SingleOrDefault();
@@ -59,7 +61,9 @@ namespace ShopifyEasyShirtPrinting.Data
 
         public T Get(Expression<Func<T, bool>> predicate)
         {
-            return _context.Set<T>()
+            using var context = new LonelyKidsContext(_connectionString);
+
+            return context.Set<T>()
                 .Where(predicate)
                 .AsNoTracking()
                 .SingleOrDefault();
@@ -67,14 +71,18 @@ namespace ShopifyEasyShirtPrinting.Data
 
         public IEnumerable<T> All()
         {
-            return _context.Set<T>()
+            using var context = new LonelyKidsContext(_connectionString);
+
+            return context.Set<T>()
                 .AsNoTracking()
                 .ToArray();
         }
 
         public T GetById(int id)
         {
-            return _context.Set<T>()
+            using var context = new LonelyKidsContext(_connectionString);
+
+            return context.Set<T>()
                 .Where(x => x.Id == id)
                 .AsNoTracking()
                 .SingleOrDefault();
@@ -82,19 +90,22 @@ namespace ShopifyEasyShirtPrinting.Data
 
         public void Update(T entity)
         {
-            var existing = _context.Set<T>().Find(entity.Id);
+            using var context = new LonelyKidsContext(_connectionString);
+
+            var existing = context.Set<T>().Find(entity.Id);
             if (existing != null)
             {
                 _mapper.Map(entity, existing);
-                _context.Entry(existing).State = EntityState.Modified;
-                _context.SaveChanges();
+                context.Entry(existing).State = EntityState.Modified;
+                context.SaveChanges();
             }
         }
 
         public void AddRange(IEnumerable<T> entities)
         {
-            _context.Set<T>().AddRange(entities.ToArray());
-            _context.SaveChanges();
+            using var context = new LonelyKidsContext(_connectionString);
+            context.Set<T>().AddRange(entities.ToArray());
+            context.SaveChanges();
         }
     }
 }

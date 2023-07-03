@@ -5,7 +5,7 @@ namespace ShopifyEasyShirtPrinting.Data
 {
     public class LogRespository : PGSQLRepositoryBase<Log>
     {
-        public LogRespository(LonelyKidsContext context, IMapper mapper) : base(context, mapper)
+        public LogRespository(string connectionString, IMapper mapper) : base(connectionString, mapper)
         {
         }
     }

@@ -63,7 +63,6 @@ namespace ShopifyEasyShirtPrinting
                 containerRegistry.RegisterInstance(productVariantService);
                 containerRegistry.RegisterInstance(productImageService);
 
-
                 var databaseHost = string.IsNullOrWhiteSpace(Settings.Default.DatabaseHost) ? "localhost" : Settings.Default.DatabaseHost;
                 var databasePort = Settings.Default.DatabasePort;
                 var databaseName = Settings.Default.DatabaseName;
@@ -91,13 +90,6 @@ namespace ShopifyEasyShirtPrinting
                 containerRegistry.RegisterForNavigation<Bins>();
                 containerRegistry.RegisterForNavigation<SettingsView>();
 
-                var bus = RabbitHutch.CreateBus($"host={Settings.Default.DatabaseHost};username=warwick;password=warwickpass1");
-                
-                containerRegistry.RegisterInstance(bus);
-
-
-                // regionManager.RegisterViewWithRegion("MainRegion", typeof(OrganizerView));
-
                 var config = new MapperConfiguration(cfg =>
                 {
                     cfg.CreateMap<MyLineItem, MyLineItem>();
@@ -105,25 +97,29 @@ namespace ShopifyEasyShirtPrinting
                     cfg.CreateMap<Log, Log>();
                     cfg.CreateMap<Settings, SettingsViewModel>().ReverseMap();
                 });
+
                 containerRegistry.RegisterInstance(config.CreateMapper());
                 containerRegistry.RegisterDialog<LabelPrintingDialog, LabelPrintingDialogViewModel>();
                 containerRegistry.RegisterDialog<AfterScanDialog, AfterScanDialogViewModel>();
                 containerRegistry.RegisterDialog<QuantityChangerDialog, QuantityChangerDialogViewModel>();
 
-
-                containerRegistry.RegisterSingleton<ILineRepository, LineRepository>();
-                containerRegistry.RegisterSingleton<IOrderRepository, OrderRepository>();
-                containerRegistry.RegisterSingleton<LogRespository>();
-
-
+                // DataAccess Setup
+                containerRegistry.RegisterInstance<ILineRepository>(new LineRepository(connectionString, Container.Resolve<IMapper>()));
+                containerRegistry.RegisterInstance<IOrderRepository>(new OrderRepository(connectionString, Container.Resolve<IMapper>()));
+                containerRegistry.RegisterInstance(new LogRespository(connectionString, Container.Resolve<IMapper>()));
 
                 containerRegistry.RegisterSingleton<IEventAggregator, EventAggregator>();
+                
+                // EventBus Setup
+                var bus = RabbitHutch.CreateBus($"host={Settings.Default.DatabaseHost};username=warwick;password=warwickpass1");
+                containerRegistry.RegisterInstance(bus);
 
-
+                // Selenium Setup
                 if (Settings.Default.UseBrowser)
                 {
                     containerRegistry.RegisterSingleton<IShipStationBrowserService, ShipStationBrowserService>();
                 }
+                
                 else
                 {
                     containerRegistry.RegisterSingleton<IShipStationBrowserService, DummyShipstatiionBrowserService>();

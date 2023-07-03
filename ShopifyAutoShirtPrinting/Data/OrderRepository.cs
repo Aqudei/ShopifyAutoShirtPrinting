@@ -5,7 +5,7 @@ namespace ShopifyEasyShirtPrinting.Data
 {
     internal class OrderRepository : PGSQLRepositoryBase<OrderInfo>, IOrderRepository
     {
-        public OrderRepository(LonelyKidsContext context, IMapper mapper) : base(context, mapper)
+        public OrderRepository(string connectionString, IMapper mapper) : base(connectionString, mapper)
         {
         }
     }

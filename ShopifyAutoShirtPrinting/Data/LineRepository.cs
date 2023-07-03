@@ -5,7 +5,7 @@ namespace ShopifyEasyShirtPrinting.Data
 {
     public class LineRepository : PGSQLRepositoryBase<MyLineItem>, ILineRepository
     {
-        public LineRepository(LonelyKidsContext context, IMapper mapper) : base(context, mapper)
+        public LineRepository(string connectionString, IMapper mapper) : base(connectionString, mapper)
         {
         }
     }

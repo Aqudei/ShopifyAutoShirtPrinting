@@ -204,6 +204,11 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             return;
         }
 
+        if (myLineItem.Id == 0)
+        {
+            return;
+        }
+
         myLineItem.Status = tag;
         var dateNow = DateTime.Now;
 

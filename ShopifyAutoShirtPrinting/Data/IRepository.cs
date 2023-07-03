@@ -14,7 +14,5 @@ namespace ShopifyEasyShirtPrinting.Data
         IEnumerable<T> All();
         IEnumerable<T> Find(System.Linq.Expressions.Expression<Func<T, bool>> predicate);
         T FindOne(System.Linq.Expressions.Expression<Func<T, bool>> predicate);
-
-        void DeleteAll();
     }
 }
