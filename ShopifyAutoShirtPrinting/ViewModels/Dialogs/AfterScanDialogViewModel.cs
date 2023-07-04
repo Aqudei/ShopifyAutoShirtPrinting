@@ -3,6 +3,7 @@ using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using ShopifyEasyShirtPrinting.Data;
 using ShopifyEasyShirtPrinting.Models;
+using ShopifyEasyShirtPrinting.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,17 +13,15 @@ using System.Threading.Tasks;
 
 namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 {
-    public class AfterScanDialogViewModel : BindableBase, IDialogAware
+    public class AfterScanDialogViewModel : PageBase, IDialogAware
     {
         private string _title;
         private string _orderNumber;
         private int? _binNumber;
         private string _customerName;
         private string _customerEmail;
-        private readonly ILineRepository _lineRepository;
         public ObservableCollection<MyLineItem> MyLineItems { get; set; } = new();
 
-        public string Title => _title;
 
         public string OrderNumber { get => _orderNumber; set => SetProperty(ref _orderNumber, value); }
         public int? BinNumber { get => _binNumber; set => SetProperty(ref _binNumber, value); }
@@ -33,11 +32,14 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         public event Action<IDialogResult> RequestClose;
         private DelegateCommand _doneCommand;
         private string _message;
+        private readonly ApiClient _apiClient;
 
         public DelegateCommand DoneCommand
         {
             get { return _doneCommand ??= new DelegateCommand(HandleDone); }
         }
+
+        public override string Title => _title;
 
         private void HandleDone()
         {
@@ -52,6 +54,12 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
         public void OnDialogClosed()
         { }
+
+
+        public AfterScanDialogViewModel(ApiClient apiClient)
+        {
+            _apiClient = apiClient;
+        }
 
         public void OnDialogOpened(IDialogParameters parameters)
         {
@@ -70,22 +78,24 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             {
                 MyLineItems.Clear();
 
-                var lineItems = _lineRepository.Get(l => l.LineItemId == lineItemId);
-
-                if (lineItems != null)
+                Task.Run(async () =>
                 {
-                    MyLineItems.Add(lineItems);
-                    OrderNumber = lineItems.OrderNumber;
-                    BinNumber = lineItems.BinNumber;
-                    CustomerName = lineItems.Customer;
-                    CustomerEmail = lineItems.CustomerEmail;
-                }
-            }
-        }
+                    var prams = new Dictionary<string, string> { { "LineItemId", $"{lineItemId}" } };
+                    var lineItems = await _apiClient.ListItemsAsync(prams);
+                    if (lineItems != null && lineItems.Any())
+                    {
+                        await _dispatcher.InvokeAsync(() =>
+                        {
+                            MyLineItems.Add(lineItems[0]);
+                            OrderNumber = lineItems[0].OrderNumber;
+                            BinNumber = lineItems[0].BinNumber;
+                            CustomerName = lineItems[0].Customer;
+                            CustomerEmail = lineItems[0].CustomerEmail;
+                        });
+                    }
+                });
 
-        public AfterScanDialogViewModel(ILineRepository lineRepository)
-        {
-            _lineRepository = lineRepository;
+            }
         }
     }
 }

@@ -3,56 +3,28 @@ using ShopifyEasyShirtPrinting.Models;
 using ShopifyEasyShirtPrinting.ViewModels;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ShopifyEasyShirtPrinting.Services
 {
     public class BinService
     {
-        private readonly IOrderRepository _orderInfoRepository;
-        private readonly ILineRepository _lineRepository;
+        private readonly ApiClient _apiClient;
 
-        public BinService(IOrderRepository orderRepository, ILineRepository lineRepository)
+        public BinService(ApiClient apiClient)
         {
-            _orderInfoRepository = orderRepository;
-            _lineRepository = lineRepository;
+            _apiClient = apiClient;
         }
 
 
-        public IEnumerable<Bin> ListBins()
+        public async Task<Bin[]> ListBinsAsync()
         {
-            var orders = _orderInfoRepository.Find(o => o.BinNumber != 0 && o.Active).OrderBy(o => o.BinNumber).ToList();
-            foreach (var order in orders)
-            {
-                var lines = _lineRepository.Find(b=> b.OrderId == order.OrderId);
-                var bin = new Bin   
-                {
-                    BinNumber = order.BinNumber,
-                    OrderNumber = lines.FirstOrDefault()?.OrderNumber,
-                    Items = new List<MyLineItem>(lines)
-                };
-
-                yield return bin;
-            }
+            return await _apiClient.ListBinsAsync();
         }
 
-        public void EmptyBin(int binNumber)
+        public async Task EmptyBinAsync(int binNumber)
         {
-            var orders = _orderInfoRepository.Find(o => o.BinNumber == binNumber && o.Active);
-            foreach (var order in orders)
-            {
-                order.Active = false;
-                order.BinNumber = 0;
-                _orderInfoRepository.Update(order);
-            }
-
-            var orderIds = orders.Select(o => o.OrderId).ToList();
-            var lines = _lineRepository.Find(l => orderIds.Contains(l.OrderId.Value));
-
-            foreach (var line in lines)
-            {
-                line.BinNumber = 0;
-                _lineRepository.Update(line);
-            }
+            await _apiClient.EmptyBinAsync(binNumber);
         }
 
     }

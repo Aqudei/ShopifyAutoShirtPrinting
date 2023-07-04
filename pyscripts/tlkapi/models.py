@@ -46,7 +46,7 @@ class LineItem(models.Model):
         db_table = 'MyLineItems'
 
 
-class OrderInfoViewSet(models.Model):
+class OrderInfo(models.Model):
     Id = models.AutoField(db_column='Id', primary_key=True)  # Field name made lowercase.
     BinNumber = models.IntegerField(db_column='BinNumber')  # Field name made lowercase.
     OrderId = models.BigIntegerField(db_column='OrderId')  # Field name made lowercase.

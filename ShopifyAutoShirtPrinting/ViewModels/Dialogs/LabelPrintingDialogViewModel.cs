@@ -3,14 +3,17 @@ using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using ShopifyEasyShirtPrinting.Data;
 using ShopifyEasyShirtPrinting.Models;
+using ShopifyEasyShirtPrinting.Services;
 using ShopifySharp;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 {
-    internal class LabelPrintingDialogViewModel : BindableBase, IDialogAware
+    internal class LabelPrintingDialogViewModel : PageBase, IDialogAware
     {
         public string Message { get => _message; set => SetProperty(ref _message, value); }
         private DelegateCommand<string> _dialogCommand;
@@ -19,7 +22,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         private string _customerName;
         private string _customerEmail;
         private string _message;
-        private readonly ILineRepository _lineRepository;
+        private readonly ApiClient _apiClient;
 
         public ObservableCollection<MyLineItem> Orders { get; set; } = new();
 
@@ -47,9 +50,9 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
         }
 
-        public LabelPrintingDialogViewModel(ILineRepository lineRepository)
+        public LabelPrintingDialogViewModel(ApiClient apiClient)
         {
-            _lineRepository = lineRepository;
+            _apiClient = apiClient;
         }
 
         public void OnDialogOpened(IDialogParameters parameters)
@@ -59,23 +62,27 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
                 Message = message;
             }
 
-            
             if (parameters.TryGetValue<long?>("OrderId", out var orderId))
             {
                 Orders.Clear();
-
-                var lineItems = _lineRepository.Find(l => l.OrderId == orderId).ToList();
-
-                if (lineItems.Any())
+                Task.Run(async () =>
                 {
-                    Orders.AddRange(lineItems);
-                    OrderNumber = lineItems.FirstOrDefault()?.OrderNumber;
-                    BinNumber = lineItems.FirstOrDefault()?.BinNumber;
-                    CustomerName = lineItems.FirstOrDefault()?.Customer;
-                    CustomerEmail = lineItems.FirstOrDefault()?.CustomerEmail;
-                }
-            }
+                    var prams = new Dictionary<string, string>() { { "OrderId", $"{orderId}" } };
+                    var lineItems = await _apiClient.ListItemsAsync(prams);
 
+                    if (lineItems != null && lineItems.Any())
+                    {
+                        await _dispatcher.InvokeAsync(() =>
+                         {
+                             Orders.AddRange(lineItems);
+                             OrderNumber = lineItems.FirstOrDefault()?.OrderNumber;
+                             BinNumber = lineItems.FirstOrDefault()?.BinNumber;
+                             CustomerName = lineItems.FirstOrDefault()?.Customer;
+                             CustomerEmail = lineItems.FirstOrDefault()?.CustomerEmail;
+                         });
+                    }
+                });
+            }
         }
 
         public string CustomerName
@@ -102,7 +109,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             set => SetProperty(ref _orderNumber, value);
         }
 
-        public string Title { get; } = "Print Shipment Label";
+        public override string Title => "Print Shipment Label";
+
         public event Action<IDialogResult> RequestClose;
     }
 }

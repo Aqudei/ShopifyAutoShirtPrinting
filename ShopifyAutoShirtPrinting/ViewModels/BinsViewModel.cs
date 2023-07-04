@@ -10,7 +10,7 @@ using System.Windows.Data;
 
 namespace ShopifyEasyShirtPrinting.ViewModels
 {
-    internal class BinsViewModel : PageBase, INavigationAware
+    public class BinsViewModel : PageBase, INavigationAware
     {
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly BinService _binService;
@@ -18,7 +18,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         public override string Title => "Bins";
         private ObservableCollection<Bin> _bins = new();
-
 
         public ICollectionView Bins { get => bins; set => SetProperty(ref bins, value); }
 
@@ -39,7 +38,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
             if (result == MessageDialogResult.Affirmative)
             {
-                _binService.EmptyBin(bin.BinNumber);
+                _binService.EmptyBinAsync(bin.BinNumber);
                 LoadBins();
             }
         }
@@ -80,21 +79,18 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             };
         }
 
-        private void LoadBins()
+        private async Task LoadBins()
         {
-            _bins.Clear();
-            Task.Run(() =>
+            await _dispatcher.InvokeAsync(_bins.Clear);
+            foreach (var bin in await _binService.ListBinsAsync())
             {
-                foreach (var bin in _binService.ListBins())
-                {
-                    _dispatcher.InvokeAsync(() => _bins.Add(bin));
-                }
-            });
+                await _dispatcher.InvokeAsync(() => _bins.Add(bin));
+            }
         }
 
-        public void OnNavigatedTo(NavigationContext navigationContext)
+        public async void OnNavigatedTo(NavigationContext navigationContext)
         {
-            LoadBins();
+            await LoadBins();
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)

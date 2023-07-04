@@ -80,8 +80,8 @@ namespace ShopifyEasyShirtPrinting
                 else
                     connectionString = $"Server={databaseHost};Port={databasePort};Database={databaseName};User Id={databaseUser};Password={databasePass};";
 
-                Database.SetInitializer(new MigrateDatabaseToLatestVersion<LonelyKidsContext, Migrations.Configuration>(useSuppliedContext: true));
-                containerRegistry.RegisterInstance(new LonelyKidsContext(connectionString));
+                // Database.SetInitializer(new MigrateDatabaseToLatestVersion<LonelyKidsContext, Migrations.Configuration>(useSuppliedContext: true));
+                // containerRegistry.RegisterInstance(new LonelyKidsContext(connectionString));
                 containerRegistry.RegisterInstance(new DbService(connectionString));
 
                 containerRegistry.RegisterInstance(DialogCoordinator.Instance);
@@ -108,9 +108,9 @@ namespace ShopifyEasyShirtPrinting
                 containerRegistry.RegisterDialog<QuantityChangerDialog, QuantityChangerDialogViewModel>();
 
                 // DataAccess Setup
-                containerRegistry.RegisterInstance<ILineRepository>(new LineRepository(connectionString, Container.Resolve<IMapper>()));
-                containerRegistry.RegisterInstance<IOrderRepository>(new OrderRepository(connectionString, Container.Resolve<IMapper>()));
-                containerRegistry.RegisterInstance(new LogRespository(connectionString, Container.Resolve<IMapper>()));
+                // containerRegistry.RegisterInstance<ILineRepository>(new LineRepository(connectionString, Container.Resolve<IMapper>()));
+                // containerRegistry.RegisterInstance<IOrderRepository>(new OrderRepository(connectionString, Container.Resolve<IMapper>()));
+                // containerRegistry.RegisterInstance(new LogRespository(connectionString, Container.Resolve<IMapper>()));
 
                 containerRegistry.RegisterSingleton<IEventAggregator, EventAggregator>();
 

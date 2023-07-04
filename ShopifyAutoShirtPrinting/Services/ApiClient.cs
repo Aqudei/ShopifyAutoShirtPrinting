@@ -1,8 +1,10 @@
-﻿using ImTools;
+﻿using DryIoc;
+using ImTools;
 using RestSharp;
 using RestSharp.Authenticators;
 using RestSharp.Serializers.NewtonsoftJson;
 using ShopifyEasyShirtPrinting.Models;
+using ShopifyEasyShirtPrinting.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +13,11 @@ using System.Threading.Tasks;
 
 namespace ShopifyEasyShirtPrinting.Services
 {
+    public class AvailableBinResponse
+    {
+        public int AvailableBinNumber { get; set; }
+    }
+
     public class ApiClient
     {
         private readonly RestClient _client;
@@ -166,10 +173,41 @@ namespace ShopifyEasyShirtPrinting.Services
 
         public async Task<OrderInfo> UpdateOrderInfo(OrderInfo orderInfo)
         {
-            var request = new RestRequest($"/api/Orders/{orderInfo.Id}")
+            var request = new RestRequest($"/api/Orders/{orderInfo.Id}/")
                 .AddBody(orderInfo);
 
             var response = await _client.ExecutePutAsync<OrderInfo>(request);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                return response.Data;
+            }
+
+            return null;
+        }
+
+        public async Task<Bin[]> ListBinsAsync()
+        {
+            var request = new RestRequest("/api/Bins/");
+
+            var response = await _client.ExecuteGetAsync<Bin[]>(request);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                return response.Data;
+            }
+
+            return null;
+        }
+
+        public async Task EmptyBinAsync(int binNumber)
+        {
+            var request = new RestRequest($"/api/Bins/{binNumber}/");
+            var response = await _client.ExecutePostAsync(request);
+        }
+
+        public async Task<AvailableBinResponse> GetNextAvailableBin()
+        {
+            var request = new RestRequest("/api/Bins/Available/");
+            var response = await _client.ExecuteGetAsync<AvailableBinResponse>(request);
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 return response.Data;

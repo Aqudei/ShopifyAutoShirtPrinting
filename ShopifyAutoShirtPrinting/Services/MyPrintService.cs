@@ -12,7 +12,6 @@ namespace ShopifyEasyShirtPrinting.Services
     public class MyPrintService
     {
         private readonly ApiClient _apiClient;
-        private readonly LogRespository _logRespository;
 
         //private readonly ILiteCollection<MyLineItem> _lineItemsCollection;
 
@@ -41,7 +40,6 @@ namespace ShopifyEasyShirtPrinting.Services
                 myLineItem.Status = "Processed";
                 myLineItem.BinNumber = await GetBinAsync(myLineItem.OrderId.Value);
                 await _apiClient.UpdateLineItemAsync(myLineItem);
-
 
                 await _apiClient.AddNewLogAsync(new Log
                 {
@@ -97,18 +95,8 @@ namespace ShopifyEasyShirtPrinting.Services
 
         private async Task<int> GetNextAvailableBinNumber()
         {
-            for (var i = 1; ; i++)
-            {
-
-                var orderInfos = await _apiClient.ListOrdersInfo(new Dictionary<string, string> { { "BinNumber", $"{i}" }, { "Active", "1" } });
-
-                if (orderInfos.Any())
-                {
-                    continue;
-                }
-
-                return i;
-            }
+            var availableBinResponse = await _apiClient.GetNextAvailableBin();
+            return availableBinResponse.AvailableBinNumber;
         }
     }
 }

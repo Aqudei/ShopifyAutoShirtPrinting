@@ -1,4 +1,6 @@
-﻿using Prism.Commands;
+﻿using AutoMapper;
+using ImTools;
+using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using ShopifyEasyShirtPrinting.Data;
@@ -22,7 +24,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         public ObservableCollection<MyLineItem> LineItems { get; set; } = new();
         private DelegateCommand<string> _dialogCommand;
         private string _message;
-        private readonly ILineRepository _lineRepository;
+        private readonly IMapper _mapper;
 
         public string Message
         {
@@ -85,19 +87,21 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         {
 
         }
-
+        public QuantityChangerDialogViewModel(IMapper mapper)
+        {
+            _mapper = mapper;
+        }
         public void OnDialogOpened(IDialogParameters parameters)
         {
-            if (parameters.TryGetValue<ICollection<int>>("LineItemsIds", out var lineItemsIds))
+            if (parameters.TryGetValue<MyLineItem[]>("LineItems", out var lineItems))
             {
-                var items = _lineRepository.Find(l => lineItemsIds.Contains(l.Id));
-                LineItems.AddRange(items);
+                foreach (var item in lineItems)
+                {
+                    var itemCopy = new MyLineItem();
+                    _mapper.Map(item, itemCopy);
+                    LineItems.Add(itemCopy);
+                }
             }
-        }
-
-        public QuantityChangerDialogViewModel(ILineRepository lineRepository)
-        {
-            _lineRepository = lineRepository;
         }
     }
 }

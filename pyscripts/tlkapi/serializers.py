@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import LineItem, Log, OrderInfoViewSet
+from .models import LineItem, Log, OrderInfo
 
 
 class LineItemSerializer(serializers.ModelSerializer):
@@ -10,6 +10,10 @@ class LineItemSerializer(serializers.ModelSerializer):
         model = LineItem
         fields = '__all__'
 
+class BinSerializer(serializers.Serializer):
+    BinNumber = serializers.IntegerField()
+    OrderNumber = serializers.CharField()
+    Items = LineItemSerializer(many=True)
 
 class LogSerializer(serializers.ModelSerializer):
     """
@@ -25,5 +29,5 @@ class OrderInfoSerializer(serializers.ModelSerializer):
     docstring
     """
     class Meta:
-        model = OrderInfoViewSet
+        model = OrderInfo
         fields = '__all__'

@@ -17,12 +17,24 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from rest_framework import routers
-from .views import LineItemViewSet, LogAPIView , OrderInfoViewSet
+from .views import (
+    LineItemViewSet,
+    LogAPIView,
+    OrderInfoViewSet,
+    ListBinsView,
+    AvailableBin,
+    DestroyBinView
+)
+
 router = routers.DefaultRouter()
-router.register(r'LineItems',LineItemViewSet,basename='LineItem')
-router.register(r'Orders',OrderInfoViewSet,basename='Order')
+router.register(r'LineItems', LineItemViewSet, basename='LineItem')
+router.register(r'Orders', OrderInfoViewSet, basename='Order')
 
 urlpatterns = router.urls
 urlpatterns += [
-    path('Logs/', LogAPIView.as_view())
+    path('Logs/', LogAPIView.as_view()),
+    path('Bins/<int:BinNumber>/', DestroyBinView.as_view()),
+    path('Bins/', ListBinsView.as_view()),
+    path('Bins/Available/', AvailableBin.as_view()),
+
 ]

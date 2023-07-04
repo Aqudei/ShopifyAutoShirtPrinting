@@ -591,25 +591,25 @@
     <Compile Include="Converters\StatusToColorConverter.cs" />
     <Compile Include="Data\DbService.cs" />
     <Compile Include="Data\EntityBase.cs" />
-    <Compile Include="Data\ILineRepository.cs" />
-    <Compile Include="Data\IOrderRepository.cs" />
-    <Compile Include="Data\IRepository.cs" />
-    <Compile Include="Data\LineRepository.cs" />
-    <Compile Include="Data\LogRespository.cs" />
-    <Compile Include="Data\LonelyKidsContext.cs" />
-    <Compile Include="Data\NpgSqlConfiguration.cs" />
-    <Compile Include="Data\OrderRepository.cs" />
-    <Compile Include="Data\PGSQLRepositoryBase.cs" />
+    <None Include="Data\ILineRepository.cs" />
+    <None Include="Data\IOrderRepository.cs" />
+    <None Include="Data\IRepository.cs" />
+    <None Include="Data\LineRepository.cs" />
+    <None Include="Data\LogRespository.cs" />
+    <None Include="Data\LonelyKidsContext.cs" />
+    <None Include="Data\NpgSqlConfiguration.cs" />
+    <None Include="Data\OrderRepository.cs" />
+    <None Include="Data\PGSQLRepositoryBase.cs" />
     <None Include="Data\LiteDbRepositoryBase.cs" />
     <Compile Include="Events\DoneFetchingLines.cs" />
     <Compile Include="Extensions\DialogServiceExtensions.cs" />
     <Compile Include="Helpers\QrHelper.cs" />
     <Compile Include="Messaging\ItemsUpdated.cs" />
-    <Compile Include="Migrations\202306220321441_initial.cs" />
+    <None Include="Migrations\202306220321441_initial.cs" />
     <Compile Include="Migrations\202306220321441_initial.designer.cs">
       <DependentUpon>202306220321441_initial.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\Configuration.cs" />
+    <None Include="Migrations\Configuration.cs" />
     <Compile Include="Services\ApiClient.cs" />
     <Compile Include="Services\BinService.cs" />
     <Compile Include="ViewModels\Bin.cs" />

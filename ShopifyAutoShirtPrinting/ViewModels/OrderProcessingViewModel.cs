@@ -92,10 +92,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     private readonly ProductImageService _productImageService;
     private readonly GlobalVariables _globalVariables;
     private readonly IDialogCoordinator _dialogCoordinator;
-    private readonly LogRespository _logRespository;
     private readonly MyPrintService _myPrintService;
     private readonly IMapper _mapper;
-    private readonly IOrderRepository _orderRepository;
     private readonly BinService _binService;
     private readonly DbService _dbService;
     private readonly IBus _bus;
@@ -324,8 +322,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     public OrderProcessingViewModel(IDialogService dialogService, OrderService orderService, ShipStationApi shipStationApi, IShipStationBrowserService browserService,
         ProductVariantService productVariantService, ProductImageService productImageService, GlobalVariables globalVariables, IDialogCoordinator dialogCoordinator,
-        IEventAggregator eventAggregator, LogRespository logRespository, IMapper mapper, MyPrintService myPrintService,
-        IOrderRepository orderRepository, BinService binService, DbService dbService, IBus bus, ApiClient apiClient)
+        IEventAggregator eventAggregator, IMapper mapper, MyPrintService myPrintService,
+        BinService binService, DbService dbService, IBus bus, ApiClient apiClient)
     {
         _dispatcher = Application.Current.Dispatcher;
 
@@ -338,9 +336,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         _productImageService = productImageService;
         _globalVariables = globalVariables;
         _dialogCoordinator = dialogCoordinator;
-        _logRespository = logRespository;
         _myPrintService = myPrintService;
-        _orderRepository = orderRepository;
         _eventAggregator = eventAggregator;
         _binService = binService;
         _dbService = dbService;
@@ -612,19 +608,19 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                                             { "Message", "Ready to Print Shipping Labels?" }
                                         };
 
-                                        _dialogService.ShowDialog("LabelPrintingDialog", dlgParams, result =>
+                                        _dialogService.ShowDialog("LabelPrintingDialog", dlgParams, async result =>
                                         {
                                             if (result.Result == ButtonResult.Yes)
                                             {
                                                 foreach (var lineItem in lineItems)
                                                 {
-                                                    ApplyTagForLineItem(lineItem, "LabelPrinted");
+                                                    await ApplyTagForLineItem(lineItem, "LabelPrinted");
                                                     lineItem.BinNumber = 0;
                                                 }
 
-                                                _binService.EmptyBin(orderItemResult.BinNumber);
+                                                await _binService.EmptyBinAsync(orderItemResult.BinNumber);
 
-                                                Task.Run(() => _browserService.NavigateToOrder(lineItem.OrderNumber));
+                                                await Task.Run(() => _browserService.NavigateToOrder(lineItem.OrderNumber));
                                                 FocusChrome();
                                             }
                                         });
@@ -632,7 +628,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             }
             else
             {
-                var orderInfo = _orderRepository.FindOne(o => o.OrderId == lineItem.OrderId);
+                var prams = new Dictionary<string, string> { { "OrderId", $"{lineItem.OrderId}" } };
+                var orderInfo = _apiClient.GetOrderInfoBy(prams);
 
                 if (lineItems.Where(l => l.BinNumber > 0 && l.OrderId == lineItem.OrderId).Sum(x => x.PrintedQuantity) > 1)
                 {
