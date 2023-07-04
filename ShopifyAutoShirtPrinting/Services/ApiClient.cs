@@ -21,7 +21,7 @@ namespace ShopifyEasyShirtPrinting.Services
     public class ApiClient
     {
         private readonly RestClient _client;
-        private readonly string _baseUrl = "http://127.0.0.1:8000";
+        private readonly string _baseUrl = "http://170.64.158.123";
 
         public ApiClient()
         {
