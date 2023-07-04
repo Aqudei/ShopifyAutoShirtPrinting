@@ -15,7 +15,6 @@ class Log(models.Model):
     MyLineItemId = models.ForeignKey('LineItem', models.DO_NOTHING, db_column='MyLineItemId')  # Field name made lowercase.
 
     class Meta:
-        managed = False
         db_table = 'Logs'
 
 
@@ -40,9 +39,8 @@ class LineItem(models.Model):
     BinNumber = models.IntegerField(db_column='BinNumber')  # Field name made lowercase.
     Status = models.TextField(db_column='Status', blank=True, null=True)  # Field name made lowercase.
     Shipping = models.TextField(db_column='Shipping', blank=True, null=True)  # Field name made lowercase.
-
+    # OrderInfo = models.ForeignKey("tlkapi.OrderInfo", verbose_name=_(""), on_delete=models.CASCADE)
     class Meta:
-        managed = False
         db_table = 'MyLineItems'
 
 
@@ -59,5 +57,4 @@ class OrderInfo(models.Model):
     ShipmentId = models.IntegerField(db_column='ShipmentId')  # Field name made lowercase.
 
     class Meta:
-        managed = False
         db_table = 'OrderInfoes'
