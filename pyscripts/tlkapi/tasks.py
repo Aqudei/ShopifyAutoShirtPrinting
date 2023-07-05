@@ -5,4 +5,4 @@ def fetch_orders():
     """
     docstring
     """
-    pass
+    print("@fetch_orders()")
