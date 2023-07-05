@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'django_filters',
-    'tlkapi.apps.TlkapiConfig'
+    'tlkapi.apps.TlkapiConfig',
+    'django_celery_beat',
 ]
 
 REST_FRAMEWORK = {
@@ -135,7 +136,7 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)

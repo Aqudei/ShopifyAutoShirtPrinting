@@ -13,11 +13,12 @@ class Log(models.Model):
     # Field name made lowercase.
     Id = models.AutoField(db_column='Id', primary_key=True)
     # Field name made lowercase.
-    ChangeDate = models.DateTimeField(db_column='ChangeDate')
+    ChangeDate = models.DateTimeField(
+        db_column='ChangeDate', auto_now_add=True, blank=True)
     # Field name made lowercase.
     ChangeStatus = models.TextField(
         db_column='ChangeStatus', blank=True, null=True)
-    # Field name made lowercase.
+    # Field name made lowercase,.
     LineItem = models.ForeignKey(
         'LineItem', models.SET_NULL, db_column='MyLineItemId', related_name='Logs', null=True)
 
@@ -59,7 +60,7 @@ class LineItem(models.Model):
         db_column='CustomerEmail', blank=True, null=True)
     # Field name made lowercase.
     DateModified = models.DateTimeField(
-        db_column='DateModified', blank=True, null=True)
+        db_column='DateModified', blank=True, null=True, auto_now=True)
     # Field name made lowercase.
     ProductImage = models.TextField(
         db_column='ProductImage', blank=True, null=True)
@@ -81,6 +82,7 @@ class LineItem(models.Model):
 
     class Meta:
         db_table = 'MyLineItems'
+        ordering = ['-OrderNumber']
 
 
 class OrderInfo(models.Model):
