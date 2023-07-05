@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 Type=forking
-User=www-data
-Group=www-data
+User=root
+Group=root
 EnvironmentFile=/etc/conf.d/celery
 WorkingDirectory=/root/dev/ShopifyAutoShirtPrinting/pyscripts
 ExecStart=/bin/sh -c '${CELERY_BIN} -A $CELERY_APP multi start $CELERYD_NODES \

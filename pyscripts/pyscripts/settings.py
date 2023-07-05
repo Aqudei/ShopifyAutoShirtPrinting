@@ -154,3 +154,6 @@ STATIC_ROOT = "/var/www/pyscripts/static"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
+
+SHOP_URL, API_VERSION, PRIVATE_APP_PASSWORD = config(
+    'SHOPIFY_SHOP_URL'),  config('SHOPIFY_API_VERSION'), config('SHOPIFY_TOKEN')

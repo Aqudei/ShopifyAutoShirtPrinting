@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 Type=simple
-User=celery
-Group=celery
+User=root
+Group=root
 EnvironmentFile=/etc/conf.d/celery
 WorkingDirectory=/root/dev/ShopifyAutoShirtPrinting/pyscripts
 ExecStart=/bin/sh -c '${CELERY_BIN} -A ${CELERY_APP} beat  \
