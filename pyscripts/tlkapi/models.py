@@ -46,7 +46,7 @@ class LineItem(models.Model):
     LineItemId = models.BigIntegerField(
         db_column='LineItemId', blank=True, null=True)
     # Field name made lowercase.
-    Quantity = models.IntegerField(db_column='Quantity', blank=True, null=True)
+    Quantity = models.IntegerField(db_column='Quantity', blank=True, null=True, default=0)
     # Field name made lowercase.
     FulfillmentStatus = models.TextField(
         db_column='FulfillmentStatus', blank=True, null=True)
@@ -70,15 +70,15 @@ class LineItem(models.Model):
     OrderId = models.BigIntegerField(
         db_column='OrderId', blank=True, null=True)
     # Field name made lowercase.
-    PrintedQuantity = models.IntegerField(db_column='PrintedQuantity')
+    PrintedQuantity = models.IntegerField(db_column='PrintedQuantity', default=0)
     # Field name made lowercase.
-    BinNumber = models.IntegerField(db_column='BinNumber')
+    BinNumber = models.IntegerField(db_column='BinNumber', default=0)
     # Field name made lowercase.
     Status = models.TextField(db_column='Status', blank=True, null=True)
     # Field name made lowercase.
     Shipping = models.TextField(db_column='Shipping', blank=True, null=True)
     Order = models.ForeignKey(
-        "tlkapi.OrderInfo", verbose_name=_("Order"), on_delete=models.SET_NULL, null=True, related_name='LineItems')
+        "tlkapi.OrderInfo", verbose_name=_("Order"), on_delete=models.SET_NULL, null=True, blank=True, related_name='LineItems')
 
     class Meta:
         db_table = 'MyLineItems'
@@ -89,24 +89,24 @@ class OrderInfo(models.Model):
     # Field name made lowercase.
     Id = models.AutoField(db_column='Id', primary_key=True)
     # Field name made lowercase.
-    BinNumber = models.IntegerField(db_column='BinNumber')
+    BinNumber = models.IntegerField(db_column='BinNumber', default=0)
     # Field name made lowercase.
     OrderId = models.BigIntegerField(db_column='OrderId')
     # Field name made lowercase.
-    Active = models.BooleanField(db_column='Active')
+    Active = models.BooleanField(db_column='Active',default=False)
     # Field name made lowercase.
-    LabelPrinted = models.BooleanField(db_column='LabelPrinted')
+    LabelPrinted = models.BooleanField(db_column='LabelPrinted',default=False)
     # Field name made lowercase.
     LabelData = models.TextField(db_column='LabelData', blank=True, null=True)
     # Field name made lowercase.
     TrackingNumber = models.TextField(
         db_column='TrackingNumber', blank=True, null=True)
     # Field name made lowercase.
-    InsuranceCost = models.FloatField(db_column='InsuranceCost')
+    InsuranceCost = models.FloatField(db_column='InsuranceCost', default=0.0)
     # Field name made lowercase.
-    ShipmentCost = models.FloatField(db_column='ShipmentCost')
+    ShipmentCost = models.FloatField(db_column='ShipmentCost', default=0.0)
     # Field name made lowercase.
-    ShipmentId = models.IntegerField(db_column='ShipmentId')
+    ShipmentId = models.IntegerField(db_column='ShipmentId', default=0)
 
     class Meta:
         db_table = 'OrderInfoes'
