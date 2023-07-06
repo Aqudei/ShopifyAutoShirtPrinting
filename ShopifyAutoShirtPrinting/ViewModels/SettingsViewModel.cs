@@ -42,12 +42,12 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         }
 
-        private string _databaseHost;
+        private string _serverHost = "170.64.158.123";
 
-        public string DatabaseHost
+        public string ServerHost
         {
-            get { return _databaseHost; }
-            set { SetProperty(ref _databaseHost, value); }
+            get { return _serverHost; }
+            set { SetProperty(ref _serverHost, value); }
         }
 
 

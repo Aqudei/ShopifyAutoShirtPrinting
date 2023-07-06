@@ -32,7 +32,7 @@
     <Setting Name="Tags" Type="System.Collections.Specialized.StringCollection" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="DatabaseHost" Type="System.String" Scope="User">
+    <Setting Name="ServerHost" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="DatabasePort" Type="System.String" Scope="User">

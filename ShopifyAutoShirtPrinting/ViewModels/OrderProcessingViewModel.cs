@@ -251,8 +251,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         if (prompt != MessageDialogResult.Affirmative)
             return;
 
-        _dbService.ResetDatabase();
-
+        await _apiClient.ReetDatabase();
         await Task.Delay(TimeSpan.FromSeconds(3));
         await Task.Run(FetchLineItems);
     }
@@ -347,11 +346,6 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
         Task.Run(FetchLineItems).ContinueWith(t =>
         {
-            _bus.PubSub.Subscribe<string>("hello", s =>
-            {
-                Debug.WriteLine(s);
-            });
-
             if (!_globalVariables.IsOnLocalMachine)
                 _bus.PubSub.Subscribe<ItemsUpdated>("item.updated", async (e) =>
                 {
@@ -490,12 +484,11 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                         await Task.Run(() => FetchProductImageAsync(SelectedLineItem));
 
                         Logs.Clear();
-                        await Task.Run(async () =>
+                        var logs = await _apiClient.ListLogsAsync(SelectedLineItem.Id);
+                        if (logs != null)
                         {
-                            var logs = await _apiClient.ListLogsAsync(SelectedLineItem.Id);
                             await _dispatcher.InvokeAsync(() => Logs.AddRange(logs));
-                        });
-
+                        }
 
                         Notes = SelectedLineItem.Notes;
                     }

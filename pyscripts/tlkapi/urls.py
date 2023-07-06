@@ -23,7 +23,7 @@ from .views import (
     OrderInfoViewSet,
     ListBinsView,
     AvailableBin,
-    DestroyBinView
+    DestroyBinView,ResetDatabaseAPIView
 )
 
 router = routers.DefaultRouter()
@@ -36,5 +36,5 @@ urlpatterns += [
     path('Bins/<int:BinNumber>/', DestroyBinView.as_view()),
     path('Bins/', ListBinsView.as_view()),
     path('Bins/Available/', AvailableBin.as_view()),
-
+    path('ResetDatabase/', ResetDatabaseAPIView.as_view()),
 ]

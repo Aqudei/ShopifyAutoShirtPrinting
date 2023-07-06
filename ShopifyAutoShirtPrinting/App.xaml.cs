@@ -64,7 +64,7 @@ namespace ShopifyEasyShirtPrinting
                 containerRegistry.RegisterInstance(productVariantService);
                 containerRegistry.RegisterInstance(productImageService);
 
-                var databaseHost = string.IsNullOrWhiteSpace(Settings.Default.DatabaseHost) ? "localhost" : Settings.Default.DatabaseHost;
+                var databaseHost = string.IsNullOrWhiteSpace(Settings.Default.ServerHost) ? "localhost" : Settings.Default.ServerHost;
                 var databasePort = Settings.Default.DatabasePort;
                 var databaseName = Settings.Default.DatabaseName;
                 var databaseUser = Settings.Default.DatabaseUser;
@@ -115,7 +115,7 @@ namespace ShopifyEasyShirtPrinting
                 containerRegistry.RegisterSingleton<IEventAggregator, EventAggregator>();
 
                 // EventBus Setup
-                var bus = RabbitHutch.CreateBus($"host={Settings.Default.DatabaseHost};username=warwick;password=warwickpass1");
+                var bus = RabbitHutch.CreateBus($"host={Settings.Default.ServerHost};username=warwick;password=warwickpass1");
                 containerRegistry.RegisterInstance(bus);
 
                 // Selenium Setup

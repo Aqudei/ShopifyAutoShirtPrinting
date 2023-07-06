@@ -3,7 +3,16 @@ import shopify
 from django.conf import settings
 from .models import OrderInfo, LineItem, Log
 
+@shared_task
+def reset_database_task():
+    """
+    docstring
+    """
+    Log.objects.all().delete()
+    LineItem.objects.all().delete()
+    OrderInfo.objects.all().delete()
 
+    
 def process_orders(orders_response):
     """
     docstring

@@ -145,12 +145,12 @@ namespace ShopifyEasyShirtPrinting.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string DatabaseHost {
+        public string ServerHost {
             get {
-                return ((string)(this["DatabaseHost"]));
+                return ((string)(this["ServerHost"]));
             }
             set {
-                this["DatabaseHost"] = value;
+                this["ServerHost"] = value;
             }
         }
         

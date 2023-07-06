@@ -47,21 +47,23 @@
                 <Label Margin="2" Width="120">Font Size</Label>
                 <TextBox Margin="2" Text="{Binding FontSize}" Width="400"/>
             </StackPanel>
-
+            
             <StackPanel Orientation="Horizontal">
+                <Label Margin="2" Width="120" Content="Server IP Address:"/>
+                <TextBox Margin="2" Text="{Binding ServerHost}" Width="400"/>
+            </StackPanel>
+            
+            <!--<StackPanel Orientation="Horizontal">
                 <Label Margin="2" Width="120">DB User</Label>
                 <TextBox Margin="2" Text="{Binding DatabaseUser}" Width="400"/>
-            </StackPanel>
+            </StackPanel>-->
 
-            <StackPanel Orientation="Horizontal">
+            <!--<StackPanel Orientation="Horizontal">
                 <Label Margin="2" Width="120">DB Name</Label>
                 <TextBox Margin="2" Text="{Binding DatabaseName}" Width="400"/>
             </StackPanel>
             
-            <StackPanel Orientation="Horizontal">
-                <Label Margin="2" Width="120">DB Host</Label>
-                <TextBox Margin="2" Text="{Binding DatabaseHost}" Width="400"/>
-            </StackPanel>
+
 
             <StackPanel Orientation="Horizontal">
                 <Label Margin="2" Width="120">DB Port</Label>
@@ -71,7 +73,7 @@
             <StackPanel Orientation="Horizontal">
                 <Label Margin="2" Width="120">DB Pass</Label>
                 <TextBox Margin="2" Text="{Binding DatabasePass}" Width="400"/>
-            </StackPanel>
+            </StackPanel>-->
             <!--<StackPanel Orientation="Horizontal">
                 <Label Margin="2" Width="120">Tags</Label>
                 <ListBox Margin="2" 

@@ -16,6 +16,7 @@ from .serializers import (
     OrderInfoSerializer,
     BinSerializer
 )
+from .tasks import reset_database_task
 
 # Create your views here.
 
@@ -88,6 +89,17 @@ class AvailableBin(views.APIView):
             })
 
 
+
+class ResetDatabaseAPIView(views.APIView):
+    """
+    docstring
+    """
+    def post(self,request,*args, **kwargs):
+        """
+        docstring
+        """
+        reset_database_task.delay()
+        return response.Response({"message","Database reset"})
 
 class ListBinsView(views.APIView):
     """

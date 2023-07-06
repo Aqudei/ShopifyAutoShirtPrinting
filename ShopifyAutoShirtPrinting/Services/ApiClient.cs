@@ -198,6 +198,13 @@ namespace ShopifyEasyShirtPrinting.Services
             return null;
         }
 
+
+        public async Task ReetDatabase()
+        {
+            var request = new RestRequest("/api/ResetDatabase/");
+            var response = await _client.PostAsync(request);
+        }
+
         public async Task EmptyBinAsync(int binNumber)
         {
             var request = new RestRequest($"/api/Bins/{binNumber}/");
