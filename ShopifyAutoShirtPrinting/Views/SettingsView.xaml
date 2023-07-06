@@ -53,10 +53,10 @@
                 <TextBox Margin="2" Text="{Binding ServerHost}" Width="400"/>
             </StackPanel>
             
-            <StackPanel Orientation="Horizontal">
+            <!--<StackPanel Orientation="Horizontal">
                 <Label Margin="2" Width="120">Server Port</Label>
                 <TextBox Margin="2" Text="{Binding ServerPort}" Width="400"/>
-            </StackPanel>
+            </StackPanel>-->
 
             <StackPanel Orientation="Horizontal">
                 <Label Margin="2" Width="120">API Base URL:</Label>
