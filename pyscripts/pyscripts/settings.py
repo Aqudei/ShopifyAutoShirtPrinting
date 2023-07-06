@@ -29,7 +29,9 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'thelonelykids.ga',
     'www.thelonelykids.ga',
-    '170.64.158.123'
+    '170.64.158.123',
+    '127.0.0.1', 
+    'localhost'
 ]
 
 

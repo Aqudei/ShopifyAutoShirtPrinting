@@ -35,8 +35,8 @@
     <Setting Name="ServerHost" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="DatabasePort" Type="System.String" Scope="User">
-      <Value Profile="(Default)">25060</Value>
+    <Setting Name="ServerPort" Type="System.String" Scope="User">
+      <Value Profile="(Default)">8000</Value>
     </Setting>
     <Setting Name="DatabasePass" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -46,6 +46,9 @@
     </Setting>
     <Setting Name="DatabaseName" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ApiBaseUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">http://127.0.0.1:8000</Value>
     </Setting>
   </Settings>
 </SettingsFile>

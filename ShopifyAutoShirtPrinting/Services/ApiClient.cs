@@ -13,15 +13,15 @@ using System.Threading.Tasks;
 
 namespace ShopifyEasyShirtPrinting.Services
 {
-    public class AvailableBinResponse
+    public class BinNumberResponse
     {
-        public int AvailableBinNumber { get; set; }
+        public int BinNumber { get; set; }
     }
 
     public class ApiClient
     {
         private readonly RestClient _client;
-        private readonly string _baseUrl = "http://170.64.158.123";
+        private readonly string _baseUrl = $"{Properties.Settings.Default.ApiBaseUrl}";
 
         public ApiClient()
         {
@@ -81,9 +81,9 @@ namespace ShopifyEasyShirtPrinting.Services
             return null;
         }
 
-        public async Task<IEnumerable<Log>> ListLogsAsync(int myLineItemId)
+        public async Task<IEnumerable<Log>> ListLogsAsync(long myLineItemId)
         {
-            var request = new RestRequest($"/api/Logs/?MyLineItemId={myLineItemId}");
+            var request = new RestRequest($"/api/Logs/?LineItem={myLineItemId}");
 
             var response = await _client.ExecuteGetAsync<IEnumerable<Log>>(request);
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
@@ -211,16 +211,17 @@ namespace ShopifyEasyShirtPrinting.Services
             var response = await _client.ExecutePostAsync(request);
         }
 
-        public async Task<AvailableBinResponse> GetNextAvailableBin()
+        public async Task<MyLineItem> ProcessItem(long lineItemId)
         {
-            var request = new RestRequest("/api/Bins/Available/");
-            var response = await _client.ExecuteGetAsync<AvailableBinResponse>(request);
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            var request = new RestRequest($"/api/ProcessItem/{lineItemId}/");
+            var response = await _client.ExecutePostAsync<MyLineItem>(request);
+
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
             {
-                return response.Data;
+                throw new Exception($"Error @ ProcessItem({lineItemId})!");
             }
 
-            return null;
+            return response.Data;
         }
     }
 }

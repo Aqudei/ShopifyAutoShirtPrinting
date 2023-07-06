@@ -53,6 +53,16 @@
                 <TextBox Margin="2" Text="{Binding ServerHost}" Width="400"/>
             </StackPanel>
             
+            <StackPanel Orientation="Horizontal">
+                <Label Margin="2" Width="120">Server Port</Label>
+                <TextBox Margin="2" Text="{Binding ServerPort}" Width="400"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal">
+                <Label Margin="2" Width="120">API Base URL:</Label>
+                <TextBox Margin="2" Text="{Binding ApiBaseUrl}" Width="400"/>
+            </StackPanel>
+
             <!--<StackPanel Orientation="Horizontal">
                 <Label Margin="2" Width="120">DB User</Label>
                 <TextBox Margin="2" Text="{Binding DatabaseUser}" Width="400"/>
@@ -65,10 +75,7 @@
             
 
 
-            <StackPanel Orientation="Horizontal">
-                <Label Margin="2" Width="120">DB Port</Label>
-                <TextBox Margin="2" Text="{Binding DatabasePort}" Width="400"/>
-            </StackPanel>
+
 
             <StackPanel Orientation="Horizontal">
                 <Label Margin="2" Width="120">DB Pass</Label>

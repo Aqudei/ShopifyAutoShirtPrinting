@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using EasyNetQ;
 using ImTools;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -96,7 +95,6 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     private readonly IMapper _mapper;
     private readonly BinService _binService;
     private readonly DbService _dbService;
-    private readonly IBus _bus;
     private readonly ApiClient _apiClient;
     private readonly IEventAggregator _eventAggregator;
     private DelegateCommand _openQrScannerCommand;
@@ -240,7 +238,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private async void RefreshData()
     {
-        await Task.Run(FetchLineItems);
+        await FetchLineItems();
     }
 
     private async void HandleResetDatabase()
@@ -253,7 +251,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
         await _apiClient.ReetDatabase();
         await Task.Delay(TimeSpan.FromSeconds(3));
-        await Task.Run(FetchLineItems);
+        await FetchLineItems();
     }
 
     private async void HandleSaveQrTag()
@@ -322,7 +320,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     public OrderProcessingViewModel(IDialogService dialogService, OrderService orderService, ShipStationApi shipStationApi, IShipStationBrowserService browserService,
         ProductVariantService productVariantService, ProductImageService productImageService, GlobalVariables globalVariables, IDialogCoordinator dialogCoordinator,
         IEventAggregator eventAggregator, IMapper mapper, MyPrintService myPrintService,
-        BinService binService, DbService dbService, IBus bus, ApiClient apiClient)
+        BinService binService, DbService dbService, ApiClient apiClient)
     {
         _dispatcher = Application.Current.Dispatcher;
 
@@ -339,58 +337,22 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         _eventAggregator = eventAggregator;
         _binService = binService;
         _dbService = dbService;
-        _bus = bus;
         _apiClient = apiClient;
         LineItemsView = CollectionViewSource.GetDefaultView(_lineItems);
         LineItemsView.SortDescriptions.Add(new SortDescription("OrderNumber", ListSortDirection.Descending));
 
-        Task.Run(FetchLineItems).ContinueWith(t =>
-        {
-            if (!_globalVariables.IsOnLocalMachine)
-                _bus.PubSub.Subscribe<ItemsUpdated>("item.updated", async (e) =>
-                {
-                    if (e.MyLineItemDatabaseIds == null || e.MyLineItemDatabaseIds.Length <= 0)
-                        return;
+        Task.Run(FetchLineItems);
 
-                    foreach (var lineItemDbId in e.MyLineItemDatabaseIds)
-                    {
-                        var dbLineItem = await _apiClient.GetLineItemByIdAsync(lineItemDbId);
-                        var displayLineItem = _lineItems.SingleOrDefault(l => l.Id == lineItemDbId);
+        if (!_globalVariables.IsOnLocalMachine)
+            InitChangeListener();
 
-                        if (dbLineItem != null && displayLineItem != null)
-                        {
-                            if (displayLineItem.Notes != dbLineItem.Notes)
-                            {
-                                _dispatcher.Invoke(() => { displayLineItem.Notes = dbLineItem.Notes; });
-                            }
-
-                            if (displayLineItem.Status != dbLineItem.Status)
-                            {
-                                _dispatcher.Invoke(() => { displayLineItem.Status = dbLineItem.Status; });
-                            }
-
-                            if (displayLineItem.DateModified != dbLineItem.DateModified)
-                            {
-                                _dispatcher.Invoke(() => { displayLineItem.DateModified = dbLineItem.DateModified; });
-                            }
-
-                            if (displayLineItem.BinNumber != dbLineItem.BinNumber)
-                            {
-                                _dispatcher.Invoke(() => { displayLineItem.BinNumber = dbLineItem.BinNumber; });
-                            }
-
-                            if (displayLineItem.PrintedQuantity != dbLineItem.PrintedQuantity)
-                            {
-                                _dispatcher.Invoke(() => { displayLineItem.PrintedQuantity = dbLineItem.PrintedQuantity; });
-                            }
-                        }
-                    }
-                });
-
-            _dispatcher.Invoke(() => ShippingLines.AddRange(_lineItems.Select(l => l.Shipping).Distinct().ToList()));
-
-        });
+        _dispatcher.Invoke(() => ShippingLines.AddRange(_lineItems.Select(l => l.Shipping).Distinct().ToList()));
         PropertyChanged += OrderProcessingViewModel_PropertyChanged;
+    }
+
+    private void InitChangeListener()
+    {
+
     }
 
     private DelegateCommand _browseQrCommand;
@@ -481,7 +443,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                     if (SelectedLineItem != null)
                     {
                         CurrentImage = null;
-                        await Task.Run(() => FetchProductImageAsync(SelectedLineItem));
+                        await FetchProductImageAsync(SelectedLineItem);
 
                         Logs.Clear();
                         var logs = await _apiClient.ListLogsAsync(SelectedLineItem.Id);
@@ -522,9 +484,10 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                                                                    DetectedQr.EndsWith(" ")))
                     {
                         var parsedQr = MyQr.Parse(DetectedQr.Trim(" \r\n\t".ToCharArray()));
-                        DetectedQr = "";
 
-
+                        await _dispatcher.InvokeAsync(() => DetectedQr = "");
+                        
+                        
                         if (parsedQr != null)
                         {
                             // QrInfo = FetchQrInfo(parsedQr);
@@ -656,11 +619,11 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 }
             }
 
-            if (!_globalVariables.IsOnLocalMachine)
-                _bus.PubSub.Publish(new ItemsUpdated
-                {
-                    MyLineItemDatabaseIds = new int[] { lineItem.Id }
-                });
+            //if (!_globalVariables.IsOnLocalMachine)
+            //    _bus.PubSub.Publish(new ItemsUpdated
+            //    {
+            //        MyLineItemDatabaseIds = new int[] { lineItem.Id }
+            //    });
         }
         catch (Exception exception)
         {
@@ -788,7 +751,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         foreach (var orderItem in _lineItems) orderItem.IsSelected = false;
     }
 
-    private async void FetchProductImageAsync(MyLineItem myLineItem)
+    private async Task FetchProductImageAsync(MyLineItem myLineItem)
     {
         try
         {
@@ -853,7 +816,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         return imagePath;
     }
 
-    private async void FetchLineItems()
+    private async Task FetchLineItems()
     {
         var waitDialog = await _dialogCoordinator.ShowProgressAsync(this, "Please wait", "Fetching orders @ page # 1...");
         waitDialog.SetIndeterminate();
@@ -863,6 +826,12 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             // Update UI
             await _dispatcher.InvokeAsync(() => _lineItems.Clear());
             var lineItems = await _apiClient.ListItemsAsync();
+            
+            if (lineItems == null)
+            {
+                return;
+            }
+
             foreach (var lineItem in lineItems)
             {
                 await _dispatcher.InvokeAsync(() =>
@@ -946,11 +915,11 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private void BroadcastChanges(int[] ints)
     {
-        if (!_globalVariables.IsOnLocalMachine)
-            _bus.PubSub.Publish(new ItemsUpdated
-            {
-                MyLineItemDatabaseIds = ints,
-            });
+        //if (!_globalVariables.IsOnLocalMachine)
+        //    _bus.PubSub.Publish(new ItemsUpdated
+        //    {
+        //        MyLineItemDatabaseIds = ints,
+        //    });
     }
 
     public MyLineItem SelectedLineItem

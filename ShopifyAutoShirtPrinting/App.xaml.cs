@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using DotNetEnv;
-using EasyNetQ;
 using MahApps.Metro.Controls.Dialogs;
 using NLog;
 using Prism.DryIoc;
@@ -65,19 +64,19 @@ namespace ShopifyEasyShirtPrinting
                 containerRegistry.RegisterInstance(productImageService);
 
                 var databaseHost = string.IsNullOrWhiteSpace(Settings.Default.ServerHost) ? "localhost" : Settings.Default.ServerHost;
-                var databasePort = Settings.Default.DatabasePort;
+                var databasePort = Settings.Default.ServerPort;
                 var databaseName = Settings.Default.DatabaseName;
                 var databaseUser = Settings.Default.DatabaseUser;
                 var databasePass = Settings.Default.DatabasePass;
 
                 var connectionString = "";
 
-                //if (System.Environment.MachineName.Contains("LAPTOP-DB8A9BOL"))
-                //{
-                //    connectionString = $"Server=localhost;Port=5432;Database=thelonelykids;User Id=postgres;Password=Espelimbergo;";
-                //    _globalVariables.IsOnLocalMachine = true;
-                //}
-                //else
+                if (System.Environment.MachineName.Contains("LAPTOP-DB8A9BOL"))
+                {
+                    connectionString = $"Server=localhost;Port=5432;Database=thelonelykids;User Id=postgres;Password=Espelimbergo;";
+                    _globalVariables.IsOnLocalMachine = true;
+                }
+                else
                     connectionString = $"Server={databaseHost};Port={databasePort};Database={databaseName};User Id={databaseUser};Password={databasePass};";
 
                 // Database.SetInitializer(new MigrateDatabaseToLatestVersion<LonelyKidsContext, Migrations.Configuration>(useSuppliedContext: true));
@@ -115,8 +114,8 @@ namespace ShopifyEasyShirtPrinting
                 containerRegistry.RegisterSingleton<IEventAggregator, EventAggregator>();
 
                 // EventBus Setup
-                var bus = RabbitHutch.CreateBus($"host={Settings.Default.ServerHost};username=warwick;password=warwickpass1");
-                containerRegistry.RegisterInstance(bus);
+                //var bus = RabbitHutch.CreateBus($"host={Settings.Default.ServerHost};username=warwick;password=warwickpass1");
+                //containerRegistry.RegisterInstance(bus);
 
                 // Selenium Setup
                 if (Settings.Default.UseBrowser)
@@ -186,10 +185,10 @@ namespace ShopifyEasyShirtPrinting
             if (Container.IsRegistered<IShipStationBrowserService>())
                 Container.Resolve<IShipStationBrowserService>().Dispose();
 
-            if (Container.IsRegistered<IBus>())
-            {
-                Container.Resolve<IBus>().Dispose();
-            }
+            //if (Container.IsRegistered<IBus>())
+            //{
+            //    Container.Resolve<IBus>().Dispose();
+            //}
         }
     }
 }

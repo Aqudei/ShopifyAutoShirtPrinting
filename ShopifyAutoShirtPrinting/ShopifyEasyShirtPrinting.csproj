@@ -120,9 +120,6 @@
     <Reference Include="DYMO.Label.Framework, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5426002a38745af9, processorArchitecture=MSIL">
       <HintPath>..\packages\DYMO.Label.8.5.1.04\lib\net45\DYMO.Label.Framework.dll</HintPath>
     </Reference>
-    <Reference Include="EasyNetQ, Version=7.0.0.0, Culture=neutral, PublicKeyToken=8b1766e46498eb4b, processorArchitecture=MSIL">
-      <HintPath>..\packages\EasyNetQ.7.5.3\lib\netstandard2.0\EasyNetQ.dll</HintPath>
-    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.dll</HintPath>
     </Reference>

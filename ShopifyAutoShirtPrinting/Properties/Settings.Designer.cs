@@ -156,13 +156,13 @@ namespace ShopifyEasyShirtPrinting.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("25060")]
-        public string DatabasePort {
+        [global::System.Configuration.DefaultSettingValueAttribute("8000")]
+        public string ServerPort {
             get {
-                return ((string)(this["DatabasePort"]));
+                return ((string)(this["ServerPort"]));
             }
             set {
-                this["DatabasePort"] = value;
+                this["ServerPort"] = value;
             }
         }
         
@@ -199,6 +199,18 @@ namespace ShopifyEasyShirtPrinting.Properties {
             }
             set {
                 this["DatabaseName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://127.0.0.1:8000")]
+        public string ApiBaseUrl {
+            get {
+                return ((string)(this["ApiBaseUrl"]));
+            }
+            set {
+                this["ApiBaseUrl"] = value;
             }
         }
     }

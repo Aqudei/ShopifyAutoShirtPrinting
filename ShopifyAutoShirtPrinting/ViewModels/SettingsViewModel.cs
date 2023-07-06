@@ -88,16 +88,18 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 #pragma warning disable CS0169 // The field 'SettingsViewModel._tagInput' is never used
         private string _tagInput;
 #pragma warning restore CS0169 // The field 'SettingsViewModel._tagInput' is never used
-        private string databasePort;
+        private string _serverPort;
         private string databasePass;
         private string databaseUser;
         private string databaseName;
+        private string apiBaseUrl;
 
-        public string DatabasePort { get => databasePort; set => SetProperty(ref databasePort, value); }
+        public string ServerPort { get => _serverPort; set => SetProperty(ref _serverPort, value); }
         public string DatabasePass { get => databasePass; set => SetProperty(ref databasePass, value); }
         public string DatabaseUser { get => databaseUser; set => SetProperty(ref databaseUser, value); }
         public string DatabaseName { get => databaseName; set => SetProperty(ref databaseName, value); }
-
+        public string ApiBaseUrl { get => apiBaseUrl; set => SetProperty(ref apiBaseUrl, value); }
+        
         public DelegateCommand SaveSettingsCommand
         {
             get { return _saveSettingsCommand ??= new DelegateCommand(HandleSaveSettings); }

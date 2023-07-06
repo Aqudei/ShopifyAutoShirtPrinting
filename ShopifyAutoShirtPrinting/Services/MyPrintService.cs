@@ -22,34 +22,34 @@ namespace ShopifyEasyShirtPrinting.Services
 
         public async Task<MyLineItem> PrintItem(MyLineItem myLineItem)
         {
-            await Task.Delay(1);
-
-            if (myLineItem.PrintedQuantity < myLineItem.Quantity)
+            if (myLineItem.PrintedQuantity >= myLineItem.Quantity)
             {
-                var orderInfo = await _apiClient.GetOrderInfoBy(new Dictionary<string, string> { { "OrderId", $"{myLineItem.OrderId}" } });
-                if (orderInfo == null)
-                {
-                    await _apiClient.AddOrderInfo(new OrderInfo
-                    {
-                        OrderId = myLineItem.OrderId.Value
-                    });
-                }
-
-                // Do actual printing
-                myLineItem.PrintedQuantity += 1;
-                myLineItem.Status = "Processed";
-                myLineItem.BinNumber = await GetBinAsync(myLineItem.OrderId.Value);
-                await _apiClient.UpdateLineItemAsync(myLineItem);
-
-                await _apiClient.AddNewLogAsync(new Log
-                {
-                    ChangeDate = DateTime.Now,
-                    ChangeStatus = "Processed",
-                    MyLineItemId = myLineItem.Id
-                });
+                throw new Exception("Cannot print when All items were already Printed!");
             }
 
-            return await _apiClient.GetLineItemByIdAsync(myLineItem.Id);
+            var orderInfo = await _apiClient.GetOrderInfoBy(new Dictionary<string, string> { { "OrderId", $"{myLineItem.OrderId}" } });
+            if (orderInfo == null)
+            {
+                throw new Exception($"Missing OrderInfo / Id: {orderInfo.OrderId}");
+            }
+
+            // Do actual printing
+
+            var updatedLineItem = await _apiClient.ProcessItem(myLineItem.Id);
+
+            //myLineItem.PrintedQuantity += 1;
+            //myLineItem.Status = "Processed";
+            //myLineItem.BinNumber = updatedLineItem.BinNumber;
+            //var updatedLineItem = await _apiClient.UpdateLineItemAsync(myLineItem);
+
+            //await _apiClient.AddNewLogAsync(new Log
+            //{
+            //    ChangeDate = DateTime.Now,
+            //    ChangeStatus = "Processed",
+            //    MyLineItemId = myLineItem.Id
+            //});
+
+            return updatedLineItem;
         }
 
 
@@ -64,39 +64,6 @@ namespace ShopifyEasyShirtPrinting.Services
             }
 
             return true;
-        }
-
-        private async Task<int> GetBinAsync(long orderId)
-        {
-
-            var orders = await _apiClient.ListItemsAsync(new Dictionary<string, string> { { "OrderId", $"{orderId}" } });
-
-            var totalItems = orders.Sum(l => l.Quantity);
-            var binNumber = 0;
-
-            if (totalItems > 1)
-            {
-                var orderInfo = await _apiClient.GetOrderInfoBy(new Dictionary<string, string> { { "OrderId", $"{orderId}" } });
-
-                if (orderInfo != null)
-                {
-                    binNumber = orderInfo.BinNumber != 0 ? orderInfo.BinNumber : await GetNextAvailableBinNumber();
-                    orderInfo.BinNumber = binNumber;
-                    await _apiClient.UpdateOrderInfo(orderInfo);
-                }
-                else
-                {
-                    throw new Exception("OrderInfo not found!");
-                }
-            }
-
-            return binNumber;
-        }
-
-        private async Task<int> GetNextAvailableBinNumber()
-        {
-            var availableBinResponse = await _apiClient.GetNextAvailableBin();
-            return availableBinResponse.AvailableBinNumber;
         }
     }
 }
