@@ -22,6 +22,9 @@ class Log(models.Model):
     LineItem = models.ForeignKey(
         'LineItem', models.SET_NULL, db_column='MyLineItemId', related_name='Logs', null=True)
 
+    def __str__(self):
+        return f"{self.ChangeDate} - {self.LineItem} - {self.ChangeStatus}"
+
     class Meta:
         db_table = 'Logs'
 
@@ -46,7 +49,8 @@ class LineItem(models.Model):
     LineItemId = models.BigIntegerField(
         db_column='LineItemId', blank=True, null=True)
     # Field name made lowercase.
-    Quantity = models.IntegerField(db_column='Quantity', blank=True, null=True, default=0)
+    Quantity = models.IntegerField(
+        db_column='Quantity', blank=True, null=True, default=0)
     # Field name made lowercase.
     FulfillmentStatus = models.TextField(
         db_column='FulfillmentStatus', blank=True, null=True)
@@ -70,7 +74,8 @@ class LineItem(models.Model):
     OrderId = models.BigIntegerField(
         db_column='OrderId', blank=True, null=True)
     # Field name made lowercase.
-    PrintedQuantity = models.IntegerField(db_column='PrintedQuantity', default=0)
+    PrintedQuantity = models.IntegerField(
+        db_column='PrintedQuantity', default=0)
     # Field name made lowercase.
     BinNumber = models.IntegerField(db_column='BinNumber', default=0)
     # Field name made lowercase.
@@ -80,6 +85,10 @@ class LineItem(models.Model):
     Order = models.ForeignKey(
         "tlkapi.OrderInfo", verbose_name=_("Order"), on_delete=models.SET_NULL, null=True, blank=True, related_name='LineItems')
 
+
+    def __str__(self):
+        return self.name
+    
     class Meta:
         db_table = 'MyLineItems'
         ordering = ['-OrderNumber']
@@ -93,9 +102,9 @@ class OrderInfo(models.Model):
     # Field name made lowercase.
     OrderId = models.BigIntegerField(db_column='OrderId')
     # Field name made lowercase.
-    Active = models.BooleanField(db_column='Active',default=False)
+    Active = models.BooleanField(db_column='Active', default=False)
     # Field name made lowercase.
-    LabelPrinted = models.BooleanField(db_column='LabelPrinted',default=False)
+    LabelPrinted = models.BooleanField(db_column='LabelPrinted', default=False)
     # Field name made lowercase.
     LabelData = models.TextField(db_column='LabelData', blank=True, null=True)
     # Field name made lowercase.
@@ -107,6 +116,9 @@ class OrderInfo(models.Model):
     ShipmentCost = models.FloatField(db_column='ShipmentCost', default=0.0)
     # Field name made lowercase.
     ShipmentId = models.IntegerField(db_column='ShipmentId', default=0)
+
+    def __str__(self) -> str:
+        return f"{self.OrderId} - {self.BinNumber}"
 
     class Meta:
         db_table = 'OrderInfoes'
