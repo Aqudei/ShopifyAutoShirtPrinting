@@ -294,7 +294,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         if (prompt != MessageDialogResult.Affirmative)
             return;
 
-        await _apiClient.ReetDatabase();
+        await _apiClient.ResetDatabase();
         await Task.Delay(TimeSpan.FromSeconds(3));
         await FetchLineItems();
     }
@@ -387,15 +387,12 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         LineItemsView = CollectionViewSource.GetDefaultView(_lineItems);
         LineItemsView.SortDescriptions.Add(new SortDescription("OrderNumber", ListSortDirection.Descending));
 
-        Task.Run(FetchLineItems);
-
-        if (!_globalVariables.IsOnLocalMachine)
-            InitChangeListener();
-
-        _dispatcher.Invoke(() => ShippingLines.AddRange(_lineItems.Select(l => l.Shipping).Distinct().ToList()));
+        // _dispatcher.Invoke(() => ShippingLines.AddRange(_lineItems.Select(l => l.Shipping).Distinct().ToList()));
         PropertyChanged += OrderProcessingViewModel_PropertyChanged;
-
         _messageBus.ItemsUpdated += _messageBus_ItemsUpdated;
+
+
+        Task.Run(FetchLineItems);
     }
 
     private async void _messageBus_ItemsUpdated(object sender, int[] ids)
@@ -414,10 +411,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
     }
 
-    private void InitChangeListener()
-    {
-
-    }
+   
 
     private DelegateCommand _browseQrCommand;
 
@@ -910,7 +904,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
         catch (Exception e)
         {
-            Debug.WriteLine(e);
+            Debug.WriteLine($"{e}\n{e.StackTrace}");
         }
         finally
         {
@@ -978,10 +972,10 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             updatedIds.Add(lineItem.Id);
         }
 
-       
+
     }
 
-   
+
 
     public MyLineItem SelectedLineItem
     {

@@ -82,11 +82,11 @@ namespace ShopifyEasyShirtPrinting.Services
             return null;
         }
 
-        public async Task<IEnumerable<Log>> ListLogsAsync(long myLineItemId)
+        public async Task<Log[]> ListLogsAsync(long myLineItemId)
         {
             var request = new RestRequest($"/api/Logs/?LineItem={myLineItemId}");
 
-            var response = await _client.ExecuteGetAsync<IEnumerable<Log>>(request);
+            var response = await _client.ExecuteGetAsync<Log[]>(request);
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 return response.Data;
@@ -200,7 +200,7 @@ namespace ShopifyEasyShirtPrinting.Services
         }
 
 
-        public async Task ReetDatabase()
+        public async Task ResetDatabase()
         {
             var request = new RestRequest("/api/ResetDatabase/");
             var response = await _client.PostAsync(request);

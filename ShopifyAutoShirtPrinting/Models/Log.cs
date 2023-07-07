@@ -11,7 +11,7 @@ namespace ShopifyEasyShirtPrinting.Models
         [JsonPropertyName("ChangeStatus")]
         public string ChangeStatus { get; set; }
 
-        [JsonPropertyName("MyLineItemId")]
+        [JsonPropertyName("LineItem")]
         public int MyLineItemId { get; set; }
 
         [JsonIgnore]
