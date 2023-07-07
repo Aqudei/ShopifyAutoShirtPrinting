@@ -53,7 +53,8 @@ namespace ShopifyEasyShirtPrinting
                 var productVariantService = new ProductVariantService(shopUrl, shopToken);
                 var productImageService = new ProductImageService(shopUrl, shopToken);
 
-                containerRegistry.RegisterDialog<PrintQrView, PrintQrViewModel>();
+                // containerRegistry.RegisterDialog<PrintQrView, PrintQrViewModel>();
+                containerRegistry.RegisterDialog<CrudDialog, CrudDialogViewModel>();
                 containerRegistry.RegisterDialogWindow<MetroDialogWindow>();
                 containerRegistry.Register<ShipStationApi>();
                 containerRegistry.Register<MyPrintService>();
@@ -96,9 +97,12 @@ namespace ShopifyEasyShirtPrinting
                 var config = new MapperConfiguration(cfg =>
                 {
                     cfg.CreateMap<MyLineItem, MyLineItem>();
+                    cfg.CreateMap<MyLineItem, CrudDialogViewModel>()
+                    .ReverseMap();
                     cfg.CreateMap<OrderInfo, OrderInfo>();
                     cfg.CreateMap<Log, Log>();
-                    cfg.CreateMap<Settings, SettingsViewModel>().ReverseMap();
+                    cfg.CreateMap<Settings, SettingsViewModel>()
+                    .ReverseMap();
                 });
 
                 containerRegistry.RegisterInstance(config.CreateMapper());

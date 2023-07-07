@@ -33,7 +33,7 @@
     <ProductName>ShopifyEasyShirtPrinting</ProductName>
     <PublisherName>Aqudei</PublisherName>
     <SuiteName>Tools</SuiteName>
-    <ApplicationRevision>18</ApplicationRevision>
+    <ApplicationRevision>19</ApplicationRevision>
     <ApplicationVersion>13.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -545,6 +545,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\Dialogs\CrudDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Dialogs\QuantityChangerDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -648,6 +652,7 @@
     <Compile Include="Services\ShipStation\ShipStationApi.cs" />
     <Compile Include="ViewModels\BinsViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\AfterScanDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\CrudDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\QuantityChangerDialogViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\PageBase.cs" />
@@ -662,6 +667,9 @@
     </Compile>
     <Compile Include="Views\Dialogs\AfterScanDialog.xaml.cs">
       <DependentUpon>AfterScanDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialogs\CrudDialog.xaml.cs">
+      <DependentUpon>CrudDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialogs\QuantityChangerDialog.xaml.cs">
       <DependentUpon>QuantityChangerDialog.xaml</DependentUpon>

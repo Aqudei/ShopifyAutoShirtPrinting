@@ -110,6 +110,7 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
 
@@ -171,19 +172,35 @@
                 </Button>
                 <Button Margin="4"
                         Grid.Column="4"
-                        Command="{Binding ResetDatabaseCommand}">
+                        Command="{Binding CrudCommand}"
+                        CommandParameter="Create">
                     <StackPanel Orientation="Horizontal">
-                        <iconPacks:PackIconMaterial Kind="DatabaseRefresh"
+                        <iconPacks:PackIconMaterial Kind="PlusBox"
                                                     Height="16"
                                                     VerticalAlignment="Center"/>                        
                         <TextBlock VerticalAlignment="Center"
                                        TextWrapping="Wrap"
                                        Margin="4">
-                            <Run Text="Reset Database"/>
+                            <Run Text="New Item"/>
                         </TextBlock>
                     </StackPanel>
                 </Button>
-                <TextBox Grid.Column="5" 
+
+                <Button Margin="4"
+                        Grid.Column="5"
+                        Command="{Binding CrudCommand}"
+                        CommandParameter="Update">
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconMaterial Kind="BookEdit"
+                                                    Height="16"
+                                                    VerticalAlignment="Center"/>
+                        <TextBlock VerticalAlignment="Center"
+                                       TextWrapping="Wrap"
+                                       Margin="4"><Run Language="en-ph" Text="Edit Item"/></TextBlock>
+                    </StackPanel>
+                </Button>
+                
+                <TextBox Grid.Column="6" 
                          FontSize="20"
                          VerticalContentAlignment="Center"
                          Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -326,6 +343,7 @@
             </DataGrid>
 
             <DockPanel Grid.Row="1"
+                       LastChildFill="True"
                        Margin="5,0,5,5">
 
                 <Button DockPanel.Dock="Right"
@@ -341,7 +359,16 @@
                         </DockPanel>
                     </Button.Content>
                 </Button>
-
+                <StackPanel Orientation="Horizontal" 
+                            DockPanel.Dock="Top"
+                            HorizontalAlignment="Right">
+                    <TextBlock Text="{Binding TotalSelected}"
+                               FontSize="16"/>
+                    <TextBlock Text="/"
+                               FontSize="16"/>
+                    <TextBlock Text="{Binding TotalItems}"
+                               FontSize="16"/>
+                </StackPanel>
                 <TextBox DockPanel.Dock="Left" 
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                          ScrollViewer.VerticalScrollBarVisibility="Auto"
@@ -351,6 +378,7 @@
                          TextWrapping="Wrap"
                          MaxLines="3"
                          Height="100"/>
+                
             </DockPanel>
         </Grid>
 

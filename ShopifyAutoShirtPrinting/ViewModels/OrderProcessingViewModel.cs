@@ -236,6 +236,53 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     public DelegateCommand RefreshCommand => _refreshCommand ??= new DelegateCommand(RefreshData);
 
+
+    private DelegateCommand<string> _crudCommand;
+
+    public DelegateCommand<string> CrudCommand
+    {
+        get { return _crudCommand ??= new DelegateCommand<string>(HandleCrudCommand); }
+    }
+
+    private void HandleCrudCommand(string crudCommand)
+    {
+        switch (crudCommand.ToUpper())
+        {
+            case "CREATE":
+                _dialogService.ShowDialog("CrudDialog", callback: async (r) =>
+                {
+                    if (r.Parameters.TryGetValue<MyLineItem>("MyLineItem", out var myLineItem))
+                    {
+                        var createdLineItem = await _apiClient.CreateLineItemAsync(myLineItem);
+                    }
+                });
+                break;
+            case "UPDATE":
+                if (SelectedLineItem == null) return;
+
+                var prams = new DialogParameters { { "MyLineItem", SelectedLineItem } };
+                _dialogService.ShowDialog("CrudDialog", prams, async (r) =>
+                {
+                    if (r.Parameters.TryGetValue<MyLineItem>("MyLineItem", out var myLineItem))
+                    {
+                        var lineItem = await _apiClient.UpdateLineItemAsync(myLineItem);
+                    }
+                });
+                break;
+            default:
+                break;
+        }
+    }
+
+    public int TotalItems => _lineItems.Count;
+    public int TotalSelected
+    {
+        get
+        {
+            return _lineItems.Where(l => l.IsSelected).Count();
+        }
+    }
+
     private async void RefreshData()
     {
         await FetchLineItems();
@@ -453,6 +500,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                         }
 
                         Notes = SelectedLineItem.Notes;
+
+                        RaisePropertyChanged(nameof(TotalSelected));
                     }
                     break;
                 }
@@ -486,8 +535,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                         var parsedQr = MyQr.Parse(DetectedQr.Trim(" \r\n\t".ToCharArray()));
 
                         await _dispatcher.InvokeAsync(() => DetectedQr = "");
-                        
-                        
+
+
                         if (parsedQr != null)
                         {
                             // QrInfo = FetchQrInfo(parsedQr);
@@ -826,7 +875,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             // Update UI
             await _dispatcher.InvokeAsync(() => _lineItems.Clear());
             var lineItems = await _apiClient.ListItemsAsync();
-            
+
             if (lineItems == null)
             {
                 return;
@@ -839,6 +888,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                     _lineItems.Add(lineItem);
                 });
             }
+
+            await _dispatcher.InvokeAsync(() => RaisePropertyChanged(nameof(TotalItems)));
         }
         catch (Exception e)
         {

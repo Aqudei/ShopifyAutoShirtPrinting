@@ -223,5 +223,20 @@ namespace ShopifyEasyShirtPrinting.Services
 
             return response.Data;
         }
+
+        public async Task<MyLineItem> CreateLineItemAsync(MyLineItem myLineItem)
+        {
+            var request = new RestRequest($"/api/LineItems/")
+                .AddBody(myLineItem);
+            var response = await _client.ExecutePostAsync<MyLineItem>(request);
+
+            if (response.StatusCode != System.Net.HttpStatusCode.Created)
+            {
+                throw new Exception("Unable to Create");
+            }
+
+            return response.Data;
+
+        }
     }
 }
