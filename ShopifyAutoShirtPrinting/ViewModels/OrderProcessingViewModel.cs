@@ -411,7 +411,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
     }
 
-   
+
 
     private DelegateCommand _browseQrCommand;
 
@@ -511,8 +511,6 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                         }
 
                         Notes = SelectedLineItem.Notes;
-
-                        RaisePropertyChanged(nameof(TotalSelected));
                     }
                     break;
                 }
@@ -896,6 +894,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             {
                 await _dispatcher.InvokeAsync(() =>
                 {
+                    lineItem.PropertyChanged += LineItem_PropertyChanged;
                     _lineItems.Add(lineItem);
                 });
             }
@@ -909,6 +908,15 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         finally
         {
             await waitDialog.CloseAsync();
+        }
+    }
+
+    private void LineItem_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        MyLineItem myLineItem;
+        if (e.PropertyName == nameof(myLineItem.IsSelected))
+        {
+            RaisePropertyChanged(nameof(TotalSelected));
         }
     }
 

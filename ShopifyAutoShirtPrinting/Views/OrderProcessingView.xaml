@@ -361,13 +361,17 @@
                 </Button>
                 <StackPanel Orientation="Horizontal" 
                             DockPanel.Dock="Top"
-                            HorizontalAlignment="Right">
-                    <TextBlock Text="{Binding TotalSelected}"
-                               FontSize="16"/>
-                    <TextBlock Text="/"
-                               FontSize="16"/>
-                    <TextBlock Text="{Binding TotalItems}"
-                               FontSize="16"/>
+                            HorizontalAlignment="Left">
+                    <TextBlock>
+                        <Run Text="Showing "/>
+                        <Run Text="{Binding TotalItems, Mode=OneWay}"/>
+                        <Run Text=" of "/>
+                        <Run Text="{Binding TotalItems, Mode=OneWay}"/>
+                        <Run Text=" items ("/>
+                        <Run Text="{Binding TotalSelected, Mode=OneWay}"/>
+                        <Run Text=" selected)"/>
+                    </TextBlock>
+                   
                 </StackPanel>
                 <TextBox DockPanel.Dock="Left" 
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
