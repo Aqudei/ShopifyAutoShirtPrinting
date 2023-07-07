@@ -19,6 +19,7 @@ from django.urls import path
 from rest_framework import routers
 from .views import (
     LineItemViewSet,
+    ListLineItemsView,
     LogAPIView,
     OrderInfoViewSet,
     ListBinsView,
@@ -37,4 +38,5 @@ urlpatterns += [
     path('Bins/', ListBinsView.as_view()),
     path('ProcessItem/<int:pk>/', ProcessItemView.as_view()),
     path('ResetDatabase/', ResetDatabaseAPIView.as_view()),
+    path('ListLineItems/',ListLineItemsView.as_view())
 ]

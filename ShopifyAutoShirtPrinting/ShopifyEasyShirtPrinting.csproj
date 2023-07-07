@@ -607,6 +607,7 @@
     <Compile Include="Helpers\QrHelper.cs" />
     <Compile Include="Messaging\ItemsUpdated.cs" />
     <None Include="Migrations\202306220321441_initial.cs" />
+    <Compile Include="Messaging\MessageBus.cs" />
     <Compile Include="Migrations\202306220321441_initial.designer.cs">
       <DependentUpon>202306220321441_initial.cs</DependentUpon>
     </Compile>

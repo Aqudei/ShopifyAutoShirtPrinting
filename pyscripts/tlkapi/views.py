@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.db.models import Sum, Count
+from django_filters import rest_framework as filters
+
 from rest_framework import (
     views,
     viewsets,
@@ -21,14 +23,27 @@ from .tasks import reset_database_task
 
 # Create your views here.
 
-
 class LineItemViewSet(viewsets.ModelViewSet):
     """
     docstring
     """
     queryset = LineItem.objects.exclude(Status='Archived')
     serializer_class = LineItemSerializer
-    filterset_fields = ['LineItemId', "OrderId"]
+    filterset_fields =  ["Id",'LineItemId', "OrderId"]
+
+class ListLineItemsView(views.APIView):
+    """
+    docstring
+    """
+    def get(self,request):
+        """
+        docstring
+        """
+        ids = [int(id) for id in self.request.query_params.getlist('Id')]
+        queryset = LineItem.objects.filter(Id__in=ids)
+        serializer = LineItemSerializer(queryset,many=True)
+        
+        return response.Response(serializer.data)
 
 
 class OrderInfoViewSet(viewsets.ModelViewSet):
@@ -97,7 +112,7 @@ class ProcessItemView(views.APIView):
         
         else:
             # Case 3, first item of many, assigned to Bin
-            for i in range(200):
+            for i in range(50):
                 if i==0:
                     continue
 

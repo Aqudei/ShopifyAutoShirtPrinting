@@ -5,6 +5,7 @@ using RestSharp.Authenticators;
 using RestSharp.Serializers.NewtonsoftJson;
 using ShopifyEasyShirtPrinting.Models;
 using ShopifyEasyShirtPrinting.ViewModels;
+using ShopifySharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -237,6 +238,18 @@ namespace ShopifyEasyShirtPrinting.Services
 
             return response.Data;
 
+        }
+
+        public async Task<MyLineItem[]> ListLineItemsAsync(int[] ids)
+        {
+            var prams = string.Join("&", ids.Select(i => $"Id={i}"));
+            var request = new RestRequest($"/api/ListLineItems/?{prams}");
+            var response = await _client.ExecuteGetAsync<MyLineItem[]>(request);
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                throw new Exception("ListLineItemsAsync()");
+            }
+            return response.Data;
         }
     }
 }

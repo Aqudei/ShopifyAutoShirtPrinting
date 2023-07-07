@@ -7,6 +7,7 @@ using Prism.Events;
 using Prism.Ioc;
 using Prism.Regions;
 using ShopifyEasyShirtPrinting.Data;
+using ShopifyEasyShirtPrinting.Messaging;
 using ShopifyEasyShirtPrinting.Models;
 using ShopifyEasyShirtPrinting.Properties;
 using ShopifyEasyShirtPrinting.Services;
@@ -133,6 +134,8 @@ namespace ShopifyEasyShirtPrinting
                 }
                 Container.Resolve<IShipStationBrowserService>().DoLogin();
 
+                Debug.WriteLine("Bus Registered!");
+                containerRegistry.RegisterInstance(new MessageBus());
             }
             catch (Exception e)
             {

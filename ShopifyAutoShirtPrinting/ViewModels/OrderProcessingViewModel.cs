@@ -96,6 +96,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     private readonly BinService _binService;
     private readonly DbService _dbService;
     private readonly ApiClient _apiClient;
+    private readonly MessageBus _messageBus;
     private readonly IEventAggregator _eventAggregator;
     private DelegateCommand _openQrScannerCommand;
     private string _searchText;
@@ -149,7 +150,6 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                     {
                         await _apiClient.UpdateLineItemAsync(item);
                     }
-                    BroadcastChanges(lineItems.Select(x => x.Id).ToArray());
                 }
             }
         });
@@ -183,8 +183,6 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             await ApplyTagForLineItem(selectedItem, tag);
             updatedItems.Add(selectedItem.Id);
         }
-
-        BroadcastChanges(updatedItems.ToArray());
     }
 
     public bool IsScanOnly { get => _isScanOnly; set => SetProperty(ref _isScanOnly, value); }
@@ -367,7 +365,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     public OrderProcessingViewModel(IDialogService dialogService, OrderService orderService, ShipStationApi shipStationApi, IShipStationBrowserService browserService,
         ProductVariantService productVariantService, ProductImageService productImageService, GlobalVariables globalVariables, IDialogCoordinator dialogCoordinator,
         IEventAggregator eventAggregator, IMapper mapper, MyPrintService myPrintService,
-        BinService binService, DbService dbService, ApiClient apiClient)
+        BinService binService, DbService dbService, ApiClient apiClient, MessageBus messageBus)
     {
         _dispatcher = Application.Current.Dispatcher;
 
@@ -385,6 +383,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         _binService = binService;
         _dbService = dbService;
         _apiClient = apiClient;
+        _messageBus = messageBus;
         LineItemsView = CollectionViewSource.GetDefaultView(_lineItems);
         LineItemsView.SortDescriptions.Add(new SortDescription("OrderNumber", ListSortDirection.Descending));
 
@@ -395,6 +394,24 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
         _dispatcher.Invoke(() => ShippingLines.AddRange(_lineItems.Select(l => l.Shipping).Distinct().ToList()));
         PropertyChanged += OrderProcessingViewModel_PropertyChanged;
+
+        _messageBus.ItemsUpdated += _messageBus_ItemsUpdated;
+    }
+
+    private async void _messageBus_ItemsUpdated(object sender, int[] ids)
+    {
+        var items = await _apiClient.ListLineItemsAsync(ids);
+        foreach (var item in items)
+        {
+            var lineItem = _lineItems.FirstOrDefault(x => x.Id == item.Id);
+            if (lineItem != null)
+            {
+                await _dispatcher.InvokeAsync(() =>
+                {
+                    _mapper.Map(item, lineItem);
+                });
+            }
+        }
     }
 
     private void InitChangeListener()
@@ -961,17 +978,10 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             updatedIds.Add(lineItem.Id);
         }
 
-        BroadcastChanges(updatedIds.ToArray());
+       
     }
 
-    private void BroadcastChanges(int[] ints)
-    {
-        //if (!_globalVariables.IsOnLocalMachine)
-        //    _bus.PubSub.Publish(new ItemsUpdated
-        //    {
-        //        MyLineItemDatabaseIds = ints,
-        //    });
-    }
+   
 
     public MyLineItem SelectedLineItem
     {
