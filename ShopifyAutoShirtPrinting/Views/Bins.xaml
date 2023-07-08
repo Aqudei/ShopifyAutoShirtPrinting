@@ -41,7 +41,7 @@
                             IsReadOnly="True"
                             Margin="5"
                             AutoGenerateColumns="False"
-                            ItemsSource="{Binding Items}">
+                            ItemsSource="{Binding LineItems}">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Item" Binding="{Binding Name}"/>
                             <DataGridTextColumn Header="Printed" Binding="{Binding PrintedQuantity}"/>

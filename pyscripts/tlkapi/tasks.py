@@ -2,9 +2,15 @@ import json
 from celery import shared_task
 import shopify
 from django.conf import settings
-from .models import OrderInfo, LineItem, Log
+from .models import (
+    OrderInfo,
+    LineItem,
+    Log,
+    Bin
+)
 import pikasender
 import pika
+
 
 @shared_task
 def reset_database_task():
@@ -14,6 +20,7 @@ def reset_database_task():
     Log.objects.all().delete()
     LineItem.objects.all().delete()
     OrderInfo.objects.all().delete()
+    Bin.objects.all().delete()
 
 
 def process_orders(orders_response):
@@ -22,7 +29,8 @@ def process_orders(orders_response):
     """
     to_add = []
     for order in orders_response:
-        created_order, _ = OrderInfo.objects.get_or_create(OrderId=order.id)
+        created_order, _ = OrderInfo.objects.get_or_create(
+            OrderId=order.id, OrderNumber=order.order_number)
 
         shipping_line = order.shipping_lines[0].code
 
@@ -68,18 +76,20 @@ def fetch_orders():
         orders_response = orders_response.next_page()
         process_orders(orders_response)
 
+
 @shared_task
-def broadcast_change(ids:list[int]):
+def broadcast_change(ids: list[int]):
     """
     docstring
     """
     exchange_name = 'thelonelykids'
-    creds = pika.PlainCredentials('warwick','warwickpass1')
+    creds = pika.PlainCredentials('warwick', 'warwickpass1')
     connection = pika.BlockingConnection(
         pika.ConnectionParameters(host='170.64.158.123', credentials=creds))
     channel = connection.channel()
 
-    channel.exchange_declare(exchange=exchange_name,exchange_type='fanout')
+    channel.exchange_declare(exchange=exchange_name, exchange_type='fanout')
     message = json.dumps(ids)
-    channel.basic_publish(exchange=exchange_name, routing_key='items.updated', body=message)
+    channel.basic_publish(exchange=exchange_name,
+                          routing_key='items.updated', body=message)
     connection.close()

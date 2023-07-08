@@ -1,19 +1,16 @@
 from rest_framework import serializers
-from .models import LineItem, Log, OrderInfo
+from .models import LineItem, Log, OrderInfo, Bin
 
 
 class LineItemSerializer(serializers.ModelSerializer):
     """
     docstring
     """
+    BinNumber = serializers.IntegerField(required=False)
     class Meta:
         model = LineItem
         fields = '__all__'
-
-class BinSerializer(serializers.Serializer):
-    BinNumber = serializers.IntegerField()
-    OrderNumber = serializers.CharField()
-    Items = LineItemSerializer(many=True)
+        read_only_fields = ['BinNumber']
 
 class LogSerializer(serializers.ModelSerializer):
     """
@@ -28,6 +25,18 @@ class OrderInfoSerializer(serializers.ModelSerializer):
     """
     docstring
     """
+    LineItems = LineItemSerializer(many=True)
     class Meta:
         model = OrderInfo
+        fields = '__all__'
+
+class BinSerializer(serializers.Serializer):
+    BinNumber = serializers.IntegerField()
+    LineItems = LineItemSerializer(many=True)
+
+    class Meta:
+        """
+        docstring
+        """
+        model = Bin
         fields = '__all__'

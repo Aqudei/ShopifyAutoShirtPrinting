@@ -63,7 +63,7 @@ namespace ShopifyEasyShirtPrinting.Models
         public long? OrderId { get; set; }
 
         private int _printedQuantity;
-        private int _binNumber;
+        private int? _binNumber;
         private string _status = "Pending";
         private string _notes;
         private DateTime? _dateModified;
@@ -76,7 +76,7 @@ namespace ShopifyEasyShirtPrinting.Models
         }
 
         [JsonPropertyName("BinNumber")]
-        public int BinNumber
+        public int? BinNumber
         {
             get => _binNumber;
             set => SetProperty(ref _binNumber, value);

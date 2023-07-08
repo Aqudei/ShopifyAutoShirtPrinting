@@ -62,7 +62,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                                 Bins.Filter = (e) =>
                                 {
                                     var bin = e as Bin;
-                                    var nameMatched = bin.Items.Any(x => x.Name.ToLower().Contains(SearchText.ToLower()));
+                                    var nameMatched = bin.LineItems.Any(x => x.Name.ToLower().Contains(SearchText.ToLower()));
                                     return bin.BinNumber.ToString().Contains(SearchText) || bin.OrderNumber.ToString().Contains(SearchText) || nameMatched;
                                 };
                             }

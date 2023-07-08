@@ -7,6 +7,23 @@
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.urls import reverse
+
+
+class Bin(models.Model):
+    Number = models.IntegerField(_("Bin Number"), unique=True)
+    Active = models.BooleanField(_("Active"), default=False)
+
+    class Meta:
+        verbose_name = _("Bin")
+        verbose_name_plural = _("Bins")
+        ordering = ['Number']
+
+    def __str__(self):
+        return f"{self.Number}"
+
+    def get_absolute_url(self):
+        return reverse("Bin_detail", kwargs={"pk": self.pk})
 
 
 class Log(models.Model):
@@ -47,7 +64,7 @@ class LineItem(models.Model):
         db_column='VariantTitle', blank=True, null=True)
     # Field name made lowercase.
     LineItemId = models.BigIntegerField(
-        db_column='LineItemId', blank=True, null=True)
+        db_column='LineItemId', blank=True, null=True, unique=True)
     # Field name made lowercase.
     Quantity = models.IntegerField(
         db_column='Quantity', blank=True, null=True, default=0)
@@ -77,18 +94,15 @@ class LineItem(models.Model):
     PrintedQuantity = models.IntegerField(
         db_column='PrintedQuantity', default=0)
     # Field name made lowercase.
-    BinNumber = models.IntegerField(db_column='BinNumber', default=0)
-    # Field name made lowercase.
     Status = models.TextField(db_column='Status', blank=True, null=True)
     # Field name made lowercase.
     Shipping = models.TextField(db_column='Shipping', blank=True, null=True)
     Order = models.ForeignKey(
         "tlkapi.OrderInfo", verbose_name=_("Order"), on_delete=models.SET_NULL, null=True, blank=True, related_name='LineItems')
 
-
     def __str__(self):
         return self.Name
-    
+
     class Meta:
         db_table = 'MyLineItems'
         ordering = ['-OrderNumber']
@@ -98,11 +112,12 @@ class OrderInfo(models.Model):
     # Field name made lowercase.
     Id = models.AutoField(db_column='Id', primary_key=True)
     # Field name made lowercase.
-    BinNumber = models.IntegerField(db_column='BinNumber', default=0)
+    Bin = models.ForeignKey("tlkapi.Bin", verbose_name=_(
+        "Bin"), on_delete=models.SET_NULL, null=True, blank=True, related_name='Orders')
     # Field name made lowercase.
     OrderId = models.BigIntegerField(db_column='OrderId')
+    OrderNumber = models.CharField(_("OrderNumber"), max_length=50)
     # Field name made lowercase.
-    Active = models.BooleanField(db_column='Active', default=False)
     # Field name made lowercase.
     LabelPrinted = models.BooleanField(db_column='LabelPrinted', default=False)
     # Field name made lowercase.
@@ -118,7 +133,7 @@ class OrderInfo(models.Model):
     ShipmentId = models.IntegerField(db_column='ShipmentId', default=0)
 
     def __str__(self) -> str:
-        return f"{self.OrderId} - {self.BinNumber}"
+        return f"{self.OrderId} - {self.Bin.Number if self.Bin else 0}"
 
     class Meta:
         db_table = 'OrderInfoes'

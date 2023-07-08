@@ -209,7 +209,7 @@ namespace ShopifyEasyShirtPrinting.Services
         public async Task EmptyBinAsync(int binNumber)
         {
             var request = new RestRequest($"/api/Bins/{binNumber}/");
-            var response = await _client.ExecutePostAsync(request);
+            var response = await _client.ExecuteAsync(request, Method.Delete);
         }
 
         public async Task<MyLineItem> ProcessItem(long lineItemId)
