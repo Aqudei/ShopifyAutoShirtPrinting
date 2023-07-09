@@ -49,10 +49,16 @@ class LineItemViewSet(viewsets.ModelViewSet):
         else:
             return WriteLineItemSerializer
         
-    def perform_create(self, serializer):
-        instance = serializer.save()
-        tasks.broadcast_added.delay([instance.pk])
-
+    def perform_create(self, serializer):    
+        instance = super().perform_update(serializer)
+        tasks.broadcast_added.delay([instance.Id])
+        return instance
+    
+    def perform_update(self, serializer):
+        instance = super().perform_update(serializer)
+        tasks.broadcast_updated([instance.Id])
+        return instance
+    
     filterset_fields =  ["Id",'LineItemId', "OrderId"]
 
 class ListLineItemsView(views.APIView):

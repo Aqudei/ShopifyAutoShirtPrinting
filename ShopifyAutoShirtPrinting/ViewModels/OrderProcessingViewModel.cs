@@ -400,6 +400,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private async void _messageBus_ItemsAdded(object sender, int[] ids)
     {
+        Debug.WriteLine($"@_messageBus_ItemsAdded() -> {ids}");
         var items = await _apiClient.ListLineItemsAsync(ids);
         foreach (var item in items)
         {
@@ -416,6 +417,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private async void _messageBus_ItemsUpdated(object sender, int[] ids)
     {
+        Debug.WriteLine($"@_messageBus_ItemsUpdated() -> {ids}");
+
         var items = await _apiClient.ListLineItemsAsync(ids);
         foreach (var item in items)
         {
