@@ -245,7 +245,11 @@ namespace ShopifyEasyShirtPrinting.Services
 
             if (response.StatusCode != System.Net.HttpStatusCode.Created)
             {
-                throw new Exception("Unable to Create");
+                if (response.ErrorException != null)
+                {
+                    throw response.ErrorException;
+                }
+                throw new Exception($"Unable to Create\n{response.ErrorMessage}");
             }
 
             return response.Data;
@@ -259,6 +263,9 @@ namespace ShopifyEasyShirtPrinting.Services
             var response = await _client.ExecuteGetAsync<MyLineItem[]>(request);
             if (response.StatusCode != System.Net.HttpStatusCode.OK)
             {
+                if (response.ErrorException != null)
+                    throw response.ErrorException;
+
                 throw new Exception("ListLineItemsAsync()");
             }
             return response.Data;

@@ -409,7 +409,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             {
                 await _dispatcher.InvokeAsync(() =>
                 {
-                    _lineItems.Add(lineItem);
+                    _lineItems.Add(item);
                 });
             }
         }
