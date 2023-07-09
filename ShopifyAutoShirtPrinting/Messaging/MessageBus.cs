@@ -19,6 +19,7 @@ namespace ShopifyEasyShirtPrinting.Messaging
         private bool disposedValue;
 
         public event EventHandler<int[]> ItemsUpdated;
+        public event EventHandler<int[]> ItemsAdded;
 
         public MessageBus()
         {
@@ -52,6 +53,12 @@ namespace ShopifyEasyShirtPrinting.Messaging
                         {
                             var lineItemsIds = JsonConvert.DeserializeObject<int[]>(message);
                             ItemsUpdated?.Invoke(this, lineItemsIds);
+                            break;
+                        }
+                    case "items.added":
+                        {
+                            var lineItemsIds = JsonConvert.DeserializeObject<int[]>(message);
+                            ItemsAdded?.Invoke(this, lineItemsIds);
                             break;
                         }
                     default:

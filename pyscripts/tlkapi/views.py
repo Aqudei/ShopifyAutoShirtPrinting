@@ -3,6 +3,7 @@ from django.db.models import Sum, Count
 from django_filters import rest_framework as filters
 from rest_framework.exceptions import APIException
 from django.db.models import Count, F, Value
+from tlkapi import tasks
 
 from rest_framework import (
     views,
@@ -21,7 +22,8 @@ from .models import (
     Bin
 )
 from .serializers import (
-    LineItemSerializer,
+    ReadLineItemSerializer,
+    WriteLineItemSerializer,
     LogSerializer,
     OrderInfoSerializer,
     BinSerializer
@@ -39,7 +41,18 @@ class LineItemViewSet(viewsets.ModelViewSet):
         return queryset
     
     # queryset = LineItem.objects.exclude(Status='Archived')
-    serializer_class = LineItemSerializer
+    serializer_class = ReadLineItemSerializer
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return self.serializer_class
+        else:
+            return WriteLineItemSerializer
+        
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        tasks.broadcast_added.delay([instance.pk])
+
     filterset_fields =  ["Id",'LineItemId', "OrderId"]
 
 class ListLineItemsView(views.APIView):
@@ -52,7 +65,7 @@ class ListLineItemsView(views.APIView):
         """
         ids = [int(id) for id in self.request.query_params.getlist('Id')]
         queryset = LineItem.objects.filter(Id__in=ids)
-        serializer = LineItemSerializer(queryset,many=True)
+        serializer = ReadLineItemSerializer(queryset,many=True)
         
         return response.Response(serializer.data)
 
@@ -99,7 +112,19 @@ class ProcessItemView(views.APIView):
         bin = None
         line_item = LineItem.objects.get(pk=pk)
 
-        line_items_aggregate = line_item.Order.LineItems.aggregate(total_quantity= Sum('Quantity'))
+        line_items_aggregate = line_item.Order.LineItems.aggregate(
+            total_quantity= Sum('Quantity'),
+            total_printed = Sum('PrintedQuantity')
+        )
+
+        all_items_printed = line_items_aggregate['total_printed'] >= line_items_aggregate['total_quantity'] 
+        if all_items_printed:
+            serializer = ReadLineItemSerializer(line_item)
+            data = {
+                "LineItem": serializer.data,
+                "AllItemsPrinted" : all_items_printed
+            }
+            return response.Response(serializer.data)
         
         order_info = line_item.Order
 
@@ -125,10 +150,23 @@ class ProcessItemView(views.APIView):
             ChangeStatus = "Processed",
             LineItem = line_item
         )
+        
+        line_items_aggregate = line_item.Order.LineItems.aggregate(
+            total_quantity= Sum('Quantity'),
+            total_printed = Sum('PrintedQuantity')
+        )
 
+        all_items_printed = line_items_aggregate['total_printed'] >= line_items_aggregate['total_quantity'] 
+        
+        # tasks.broadcast_change([line_item.Id]) 
         line_item.refresh_from_db()
-        serializer = LineItemSerializer(line_item)
-        return response.Response(serializer.data)
+        serializer = ReadLineItemSerializer(line_item)
+        data = {
+            "LineItem": serializer.data,
+            "AllItemsPrinted" : all_items_printed
+        }
+
+        return response.Response(data)
     
 class ResetDatabaseAPIView(views.APIView):
     """
@@ -155,7 +193,7 @@ class ListBinsView(views.APIView):
 
         for order in in_bin_orders:
             line_items = LineItem.objects.filter(Order=order)
-            serializer = LineItemSerializer(line_items, many=True)
+            serializer = ReadLineItemSerializer(line_items, many=True)
             data.append({
                 "OrderNumber" : order.OrderNumber,
                 "BinNumber": order.Bin.Number,

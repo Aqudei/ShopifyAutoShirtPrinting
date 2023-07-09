@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DYMOPrintingSupportLib;
 using ImTools;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -390,9 +391,25 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         // _dispatcher.Invoke(() => ShippingLines.AddRange(_lineItems.Select(l => l.Shipping).Distinct().ToList()));
         PropertyChanged += OrderProcessingViewModel_PropertyChanged;
         _messageBus.ItemsUpdated += _messageBus_ItemsUpdated;
-
+        _messageBus.ItemsAdded += _messageBus_ItemsAdded;
 
         Task.Run(FetchLineItems);
+    }
+
+    private async void _messageBus_ItemsAdded(object sender, int[] ids)
+    {
+        var items = await _apiClient.ListLineItemsAsync(ids);
+        foreach (var item in items)
+        {
+            var lineItem = _lineItems.FirstOrDefault(x => x.Id == item.Id);
+            if (lineItem == null)
+            {
+                await _dispatcher.InvokeAsync(() =>
+                {
+                    _lineItems.Add(lineItem);
+                });
+            }
+        }
     }
 
     private async void _messageBus_ItemsUpdated(object sender, int[] ids)
@@ -600,45 +617,44 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         try
         {
 
-            var orderItemResult = await _myPrintService.PrintItem(lineItem);
+            _myPrintService.PrintItem(lineItem);
+            var processingItemResult = await _apiClient.ProcessItem(lineItem.Id);
 
-            //await _dispatcher.InvokeAsync(() =>
-            //{
-            //    _mapper.Map(orderItemResult, lineItem);
-            //});
 
-            await ShowLineItem(orderItemResult);
+            await ShowLineItem(processingItemResult.LineItem);
 
             var lineItems = await _apiClient.ListItemsAsync(new Dictionary<string, string> { { "OrderId", $"{lineItem.OrderId}" } });
-            var allItemsPrinted = _myPrintService.AreAllItemsPrinted(orderItemResult.OrderId.Value, lineItems);
 
-            if (allItemsPrinted)
+            if (processingItemResult.AllItemsPrinted)
             {
-                await _dispatcher.InvokeAsync(new Action(() =>
-                                    {
-                                        var dlgParams = new DialogParameters
-                                        {
-                                            { "OrderId", lineItem.OrderId },
-                                            { "Message", "Ready to Print Shipping Labels?" }
-                                        };
+                if (lineItem.Shipping == "Sydney Warehouse / Studio")
+                {
+                    _dialogService.ShowAfterScanDialog("For Pickup", "Pick up order is ready.", lineItem.LineItemId, async result =>
+                    {
+                        foreach (var lineItem in lineItems)
+                        {
+                            await ApplyTagForLineItem(lineItem, "LabelPrinted");
+                        }
+                    });
+                }
+                else
+                    await _dispatcher.InvokeAsync(() =>
+                    {
+                        _dialogService.ShowLabelPrintingDialog(lineItem.OrderId.Value, "Ready to Print Shipping label?", async result =>
+                        {
+                            if (result.Result == ButtonResult.Yes)
+                            {
+                                foreach (var lineItem in lineItems)
+                                {
+                                    await ApplyTagForLineItem(lineItem, "LabelPrinted");
+                                }
 
-                                        _dialogService.ShowDialog("LabelPrintingDialog", dlgParams, async result =>
-                                        {
-                                            if (result.Result == ButtonResult.Yes)
-                                            {
-                                                foreach (var lineItem in lineItems)
-                                                {
-                                                    await ApplyTagForLineItem(lineItem, "LabelPrinted");
-                                                    lineItem.BinNumber = 0;
-                                                }
-
-                                                await _binService.EmptyBinAsync(orderItemResult.BinNumber);
-
-                                                await Task.Run(() => _browserService.NavigateToOrder(lineItem.OrderNumber));
-                                                FocusChrome();
-                                            }
-                                        });
-                                    }));
+                                await _binService.EmptyBinAsync(processingItemResult.LineItem.BinNumber);
+                                _browserService.NavigateToOrder(lineItem.OrderNumber);
+                                FocusChrome();
+                            }
+                        });
+                    });
             }
             else
             {

@@ -19,6 +19,13 @@ namespace ShopifyEasyShirtPrinting.Services
         public int BinNumber { get; set; }
     }
 
+    public class ProcessItemResponse
+    {
+        public MyLineItem LineItem { get; set; }
+        public bool AllItemsPrinted { get; set; }
+    }
+
+
     public class ApiClient
     {
         private readonly RestClient _client;
@@ -212,14 +219,19 @@ namespace ShopifyEasyShirtPrinting.Services
             var response = await _client.ExecuteAsync(request, Method.Delete);
         }
 
-        public async Task<MyLineItem> ProcessItem(long lineItemId)
+        public async Task<ProcessItemResponse> ProcessItem(long lineItemDbId)
         {
-            var request = new RestRequest($"/api/ProcessItem/{lineItemId}/");
-            var response = await _client.ExecutePostAsync<MyLineItem>(request);
+            var request = new RestRequest($"/api/ProcessItem/{lineItemDbId}/");
+            var response = await _client.ExecutePostAsync<ProcessItemResponse>(request);
 
             if (response.StatusCode != System.Net.HttpStatusCode.OK)
             {
-                throw new Exception($"Error @ ProcessItem({lineItemId})!");
+                if (response.ErrorException != null)
+                {
+                    throw response.ErrorException;
+                }
+
+                throw new Exception("ProcessItem() Failed");
             }
 
             return response.Data;

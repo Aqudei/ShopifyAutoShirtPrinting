@@ -78,7 +78,7 @@ def fetch_orders():
 
 
 @shared_task
-def broadcast_change(ids: list[int]):
+def broadcast_updated(ids: list[int]):
     """
     docstring
     """
@@ -92,4 +92,22 @@ def broadcast_change(ids: list[int]):
     message = json.dumps(ids)
     channel.basic_publish(exchange=exchange_name,
                           routing_key='items.updated', body=message)
+    connection.close()
+
+
+@shared_task
+def broadcast_added(ids: list[int]):
+    """
+    docstring
+    """
+    exchange_name = 'thelonelykids'
+    creds = pika.PlainCredentials('warwick', 'warwickpass1')
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(host='170.64.158.123', credentials=creds))
+    channel = connection.channel()
+
+    channel.exchange_declare(exchange=exchange_name, exchange_type='fanout')
+    message = json.dumps(ids)
+    channel.basic_publish(exchange=exchange_name,
+                          routing_key='items.added', body=message)
     connection.close()
