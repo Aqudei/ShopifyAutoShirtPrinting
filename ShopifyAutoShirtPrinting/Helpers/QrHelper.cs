@@ -85,7 +85,7 @@ namespace ShopifyEasyShirtPrinting.Helpers
             return qrCode;
         }
 
-        public Bitmap DrawTextImage(string text, Bitmap refImage)
+        public Bitmap DrawTextImage(string text, Bitmap refImage, string orderNumber, bool hasNotes)
         {
             var aspectRatio = Properties.Settings.Default.PaperWidth / Properties.Settings.Default.PaperHeight;
             var width = (int)(aspectRatio * refImage.Height) - refImage.Width;
@@ -134,6 +134,13 @@ namespace ShopifyEasyShirtPrinting.Helpers
                 graphics.DrawString(text, font, brush, new RectangleF(x, y, width, height));
             }
 
+            var asterisk = "";
+            if (hasNotes)
+            {
+                asterisk = "*";
+            }
+            var tagFont = new Font(new FontFamily("Arial"), Properties.Settings.Default.FontSize + 4, FontStyle.Bold);
+            graphics.DrawString($"#{orderNumber} {asterisk}".Trim(), tagFont, brush, new RectangleF(0, 20, width, height));
 
             return textImage;
         }

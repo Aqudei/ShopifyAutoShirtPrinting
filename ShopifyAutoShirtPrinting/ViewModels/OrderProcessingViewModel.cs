@@ -334,12 +334,14 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                     $"{orderItem.OrderNumber}"
                 };
 
+        var hasNotes = !string.IsNullOrWhiteSpace(orderItem.Notes);
+
         var qrDataText = EncodeText(string.Join($"{Environment.NewLine}", qrData));
 
         var qrHelper = new QrHelper();
 
         using var qrImage = qrHelper.GenerateBitmapQr(qrDataText);
-        using var textImage = qrHelper.DrawTextImage(orderItem.Name, qrImage);
+        using var textImage = qrHelper.DrawTextImage(orderItem.Name, qrImage, orderItem.OrderNumber, hasNotes);
         var combinedImage = qrHelper.CombineImage(qrImage, textImage);
 
         return combinedImage;
