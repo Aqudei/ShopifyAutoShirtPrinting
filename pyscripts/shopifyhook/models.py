@@ -7,8 +7,8 @@ from django.utils.translation import gettext_lazy as _
 
 class Hook(models.Model):
 
-    timestamp = models.DateTimeField(
-        _("Timestamp"), auto_now=False, auto_now_add=True)
+    triggered_at = models.DateTimeField(
+        _("Triggered At"), auto_now=False, auto_now_add=True)
     event = models.CharField(_("Event"), max_length=50, null=True, blank=True)
     body = models.JSONField(_("Body"), null=True, blank=True)
     headers = models.JSONField(_("Headers"), null=True, blank=True)
