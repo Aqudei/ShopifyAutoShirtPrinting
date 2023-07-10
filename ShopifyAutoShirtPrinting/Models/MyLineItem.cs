@@ -18,13 +18,13 @@ namespace ShopifyEasyShirtPrinting.Models
         }
 
         [JsonPropertyName("OrderNumber")]
-        public string OrderNumber { get; set; }
+        public string OrderNumber { get => _orderNumber; set => SetProperty(ref _orderNumber, value); }
 
         [JsonPropertyName("Sku")]
         public string Sku { get; set; }
 
         [JsonPropertyName("Name")]
-        public string Name { get; set; }
+        public string Name { get => _name; set => SetProperty(ref _name, value); }
         [JsonPropertyName("VariantId")]
         public long? VariantId { get; set; }
         [JsonPropertyName("VariantTitle")]
@@ -32,7 +32,7 @@ namespace ShopifyEasyShirtPrinting.Models
         [JsonPropertyName("LineItemId")]
         public long? LineItemId { get; set; }
         [JsonPropertyName("Quantity")]
-        public int? Quantity { get; set; }
+        public int? Quantity { get => _quantity; set => SetProperty(ref _quantity, value); }
         [JsonPropertyName("FulfillmentStatus")]
         public string FulfillmentStatus { get; set; }
         [JsonPropertyName("FinancialStatus")]
@@ -51,7 +51,8 @@ namespace ShopifyEasyShirtPrinting.Models
         [JsonPropertyName("Notes")]
         public string Notes
         {
-            get => _notes; set
+            get => _notes;
+            set
             {
                 SetProperty(ref _notes, value);
                 RaisePropertyChanged(nameof(HasNotes));
@@ -67,6 +68,9 @@ namespace ShopifyEasyShirtPrinting.Models
         private string _status = "Pending";
         private string _notes;
         private DateTime? _dateModified;
+        private int? _quantity;
+        private string _orderNumber;
+        private string _name;
 
         [JsonPropertyName("PrintedQuantity")]
         public int PrintedQuantity
@@ -92,7 +96,7 @@ namespace ShopifyEasyShirtPrinting.Models
         public bool HasNotes => !string.IsNullOrWhiteSpace(Notes);
 
         [JsonPropertyName("Shipping")]
-        public string Shipping { get;  set; }
+        public string Shipping { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

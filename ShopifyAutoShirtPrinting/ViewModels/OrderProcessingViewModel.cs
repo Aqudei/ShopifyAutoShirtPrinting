@@ -830,6 +830,20 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         foreach (var orderItem in _lineItems) orderItem.IsSelected = false;
     }
 
+    public DelegateCommand<bool?> CheckBoxCommand
+    {
+        get => checkBoxCommand ??= new DelegateCommand<bool?>(HandleCheckBoxCommand);
+    }
+
+    private void HandleCheckBoxCommand(bool? checkBoxState)
+    {
+        if (checkBoxState.HasValue)
+            foreach (var orderItem in _lineItems)
+            {
+                orderItem.IsSelected = checkBoxState.Value;
+            }
+    }
+
     private async Task FetchProductImageAsync(MyLineItem myLineItem)
     {
         try
@@ -945,6 +959,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     private string _notes;
     private DelegateCommand applyNotesCommand;
     private bool _isScanOnly;
+    private DelegateCommand<bool?> checkBoxCommand;
 
     public DelegateCommand<IEnumerable<object>> ProcessSelectedCommand => _processSelectedCommand ??=
         new DelegateCommand<IEnumerable<object>>(ProcessSelectedOrders);

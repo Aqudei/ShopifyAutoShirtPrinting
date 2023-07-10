@@ -14,6 +14,8 @@ class OrderInfoAdmin(admin.ModelAdmin):
 @admin.register(LineItem)
 class LineItemAdmin(admin.ModelAdmin):
     list_display = ['OrderNumber', 'Name', 'Status']
+    search_fields = ['OrderNumber', 'Name']
+    list_filter = ['Status']
 
 
 @admin.register(Log)
