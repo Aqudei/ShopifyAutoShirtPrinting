@@ -2,6 +2,7 @@
 using Prism.Commands;
 using Prism.Services.Dialogs;
 using ShopifyEasyShirtPrinting.Models;
+using ShopifySharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         private string notes;
         private IMapper _mapper;
         private int id;
+        private MyLineItem TheLineItem;
 
         public DelegateCommand<string> DialogCommand
         {
@@ -35,9 +37,12 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
         private void HandleDialogCommand(string command)
         {
-
-            var resultLineItem = _mapper.Map<MyLineItem>(this);
-            var prams = new DialogParameters { { "MyLineItem", resultLineItem } };
+            TheLineItem.OrderNumber = OrderNumber;
+            TheLineItem.Name = Name;
+            TheLineItem.Quantity = Quantity;
+            TheLineItem.Notes = Notes;
+           
+            var prams = new DialogParameters { { "MyLineItem", TheLineItem } };
 
             RequestClose.Invoke(new DialogResult(ButtonResult.OK, prams));
         }
@@ -61,7 +66,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         {
             if (parameters != null && parameters.TryGetValue<MyLineItem>("MyLineItem", out var myLineItem))
             {
-                _mapper.Map(myLineItem, this);
+                TheLineItem = _mapper.Map<MyLineItem>(myLineItem);
+                _mapper.Map(TheLineItem, this);
             }
         }
     }
