@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'django_filters',
     'tlkapi.apps.TlkapiConfig',
     'django_celery_beat',
+    'shopifyhook.apps.ShopifyhookConfig'
 ]
 
 REST_FRAMEWORK = {

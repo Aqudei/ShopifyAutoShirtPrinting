@@ -425,12 +425,12 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     private void UpdateMasterCheckBoxState()
     {
         var allSelected = LineItemsView.Cast<MyLineItem>().All(x => x.IsSelected);
-        var nonSelected = LineItemsView.Cast<MyLineItem>().All(x => !x.IsSelected);
+        var noneSelected = LineItemsView.Cast<MyLineItem>().All(x => !x.IsSelected);
         if (allSelected)
         {
             MasterCheckBoxState = true;
         }
-        else if (nonSelected)
+        else if (noneSelected)
         {
             MasterCheckBoxState = false;
         }
@@ -451,6 +451,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             {
                 await _dispatcher.InvokeAsync(() =>
                 {
+                    item.PropertyChanged += LineItem_PropertyChanged;
                     _lineItems.Add(item);
                 });
             }
