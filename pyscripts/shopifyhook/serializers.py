@@ -6,3 +6,4 @@ class HookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hook
         fields = '__all__'
+        read_only_fieds = ['headers']

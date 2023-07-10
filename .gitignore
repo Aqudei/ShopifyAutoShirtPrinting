@@ -401,3 +401,4 @@ FodyWeavers.xsd
 !publish/
 venv/
 QrTest/
+*ngrok.exe
