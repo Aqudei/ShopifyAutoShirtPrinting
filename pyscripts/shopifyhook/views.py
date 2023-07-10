@@ -21,5 +21,5 @@ class WebhookHandlerView(generics.CreateAPIView):
         for header in self.request.headers:
             if header.startswith("X-Shopify"):
                 headers[header] = self.request.headers[header]
-
-        return serializer.save(headers=headers)
+        event = self.request.headers.get("X-Shopify-Topic")
+        return serializer.save(headers=headers, event=event)
