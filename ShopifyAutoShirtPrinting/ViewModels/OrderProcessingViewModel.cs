@@ -30,6 +30,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using ZXing;
@@ -416,8 +417,27 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private void LineItemsView_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
+        UpdateMasterCheckBoxState();
         RaisePropertyChanged(nameof(TotalDisplayed));
         RaisePropertyChanged(nameof(TotalItems));
+    }
+
+    private void UpdateMasterCheckBoxState()
+    {
+        var allSelected = LineItemsView.Cast<MyLineItem>().All(x => x.IsSelected);
+        var nonSelected = LineItemsView.Cast<MyLineItem>().All(x => !x.IsSelected);
+        if (allSelected)
+        {
+            MasterCheckBoxState = true;
+        }
+        else if (nonSelected)
+        {
+            MasterCheckBoxState = false;
+        }
+        else
+        {
+            MasterCheckBoxState = null;
+        }
     }
 
     private async void _messageBus_ItemsAdded(object sender, int[] ids)
@@ -839,7 +859,6 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 orderItem.IsSelected = true;
     }
 
-
     private DelegateCommand _uncheckedAllCommand;
 
     public DelegateCommand UncheckedAllCommand
@@ -857,13 +876,16 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         get => checkBoxCommand ??= new DelegateCommand<bool?>(HandleCheckBoxCommand);
     }
 
+    public bool? MasterCheckBoxState { get => _masterCheckBoxState; set => SetProperty(ref _masterCheckBoxState, value); }
+
     private void HandleCheckBoxCommand(bool? checkBoxState)
     {
         if (checkBoxState.HasValue)
-            foreach (var orderItem in _lineItems)
+            foreach (var orderItem in LineItemsView.Cast<MyLineItem>())
             {
                 orderItem.IsSelected = checkBoxState.Value;
             }
+
     }
 
     private async Task FetchProductImageAsync(MyLineItem myLineItem)
@@ -974,6 +996,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         if (e.PropertyName == nameof(myLineItem.IsSelected))
         {
             RaisePropertyChanged(nameof(TotalSelected));
+            UpdateMasterCheckBoxState();
         }
     }
 
@@ -982,6 +1005,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     private DelegateCommand applyNotesCommand;
     private bool _isScanOnly;
     private DelegateCommand<bool?> checkBoxCommand;
+    private bool? _masterCheckBoxState;
 
     public DelegateCommand<IEnumerable<object>> ProcessSelectedCommand => _processSelectedCommand ??=
         new DelegateCommand<IEnumerable<object>>(ProcessSelectedOrders);

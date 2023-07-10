@@ -75,7 +75,7 @@
                             Width="64"/>
                     <StackPanel Orientation="Vertical" 
                                 VerticalAlignment="Bottom">
-                        
+
                         <Label Content="Filter By Status:"
                                FontSize="10"
                                FontWeight="SemiBold"
@@ -177,7 +177,7 @@
                     <StackPanel Orientation="Horizontal">
                         <iconPacks:PackIconMaterial Kind="PlusBox"
                                                     Height="16"
-                                                    VerticalAlignment="Center"/>                        
+                                                    VerticalAlignment="Center"/>
                         <TextBlock VerticalAlignment="Center"
                                        TextWrapping="Wrap"
                                        Margin="4">
@@ -199,7 +199,7 @@
                                        Margin="4"><Run Language="en-ph" Text="Edit Item"/></TextBlock>
                     </StackPanel>
                 </Button>
-                
+
                 <TextBox Grid.Column="6" 
                          FontSize="20"
                          VerticalContentAlignment="Center"
@@ -261,8 +261,9 @@
                 <DataGrid.Columns>
                     <DataGridTemplateColumn>
                         <DataGridTemplateColumn.Header>
-                            <CheckBox Command="{Binding DataContext.CheckBoxCommand, ElementName=OrdersDataGrid}"
-                                      CommandParameter="{Binding IsChecked, RelativeSource={RelativeSource Self}}"/>
+                            <CheckBox IsChecked="{Binding DataContext.MasterCheckBoxState, ElementName=OrdersDataGrid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      Command="{Binding DataContext.CheckBoxCommand, ElementName=OrdersDataGrid}"
+                                      CommandParameter="{Binding IsChecked, RelativeSource={RelativeSource Self}}" />
                         </DataGridTemplateColumn.Header>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -375,7 +376,7 @@
                         <Run Text="{Binding TotalSelected, Mode=OneWay}"/>
                         <Run Text=" selected)"/>
                     </TextBlock>
-                   
+
                 </StackPanel>
                 <TextBox DockPanel.Dock="Left" 
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -386,7 +387,7 @@
                          TextWrapping="Wrap"
                          MaxLines="3"
                          Height="100"/>
-                
+
             </DockPanel>
         </Grid>
 
