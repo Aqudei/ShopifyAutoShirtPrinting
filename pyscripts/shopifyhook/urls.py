@@ -20,5 +20,5 @@ from rest_framework import routers
 from .views import WebhookHandlerView
 
 urlpatterns = [
-    path('handler/',WebhookHandlerView.as_view())
+    path('handler/9fbe8036806f4fe992552e9010d7fd07/',WebhookHandlerView.as_view())
 ]
