@@ -68,6 +68,14 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             }
 
             _mapper.Map(Settings.Default, this);
+
+            PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(ServerHost))
+                {
+                    ApiBaseUrl = $"https://{ServerHost}";
+                }
+            };
         }
 
         public double PaperWidth { get => paperWidth; set => SetProperty(ref paperWidth, value); }
@@ -99,7 +107,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         public string DatabaseUser { get => databaseUser; set => SetProperty(ref databaseUser, value); }
         public string DatabaseName { get => databaseName; set => SetProperty(ref databaseName, value); }
         public string ApiBaseUrl { get => apiBaseUrl; set => SetProperty(ref apiBaseUrl, value); }
-        
+
         public DelegateCommand SaveSettingsCommand
         {
             get { return _saveSettingsCommand ??= new DelegateCommand(HandleSaveSettings); }

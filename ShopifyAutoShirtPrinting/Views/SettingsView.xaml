@@ -47,12 +47,12 @@
                 <Label Margin="2" Width="120">Font Size</Label>
                 <TextBox Margin="2" Text="{Binding FontSize}" Width="400"/>
             </StackPanel>
-            
+
             <StackPanel Orientation="Horizontal">
                 <Label Margin="2" Width="120" Content="Server IP Address:"/>
-                <TextBox Margin="2" Text="{Binding ServerHost}" Width="400"/>
+                <TextBox Margin="2" Text="{Binding ServerHost, UpdateSourceTrigger=PropertyChanged}" Width="400"/>
             </StackPanel>
-            
+
             <!--<StackPanel Orientation="Horizontal">
                 <Label Margin="2" Width="120">Server Port</Label>
                 <TextBox Margin="2" Text="{Binding ServerPort}" Width="400"/>

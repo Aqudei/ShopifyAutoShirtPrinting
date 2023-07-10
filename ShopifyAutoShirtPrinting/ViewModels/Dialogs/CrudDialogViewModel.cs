@@ -13,7 +13,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 {
     internal class CrudDialogViewModel : PageBase, IDialogAware
     {
-        public override string Title => "";
+        public override string Title => _title;
 
         private DelegateCommand<string> _dialogCommand;
         private MyLineItem _theLineItem;
@@ -23,6 +23,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         private string notes;
         private string _name;
         private int _id;
+        private string _title;
 
         public DelegateCommand<string> DialogCommand
         {
@@ -66,11 +67,14 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         {
             if (parameters != null && parameters.TryGetValue<MyLineItem>("MyLineItem", out var myLineItem))
             {
+                _title = "Edit Item";
                 _theLineItem = _mapper.Map<MyLineItem>(myLineItem);
                 _mapper.Map(_theLineItem, this);
             }
             else
             {
+                _title = "New Item";
+
                 _theLineItem = new MyLineItem
                 {
                     Status = "Pending"

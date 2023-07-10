@@ -3,10 +3,22 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:prism="http://prismlibrary.com/"
              xmlns:local="clr-namespace:ShopifyEasyShirtPrinting.Views.Dialogs"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+    <prism:Dialog.WindowStyle>
+        <Style TargetType="Window">
+            <Setter Property="prism:Dialog.WindowStartupLocation" Value="CenterScreen" />
+            <Setter Property="ResizeMode" Value="NoResize"/>
+            <Setter Property="ShowInTaskbar" Value="False"/>
+            <Setter Property="SizeToContent" Value="WidthAndHeight"/>
+            <Setter Property="Width" Value="600"/>
+            <Setter Property="Title" Value="{Binding Title}"/>
+        </Style>
+    </prism:Dialog.WindowStyle>
+    <Grid Margin="20">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition/>
@@ -34,7 +46,10 @@
         <TextBox Text="{Binding Quantity}" Grid.Column="1" Grid.Row="2" Margin="2,2,2,2"/>
 
         <Label Content="Notes" Grid.Row="3" Margin="2,2,2,2"/>
-        <TextBox Text="{Binding Notes}" Grid.Column="1" 
+        <TextBox Text="{Binding Notes}" 
+                 Grid.Column="1" 
+                 MinLines="4"
+                 TextWrapping="Wrap"
                  Grid.Row="3" 
                  Margin="2,2,2,2"/>
 
