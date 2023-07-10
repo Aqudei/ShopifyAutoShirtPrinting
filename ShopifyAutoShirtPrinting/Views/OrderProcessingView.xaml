@@ -368,7 +368,7 @@
                             HorizontalAlignment="Left">
                     <TextBlock>
                         <Run Text="Showing "/>
-                        <Run Text="{Binding TotalItems, Mode=OneWay}"/>
+                        <Run Text="{Binding TotalDisplayed, Mode=OneWay}"/>
                         <Run Text=" of "/>
                         <Run Text="{Binding TotalItems, Mode=OneWay}"/>
                         <Run Text=" items ("/>

@@ -273,7 +273,21 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
     }
 
-    public int TotalItems => _lineItems.Count;
+    public int TotalDisplayed
+    {
+        get
+        {
+            return LineItemsView.Cast<MyLineItem>().Count();
+        }
+    }
+
+    public int TotalItems
+    {
+        get
+        {
+            return LineItemsView.SourceCollection.Cast<MyLineItem>().Count();
+        }
+    }
     public int TotalSelected
     {
         get
@@ -395,7 +409,15 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         _messageBus.ItemsUpdated += _messageBus_ItemsUpdated;
         _messageBus.ItemsAdded += _messageBus_ItemsAdded;
 
+        LineItemsView.CollectionChanged += LineItemsView_CollectionChanged;
+
         Task.Run(FetchLineItems);
+    }
+
+    private void LineItemsView_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        RaisePropertyChanged(nameof(TotalDisplayed));
+        RaisePropertyChanged(nameof(TotalItems));
     }
 
     private async void _messageBus_ItemsAdded(object sender, int[] ids)

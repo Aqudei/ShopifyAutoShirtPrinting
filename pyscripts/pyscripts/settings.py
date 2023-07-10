@@ -31,7 +31,8 @@ ALLOWED_HOSTS = [
     'www.thelonelykids.ga',
     '170.64.158.123',
     '127.0.0.1', 
-    'localhost'
+    'localhost',
+    'workflows.louiestshirtprinting.co'
 ]
 
 
