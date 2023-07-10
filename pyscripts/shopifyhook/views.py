@@ -14,7 +14,7 @@ class WebhookHandlerView(generics.CreateAPIView):
     """
     queryset = Hook.objects.all()
     serializer_class = HookSerializer
-    permission_classes = permissions.AllowAny
+    permission_classes = [permissions.AllowAny]
 
     def perform_create(self, serializer):
         headers = {}
