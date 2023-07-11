@@ -140,7 +140,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     private void HandleChangePrintedQuantity()
     {
         var parameters = new DialogParameters() {
-            {"LineItemsIds", _lineItems.Where(l=>l.IsSelected).Select(l=>l.Id).Distinct().ToList() },
+            {"LineItems", _lineItems.Where(l=>l.IsSelected).ToArray() },
         };
         _dialogService.ShowDialog("QuantityChangerDialog", parameters, async r =>
         {
@@ -222,8 +222,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         });
     }
 
-    public DelegateCommand SaveQrTagsCommand => _saveQrTagsCommand ??= new DelegateCommand(HandleSaveQrTag);
-
+    public DelegateCommand SaveQrTagsCommand => _saveQrTagsCommand ??= new DelegateCommand(HandleSaveQrTag, () => TotalSelected > 0)
+        .ObservesProperty(() => TotalSelected);
 
     private DelegateCommand _resetDatabaseCommand;
 
@@ -1028,8 +1028,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         _dialogService.ShowDialog("ScannerView");
     }
 
-    public DelegateCommand GenerateQrCommand => _generateQrCommand ??= new DelegateCommand(HandlePrintQrTags);
-
+    public DelegateCommand GenerateQrCommand => _generateQrCommand ??= new DelegateCommand(HandlePrintQrTags, () => TotalSelected > 0)
+        .ObservesProperty(() => TotalSelected);
 
     private string EncodeText(string input)
     {

@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace ShopifyEasyShirtPrinting.Services
@@ -59,7 +60,7 @@ namespace ShopifyEasyShirtPrinting.Services
                 return response.Data;
             }
 
-            return null;
+            throw new Exception(response.Content ?? response.ErrorMessage);
         }
 
         public async Task<MyLineItem> UpdateLineItemAsync(MyLineItem myLineItem)
@@ -72,7 +73,7 @@ namespace ShopifyEasyShirtPrinting.Services
                 return response.Data;
             }
 
-            return null;
+            throw new Exception(response.Content ?? response.ErrorMessage);
         }
 
         public async Task<Log> AddNewLogAsync(Log log)
@@ -86,7 +87,7 @@ namespace ShopifyEasyShirtPrinting.Services
                 return response.Data;
             }
 
-            return null;
+            throw new Exception(response.Content ?? response.ErrorMessage);
         }
 
         public async Task<Log[]> ListLogsAsync(long myLineItemId)
@@ -98,7 +99,8 @@ namespace ShopifyEasyShirtPrinting.Services
             {
                 return response.Data;
             }
-            return null;
+
+            throw new Exception(response.Content ?? response.ErrorMessage);
         }
 
         public async Task<MyLineItem> GetLineItemByIdAsync(int lineItemDbId)
@@ -109,8 +111,7 @@ namespace ShopifyEasyShirtPrinting.Services
             {
                 return response.Data;
             }
-
-            return null;
+            throw new Exception(response.Content ?? response.ErrorMessage);
         }
 
         public async Task<MyLineItem> GetItemByLineItemIdAsync(long lineItemId)
@@ -122,7 +123,7 @@ namespace ShopifyEasyShirtPrinting.Services
                 return response.Data.FirstOrDefault();
             }
 
-            return null;
+            throw new Exception(response.Content ?? response.ErrorMessage);
         }
 
         public async Task<OrderInfo> GetOrderInfoBy(Dictionary<string, string> parameters)
@@ -139,9 +140,12 @@ namespace ShopifyEasyShirtPrinting.Services
                 {
                     return response.Data.FirstOrDefault();
                 }
+
+                throw new Exception(response.Content ?? response.ErrorMessage);
+
             }
 
-            return null;
+            throw new ArgumentNullException(nameof(parameters));
         }
 
         public async Task<OrderInfo[]> ListOrdersInfo(Dictionary<string, string> parameters = null)
@@ -162,7 +166,7 @@ namespace ShopifyEasyShirtPrinting.Services
                 return response.Data;
             }
 
-            return null;
+            throw new Exception(response.Content ?? response.ErrorMessage);
         }
 
         public async Task<OrderInfo> AddOrderInfo(OrderInfo orderInfo)
@@ -176,7 +180,7 @@ namespace ShopifyEasyShirtPrinting.Services
                 return response.Data;
             }
 
-            return null;
+            throw new Exception(response.Content ?? response.ErrorMessage);
         }
 
         public async Task<OrderInfo> UpdateOrderInfo(OrderInfo orderInfo)
@@ -190,7 +194,8 @@ namespace ShopifyEasyShirtPrinting.Services
                 return response.Data;
             }
 
-            return null;
+            throw new Exception(response.Content ?? response.ErrorMessage);
+
         }
 
         public async Task<Bin[]> ListBinsAsync()
@@ -203,7 +208,7 @@ namespace ShopifyEasyShirtPrinting.Services
                 return response.Data;
             }
 
-            return null;
+            throw new Exception(response.Content ?? response.ErrorMessage);
         }
 
 
@@ -211,6 +216,7 @@ namespace ShopifyEasyShirtPrinting.Services
         {
             var request = new RestRequest("/api/ResetDatabase/");
             var response = await _client.PostAsync(request);
+
         }
 
         public async Task EmptyBinAsync(int binNumber)
@@ -224,17 +230,12 @@ namespace ShopifyEasyShirtPrinting.Services
             var request = new RestRequest($"/api/ProcessItem/{lineItemDbId}/");
             var response = await _client.ExecutePostAsync<ProcessItemResponse>(request);
 
-            if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                if (response.ErrorException != null)
-                {
-                    throw response.ErrorException;
-                }
-
-                throw new Exception("ProcessItem() Failed");
+                return response.Data;
             }
 
-            return response.Data;
+            throw new Exception(response.Content ?? response.ErrorMessage);
         }
 
         public async Task<MyLineItem> CreateLineItemAsync(MyLineItem myLineItem)
@@ -243,17 +244,12 @@ namespace ShopifyEasyShirtPrinting.Services
                 .AddBody(myLineItem);
             var response = await _client.ExecutePostAsync<MyLineItem>(request);
 
-            if (response.StatusCode != System.Net.HttpStatusCode.Created)
+            if (response.StatusCode == System.Net.HttpStatusCode.Created)
             {
-                if (response.ErrorException != null)
-                {
-                    throw response.ErrorException;
-                }
-                throw new Exception($"Unable to Create\n{response.ErrorMessage}");
+                return response.Data;
             }
 
-            return response.Data;
-
+            throw new Exception(response.Content ?? response.ErrorMessage);
         }
 
         public async Task<MyLineItem[]> ListLineItemsAsync(int[] ids)
@@ -261,14 +257,11 @@ namespace ShopifyEasyShirtPrinting.Services
             var prams = string.Join("&", ids.Select(i => $"Id={i}"));
             var request = new RestRequest($"/api/ListLineItems/?{prams}");
             var response = await _client.ExecuteGetAsync<MyLineItem[]>(request);
-            if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                if (response.ErrorException != null)
-                    throw response.ErrorException;
-
-                throw new Exception("ListLineItemsAsync()");
+                return response.Data;
             }
-            return response.Data;
+            throw new Exception(response.Content ?? response.ErrorMessage);
         }
     }
 }
