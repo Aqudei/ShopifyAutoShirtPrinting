@@ -82,7 +82,8 @@ class ListLineItemsView(views.APIView):
         docstring
         """
         ids = [int(id) for id in self.request.query_params.getlist('Id')]
-        queryset = LineItem.objects.filter(Id__in=ids)
+        queryset = LineItem.objects.filter(Id__in=ids).annotate(
+            BinNumber=F('Order__Bin__Number'))
         serializer = ReadLineItemSerializer(queryset, many=True)
 
         return response.Response(serializer.data)
