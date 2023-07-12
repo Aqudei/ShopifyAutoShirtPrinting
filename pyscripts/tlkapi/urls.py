@@ -23,7 +23,7 @@ from .views import (
     LogAPIView,
     OrderInfoViewSet,
     ListBinsView,
-    ProcessItemView,
+    ItemProcessingView,
     DestroyBinView,ResetDatabaseAPIView
 )
 
@@ -36,7 +36,7 @@ urlpatterns += [
     path('Logs/', LogAPIView.as_view()),
     path('Bins/<int:BinNumber>/', DestroyBinView.as_view()),
     path('Bins/', ListBinsView.as_view()),
-    path('ProcessItem/<int:pk>/', ProcessItemView.as_view()),
+    path('ItemProcessing/<int:pk>/', ItemProcessingView.as_view()),
     path('ResetDatabase/', ResetDatabaseAPIView.as_view()),
     path('ListLineItems/',ListLineItemsView.as_view())
 ]

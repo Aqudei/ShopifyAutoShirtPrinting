@@ -30,6 +30,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -130,31 +131,32 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         set { SetProperty(ref _selectedTagFilter, value); }
     }
 
-    private DelegateCommand _changePrintedQuantity;
+    private DelegateCommand<string> _printCommand;
 
-    public DelegateCommand ChangePrintedQuantity
+    public DelegateCommand<string> PrintCommand
     {
-        get { return _changePrintedQuantity ??= new DelegateCommand(HandleChangePrintedQuantity); }
+        get { return _printCommand ??= new DelegateCommand<string>(HandlePrintCommand, arg => SelectedLineItem != null).ObservesProperty(() => SelectedLineItem); }
     }
 
-    private void HandleChangePrintedQuantity()
+    private async void HandlePrintCommand(string arg)
     {
-        var parameters = new DialogParameters() {
-            {"LineItems", _lineItems.Where(l=>l.IsSelected).ToArray() },
-        };
-        _dialogService.ShowDialog("QuantityChangerDialog", parameters, async r =>
+        if (string.IsNullOrEmpty(arg)) return;
+        switch (arg)
         {
-            if (r.Result == ButtonResult.OK)
-            {
-                if (r.Parameters.TryGetValue<IEnumerable<MyLineItem>>("LineItems", out var lineItems))
+            case "+":
                 {
-                    foreach (var item in lineItems)
-                    {
-                        await _apiClient.UpdateLineItemAsync(item);
-                    }
+                    await ShowScanInfoAsync(SelectedLineItem);
+                    await ProcessItemForPrintingAsync(SelectedLineItem);
+                    break;
                 }
-            }
-        });
+            case "-":
+                {
+                    var processingResult = await _apiClient.UndoPrintAsync(SelectedLineItem.Id);   
+                    break;
+                }
+            default:
+                break;
+        }
     }
 
     public DelegateCommand<string> AppplyTagCommand
@@ -614,23 +616,19 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                         if (parsedQr != null)
                         {
                             // QrInfo = FetchQrInfo(parsedQr);
-                            ShowScanInfo(parsedQr);
-
                             var lineItem = await _apiClient.GetItemByLineItemIdAsync(parsedQr.LineItemId.Value);
-
                             if (lineItem == null)
                             {
                                 return;
                             }
-
-
+                            await ShowScanInfoAsync(lineItem);
                             if (IsScanOnly)
                             {
-                                await ShowLineItem(lineItem);
+                                await ActivateLineItemInView(lineItem);
                             }
                             else
                             {
-                                await ProcessQrForPrinting(lineItem);
+                                await ProcessItemForPrintingAsync(lineItem);
                             }
 
                         }
@@ -641,15 +639,9 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
     }
 
-    private void ShowScanInfo(MyQr qr)
+    private async Task ShowScanInfoAsync(MyLineItem lineItem)
     {
-        var lineItem = _lineItems.FirstOrDefault(l => l.OrderId == qr.OrderId && l.LineItemId == qr.LineItemId);
-        if (lineItem == null)
-        {
-            return;
-        }
-
-        _dispatcher.Invoke(() =>
+        await _dispatcher.InvokeAsync(() =>
         {
             ScanInfo.Clear();
             ScanInfo.Add(new KeyValuePair<string, string>("Name", lineItem.Name));
@@ -660,7 +652,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     }
 
-    private async Task ProcessQrForPrinting(MyLineItem lineItem)
+    private async Task ProcessItemForPrintingAsync(MyLineItem lineItem)
     {
         try
         {
@@ -669,7 +661,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             var processingItemResult = await _apiClient.ProcessItem(lineItem.Id);
 
 
-            await ShowLineItem(processingItemResult.LineItem);
+            await ActivateLineItemInView(processingItemResult.LineItem);
 
             var lineItems = await _apiClient.ListItemsAsync(new Dictionary<string, string> { { "OrderId", $"{lineItem.OrderId}" } });
 
@@ -754,7 +746,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
     }
 
-    private async Task ShowLineItem(MyLineItem orderItemResult)
+    private async Task ActivateLineItemInView(MyLineItem orderItemResult)
     {
         await _dispatcher.InvokeAsync(new Action(() =>
         {

@@ -43,11 +43,16 @@
                             VerticalAlignment="Bottom"
                             Margin="4"
                             Command="{Binding SaveQrTagsCommand}"/>
-                    <Button Content="Change Printed Quantity" 
+                    <Button Content="Print +"
+                            Command="{Binding PrintCommand}"
+                            CommandParameter="+"
+                            VerticalAlignment="Bottom"
+                            Margin="4"/>
+                    <Button Content="PRINT -" 
                             VerticalAlignment="Bottom"
                             Margin="4"
-                            Command="{Binding ChangePrintedQuantity}"/>
-
+                            Command="{Binding PrintCommand}"
+                            CommandParameter="-"/>
                     <!--<Button Content="QR Scanner" Width="150" Margin="4"
                         Command="{Binding OpenQrScannerCommand}" />-->
                 </StackPanel>
@@ -467,8 +472,12 @@
                             ItemsSource="{Binding ScanInfo}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel Orientation="Vertical">
-                                        <TextBlock FontWeight="Bold" Grid.Row="0" Text="{Binding Key, Mode=OneTime}"/>
+                                    <StackPanel Orientation="Vertical" 
+                                                Margin="8,0,0,0">
+                                        <TextBlock FontWeight="Bold"
+                                                   
+                                                   Grid.Row="0"
+                                                   Text="{Binding Key, Mode=OneTime}" Margin="4,0,0,0"/>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock><Run Text="    "/><Run Text=" "/><Run Text="{Binding Value, Mode=OneTime}"/></TextBlock>
                                         </StackPanel>

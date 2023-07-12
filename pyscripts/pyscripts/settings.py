@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 from decouple import config
+import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -164,3 +165,6 @@ SHOP_URL, API_VERSION, PRIVATE_APP_PASSWORD = config(
 
 
 SHOPIFY_WEBHOOK_SECRET  = config("SHOPIFY_WEBHOOK_SECRET")
+
+
+BROADCAST_ENABLED = not 'win' in sys.platform.lower()

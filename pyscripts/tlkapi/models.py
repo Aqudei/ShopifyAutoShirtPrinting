@@ -131,6 +131,7 @@ class OrderInfo(models.Model):
     ShipmentCost = models.FloatField(db_column='ShipmentCost', default=0.0)
     # Field name made lowercase.
     ShipmentId = models.IntegerField(db_column='ShipmentId', default=0)
+    AllItemsPrinted = models.BooleanField(_("All Printed"), default=False)
 
     def __str__(self) -> str:
         return f"{self.OrderId} - {self.Bin.Number if self.Bin else 0}"

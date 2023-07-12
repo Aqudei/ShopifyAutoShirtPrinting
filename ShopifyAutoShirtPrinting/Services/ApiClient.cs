@@ -20,7 +20,7 @@ namespace ShopifyEasyShirtPrinting.Services
         public int BinNumber { get; set; }
     }
 
-    public class ProcessItemResponse
+    public class ItemProcessingResponse
     {
         public MyLineItem LineItem { get; set; }
         public bool AllItemsPrinted { get; set; }
@@ -225,10 +225,10 @@ namespace ShopifyEasyShirtPrinting.Services
             var response = await _client.ExecuteAsync(request, Method.Delete);
         }
 
-        public async Task<ProcessItemResponse> ProcessItem(long lineItemDbId)
+        public async Task<ItemProcessingResponse> ProcessItem(long lineItemDbId)
         {
-            var request = new RestRequest($"/api/ProcessItem/{lineItemDbId}/");
-            var response = await _client.ExecutePostAsync<ProcessItemResponse>(request);
+            var request = new RestRequest($"/api/ItemProcessing/{lineItemDbId}/");
+            var response = await _client.ExecutePostAsync<ItemProcessingResponse>(request);
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
@@ -261,6 +261,19 @@ namespace ShopifyEasyShirtPrinting.Services
             {
                 return response.Data;
             }
+            throw new Exception(response.Content ?? response.ErrorMessage);
+        }
+
+        public async Task<ItemProcessingResponse> UndoPrintAsync(long lineItemDbId)
+        {
+            var request = new RestRequest($"/api/ItemProcessing/{lineItemDbId}/", Method.Delete);
+            var response = await _client.ExecuteAsync<ItemProcessingResponse>(request);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                return response.Data;
+            }
+
             throw new Exception(response.Content ?? response.ErrorMessage);
         }
     }

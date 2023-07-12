@@ -4,6 +4,7 @@ from django_filters import rest_framework as filters
 from rest_framework.exceptions import APIException
 from django.db.models import Count, F, Value
 from tlkapi import tasks
+from django.conf import settings
 
 from rest_framework import (
     views,
@@ -32,14 +33,17 @@ from .tasks import reset_database_task
 
 # Create your views here.
 
+
 class LineItemViewSet(viewsets.ModelViewSet):
     """
     docstring
     """
+
     def get_queryset(self):
-        queryset = LineItem.objects.exclude(Status='Archived').annotate(BinNumber=F('Order__Bin__Number'))
+        queryset = LineItem.objects.exclude(Status='Archived').annotate(
+            BinNumber=F('Order__Bin__Number'))
         return queryset
-    
+
     # queryset = LineItem.objects.exclude(Status='Archived')
     serializer_class = ReadLineItemSerializer
 
@@ -48,31 +52,36 @@ class LineItemViewSet(viewsets.ModelViewSet):
             return self.serializer_class
         else:
             return WriteLineItemSerializer
-        
-    def perform_create(self, serializer):    
+
+    def perform_create(self, serializer):
         instance = serializer.save()
         tasks.broadcast_added.delay([instance.Id])
         return instance
-    
+
     def perform_update(self, serializer):
         instance = serializer.save()
-        tasks.broadcast_updated.delay([instance.Id])
+
+        if settings.BROADCAST_ENABLED:
+            tasks.broadcast_updated.delay([instance.Id])
+
         return instance
-    
-    filterset_fields =  ["Id",'LineItemId', "OrderId"]
+
+    filterset_fields = ["Id", 'LineItemId', "OrderId"]
+
 
 class ListLineItemsView(views.APIView):
     """
     docstring
     """
-    def get(self,request):
+
+    def get(self, request):
         """
         docstring
         """
         ids = [int(id) for id in self.request.query_params.getlist('Id')]
         queryset = LineItem.objects.filter(Id__in=ids)
-        serializer = ReadLineItemSerializer(queryset,many=True)
-        
+        serializer = ReadLineItemSerializer(queryset, many=True)
+
         return response.Response(serializer.data)
 
 
@@ -81,7 +90,6 @@ class OrderInfoViewSet(viewsets.ModelViewSet):
     docstring
     """
     queryset = OrderInfo.objects.all()
-
     serializer_class = OrderInfoSerializer
     filterset_fields = ["OrderId"]
 
@@ -91,11 +99,13 @@ class LogAPIView(generics.ListCreateAPIView):
     serializer_class = LogSerializer
     filterset_fields = ['LineItem']
 
+
 class DestroyBinView(views.APIView):
     """
     docstring
     """
-    def delete(self,request, pk=None):
+
+    def delete(self, request, pk=None):
         """
         docstring
         """
@@ -107,11 +117,52 @@ class DestroyBinView(views.APIView):
         order.Bin = None
         order.save()
 
-class ProcessItemView(views.APIView):
+
+class ItemProcessingView(views.APIView):
     """
     docstring
     """
-    def post(self,request, pk=None):
+
+    def delete(self, request, pk=None):
+        """
+        docstring
+        """
+        line_item = LineItem.objects.get(Id=pk)
+        order_info = line_item.Order
+
+        if line_item.PrintedQuantity > 1:
+            line_item.PrintedQuantity = line_item.PrintedQuantity - 1
+            
+        line_item.save()
+
+        line_items_aggregate = order_info.LineItems.aggregate(
+            total_quantity=Sum('Quantity'),
+            total_printed=Sum('PrintedQuantity')
+        )
+
+        if line_items_aggregate['PrintedQuantity']==0:
+            if order_info.Bin: 
+                bin = order_info.Bin
+                bin.Active = False
+                bin.save()
+
+            order_info.Bin = None
+            order_info.save()
+
+        all_items_printed = line_items_aggregate['total_printed'] >= line_items_aggregate['total_quantity']
+        line_item.refresh_from_db()
+        serializer = ReadLineItemSerializer(line_item)
+        data = {
+            "LineItem": serializer.data,
+            "AllItemsPrinted": all_items_printed
+        }
+
+        if settings.BROADCAST_ENABLED:
+            tasks.broadcast_change.delay([l.Id for l in order_info.LineItems])
+
+        return response.Response(data)
+
+    def post(self, request, pk=None):
         """
         docstring
         """
@@ -119,19 +170,20 @@ class ProcessItemView(views.APIView):
         line_item = LineItem.objects.get(pk=pk)
 
         line_items_aggregate = line_item.Order.LineItems.aggregate(
-            total_quantity= Sum('Quantity'),
-            total_printed = Sum('PrintedQuantity')
+            total_quantity=Sum('Quantity'),
+            total_printed=Sum('PrintedQuantity')
         )
 
-        all_items_printed = line_items_aggregate['total_printed'] >= line_items_aggregate['total_quantity'] 
+        all_items_printed = line_items_aggregate['total_printed'] >= line_items_aggregate['total_quantity']
+
         if all_items_printed:
             serializer = ReadLineItemSerializer(line_item)
             data = {
                 "LineItem": serializer.data,
-                "AllItemsPrinted" : all_items_printed
+                "AllItemsPrinted": all_items_printed
             }
             return response.Response(serializer.data)
-        
+
         order_info = line_item.Order
 
         # Case 1, only one item, no need to assign Bin
@@ -144,53 +196,59 @@ class ProcessItemView(views.APIView):
                 raise APIException(detail="No available Bin")
             bin.Active = True
             bin.save()
-        
+
         order_info.Bin = bin
-        order_info.save()
-        
+
         line_item.Status = "Processed"
         line_item.PrintedQuantity += 1
         line_item.save()
-        
+
         Log.objects.create(
-            ChangeStatus = "Processed",
-            LineItem = line_item
-        )
-        
-        line_items_aggregate = line_item.Order.LineItems.aggregate(
-            total_quantity= Sum('Quantity'),
-            total_printed = Sum('PrintedQuantity')
+            ChangeStatus="Processed",
+            LineItem=line_item
         )
 
-        all_items_printed = line_items_aggregate['total_printed'] >= line_items_aggregate['total_quantity'] 
-        
-        # tasks.broadcast_change([line_item.Id]) 
+        line_items_aggregate = line_item.Order.LineItems.aggregate(
+            total_quantity=Sum('Quantity'),
+            total_printed=Sum('PrintedQuantity')
+        )
+
+        all_items_printed = line_items_aggregate['total_printed'] >= line_items_aggregate['total_quantity']
+        order_info.AllItemsPrinted = all_items_printed
+        order_info.save()
+
         line_item.refresh_from_db()
         serializer = ReadLineItemSerializer(line_item)
         data = {
             "LineItem": serializer.data,
-            "AllItemsPrinted" : all_items_printed
+            "AllItemsPrinted": all_items_printed
         }
 
+        if settings.BROADCAST_ENABLED:
+            tasks.broadcast_change.delay([l.Id for l in order_info.LineItems])
+
         return response.Response(data)
-    
+
+
 class ResetDatabaseAPIView(views.APIView):
     """
     docstring
     """
-    def post(self,request,*args, **kwargs):
+
+    def post(self, request, *args, **kwargs):
         """
         docstring
         """
         reset_database_task.delay()
-        return response.Response({"message","Database reset"})
+        return response.Response({"detail", "Database reset"})
+
 
 class ListBinsView(views.APIView):
     """
     docstring
     """
     serializer_class = BinSerializer
-    
+
     def get(self, request, *args, **kwargs):
         active_bins = Bin.objects.filter(Active=True)
         in_bin_orders = OrderInfo.objects.filter(Bin__in=active_bins)
@@ -201,12 +259,9 @@ class ListBinsView(views.APIView):
             line_items = LineItem.objects.filter(Order=order)
             serializer = ReadLineItemSerializer(line_items, many=True)
             data.append({
-                "OrderNumber" : order.OrderNumber,
+                "OrderNumber": order.OrderNumber,
                 "BinNumber": order.Bin.Number,
                 "LineItems": serializer.data
             })
-        
+
         return response.Response(data)
-        
-        
-        

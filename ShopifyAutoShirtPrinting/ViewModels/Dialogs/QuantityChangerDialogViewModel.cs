@@ -21,7 +21,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         public string Title => "Change Printed Quantity";
 
         public event Action<IDialogResult> RequestClose;
-        public ObservableCollection<MyLineItem> LineItems { get; set; } = new();
+        public MyLineItem LineItem { get; set; } = new();
         private DelegateCommand<string> _dialogCommand;
         private string _message;
         private readonly IMapper _mapper;
@@ -42,7 +42,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         {
             if (cmd.ToLower() == "save")
             {
-                if (LineItems.Any(l => l.PrintedQuantity > l.Quantity || l.PrintedQuantity < 0))
+                if (LineItem.PrintedQuantity > LineItem.Quantity || LineItem.PrintedQuantity < 0)
                 {
                     Message = "<PrintedQuantity> must be within the range of ordered Quantity (minimum 0).";
                     DelayedClear();
@@ -50,7 +50,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
                 }
 
                 var data = new DialogParameters() {
-                    { "LineItems", LineItems.AsEnumerable()}
+                    { "LineItem", LineItem  }
                 };
 
                 RequestClose?.Invoke(new DialogResult(ButtonResult.OK, data));
@@ -93,14 +93,10 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         }
         public void OnDialogOpened(IDialogParameters parameters)
         {
-            if (parameters.TryGetValue<MyLineItem[]>("LineItems", out var lineItems))
+            if (parameters.TryGetValue<MyLineItem>("LineItem", out var lineItem))
             {
-                foreach (var item in lineItems)
-                {
-                    var itemCopy = new MyLineItem();
-                    _mapper.Map(item, itemCopy);
-                    LineItems.Add(itemCopy);
-                }
+                LineItem = new MyLineItem();
+                _mapper.Map(lineItem, LineItem);
             }
         }
     }
