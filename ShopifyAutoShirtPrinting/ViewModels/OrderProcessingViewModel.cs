@@ -151,7 +151,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 }
             case "-":
                 {
-                    var processingResult = await _apiClient.UndoPrintAsync(SelectedLineItem.Id);   
+                    if (SelectedLineItem.PrintedQuantity == 0) return;
+                    var processingResult = await _apiClient.UndoPrintAsync(SelectedLineItem.Id);
                     break;
                 }
             default:
