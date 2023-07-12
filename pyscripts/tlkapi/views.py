@@ -55,7 +55,10 @@ class LineItemViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         instance = serializer.save()
-        tasks.broadcast_added.delay([instance.Id])
+
+        if settings.BROADCAST_ENABLED:
+            tasks.broadcast_added.delay([instance.Id])
+        
         return instance
 
     def perform_update(self, serializer):
@@ -158,7 +161,7 @@ class ItemProcessingView(views.APIView):
         }
 
         if settings.BROADCAST_ENABLED:
-            tasks.broadcast_change.delay([l.Id for l in order_info.LineItems])
+            tasks.broadcast_updated.delay([l.Id for l in order_info.LineItems])
 
         return response.Response(data)
 
@@ -225,7 +228,7 @@ class ItemProcessingView(views.APIView):
         }
 
         if settings.BROADCAST_ENABLED:
-            tasks.broadcast_change.delay([l.Id for l in order_info.LineItems])
+            tasks.broadcast_updated.delay([l.Id for l in order_info.LineItems])
 
         return response.Response(data)
 
