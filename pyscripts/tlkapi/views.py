@@ -143,7 +143,7 @@ class ItemProcessingView(views.APIView):
             total_printed=Sum('PrintedQuantity')
         )
 
-        if line_items_aggregate['PrintedQuantity']==0:
+        if line_items_aggregate['total_printed']==0:
             if order_info.Bin: 
                 bin = order_info.Bin
                 bin.Active = False
