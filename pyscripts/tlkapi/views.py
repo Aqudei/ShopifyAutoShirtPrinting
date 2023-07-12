@@ -161,7 +161,7 @@ class ItemProcessingView(views.APIView):
         }
 
         if settings.BROADCAST_ENABLED:
-            tasks.broadcast_updated.delay([l.Id for l in order_info.LineItems])
+            tasks.broadcast_updated.delay([l.Id for l in order_info.LineItems.all()])
 
         return response.Response(data)
 
@@ -228,7 +228,7 @@ class ItemProcessingView(views.APIView):
         }
 
         if settings.BROADCAST_ENABLED:
-            tasks.broadcast_updated.delay([l.Id for l in order_info.LineItems])
+            tasks.broadcast_updated.delay([l.Id for l in order_info.LineItems.all()])
 
         return response.Response(data)
 
