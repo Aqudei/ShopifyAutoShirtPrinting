@@ -136,6 +136,9 @@ class ItemProcessingView(views.APIView):
 
         if line_item.PrintedQuantity >= 1:
             line_item.PrintedQuantity = line_item.PrintedQuantity - 1
+        
+        if line_item.PrintedQuantity == 0:
+            line_item.Status = "Pending"
             
         line_item.save()
 
