@@ -133,7 +133,7 @@ class ItemProcessingView(views.APIView):
         line_item = LineItem.objects.get(Id=pk)
         order_info = line_item.Order
 
-        if line_item.PrintedQuantity > 1:
+        if line_item.PrintedQuantity >= 1:
             line_item.PrintedQuantity = line_item.PrintedQuantity - 1
             
         line_item.save()
