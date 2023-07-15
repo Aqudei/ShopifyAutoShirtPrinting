@@ -17,8 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from rest_framework import routers
-from .views import WebhookHandlerView
+from .views import ShopifyWebhookHandlerView, ShipStationWebhookHandlerView
 
 urlpatterns = [
-    path('handler/9fbe8036806f4fe992552e9010d7fd07/',WebhookHandlerView.as_view())
+    path('handler/9fbe8036806f4fe992552e9010d7fd07/',ShopifyWebhookHandlerView.as_view()),
+    path('handler/5ba7048b944f49ad8e1291698a7b46e5/',ShipStationWebhookHandlerView.as_view())
 ]

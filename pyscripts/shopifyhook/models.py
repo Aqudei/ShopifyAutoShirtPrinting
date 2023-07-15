@@ -7,12 +7,16 @@ from django.utils.translation import gettext_lazy as _
 
 class Hook(models.Model):
 
+    SOURCES = (('Shopify', 'Shopify'), ('ShipStation','ShipStation'))
+
     triggered_at = models.DateTimeField(
         _("Triggered At"), auto_now=False, auto_now_add=True)
     event = models.CharField(_("Event"), max_length=50, null=True, blank=True)
     body = models.JSONField(_("Body"), null=True, blank=True)
     headers = models.JSONField(_("Headers"), null=True, blank=True)
-    processed = models.BooleanField(_("Processed"), default=False, null=True, blank=True)
+    processed = models.BooleanField(
+        _("Processed"), default=False, null=True, blank=True)
+    source = models.CharField(_("Source"), max_length=20, choices=SOURCES)
 
     class Meta:
         verbose_name = _("hook")

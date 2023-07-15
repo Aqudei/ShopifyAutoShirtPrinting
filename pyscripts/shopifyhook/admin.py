@@ -5,4 +5,6 @@ from .models import Hook
 
 @admin.register(Hook)
 class HookAdmin(admin.ModelAdmin):
-    list_display = ['triggered_at', 'event', 'headers', 'processed', 'body']
+    list_display = ['triggered_at', 'event', 'headers', 'processed','source', 'body']
+    list_filter = ['event','processed','source']
+
