@@ -625,7 +625,6 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     {
         try
         {
-
             _myPrintService.PrintItem(lineItem);
             var processingItemResult = await _apiClient.ProcessItem(lineItem.Id);
 
