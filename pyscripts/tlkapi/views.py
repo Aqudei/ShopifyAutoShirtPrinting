@@ -109,15 +109,15 @@ class DestroyBinView(views.APIView):
     docstring
     """
 
-    def delete(self, request, pk=None):
+    def delete(self, request, BinNumber=None):
         """
         docstring
         """
-        bin = Bin.objects.get(pk=pk)
-        order = OrderInfo.objects.get(Bin=bin)
+        bin = Bin.objects.get(Number=BinNumber)
         bin.Active = False
         bin.save()
 
+        order = OrderInfo.objects.get(Bin=bin)
         order.Bin = None
         order.save()
 
