@@ -1,7 +1,9 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 using Prism.Commands;
 using Prism.Regions;
+using ShopifyEasyShirtPrinting.Helpers;
 using ShopifyEasyShirtPrinting.Services;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -14,6 +16,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
     {
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly BinService _binService;
+        private readonly IShipStationBrowserService _browserService;
         private DelegateCommand<Bin> clearBinCommand;
 
         public override string Title => "Bins";
@@ -38,18 +41,31 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
             if (result == MessageDialogResult.Affirmative)
             {
-                _binService.EmptyBinAsync(bin.BinNumber);
-                LoadBins();
+                await _binService.EmptyBinAsync(bin.BinNumber);
+                await LoadBins();
             }
         }
 
-        public BinsViewModel(IDialogCoordinator dialogCoordinator, BinService binService)
+        private DelegateCommand<Bin> _openInBrowserCommand;
+
+        public DelegateCommand<Bin> OpenInBrowserCommand
+        {
+            get { return _openInBrowserCommand ??= new DelegateCommand<Bin>(HandleOpenInBrowwer); }
+        }
+
+        private void HandleOpenInBrowwer(Bin bin)
+        {
+            Task.Run(() => _browserService.NavigateToOrder(bin.OrderNumber));
+            WindowHelper.FocusChrome();
+        }
+
+        public BinsViewModel(IDialogCoordinator dialogCoordinator, BinService binService, IShipStationBrowserService browserService)
         {
             _dialogCoordinator = dialogCoordinator;
             _binService = binService;
+            _browserService = browserService;
 
             Bins = CollectionViewSource.GetDefaultView(_bins);
-
 
             PropertyChanged += (s, e) =>
             {

@@ -46,38 +46,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels;
 public class OrderProcessingViewModel : PageBase, INavigationAware
 {
 
-    [DllImport("user32.dll")]
-    public static extern bool ShowWindowAsync(HandleRef hWnd, int nCmdShow);
-    [DllImport("user32.dll")]
-    public static extern bool SetForegroundWindow(IntPtr WindowHandle);
-    public const int SW_RESTORE = 9;
-    public const int SW_MAXIMIZE = 3;
-
-
-    private void FocusChrome()
-    {
-        FocusProcess("chrome");
-    }
-
-
-    private void FocusProcess(string procName)
-    {
-        var objProcesses = System.Diagnostics.Process.GetProcessesByName(procName);
-
-        foreach (Process proc in objProcesses)
-        {
-            if (proc.MainWindowTitle.Contains("ShipStation"))
-            {
-                IntPtr hWnd = IntPtr.Zero;
-                hWnd = proc.MainWindowHandle;
-                ShowWindowAsync(new HandleRef(null, hWnd), SW_MAXIMIZE);
-                SetForegroundWindow(hWnd);
-                break;
-            }
-
-        }
-    }
-
     private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
     private readonly ObservableCollection<MyLineItem> _lineItems = new();
@@ -175,7 +143,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     private void HandleOpenInBrowser(MyLineItem item)
     {
         Task.Run(() => _browserService.NavigateToOrder(item.OrderNumber));
-        FocusChrome();
+        WindowHelper.FocusChrome();
     }
 
     private async void HandleApplyTag(string tag)
@@ -692,7 +660,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
                                 await _binService.EmptyBinAsync(processingItemResult.LineItem.BinNumber);
                                 _browserService.NavigateToOrder(lineItem.OrderNumber);
-                                FocusChrome();
+                                WindowHelper.FocusChrome();
                             }
                         });
                     });

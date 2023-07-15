@@ -605,6 +605,7 @@
     <Compile Include="Events\DoneFetchingLines.cs" />
     <Compile Include="Extensions\DialogServiceExtensions.cs" />
     <Compile Include="Helpers\QrHelper.cs" />
+    <Compile Include="Helpers\WindowHelper.cs" />
     <Compile Include="Messaging\ItemsUpdated.cs" />
     <None Include="Migrations\202306220321441_initial.cs" />
     <Compile Include="Messaging\MessageBus.cs" />

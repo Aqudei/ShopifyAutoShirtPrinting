@@ -48,22 +48,38 @@
                             <DataGridTextColumn Header="Qty" Binding="{Binding Quantity}"/>
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Button Grid.Row="3" 
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Bottom"
+                    <StackPanel Orientation="Horizontal" 
+                                HorizontalAlignment="Center"
+                                Grid.Row="3" VerticalAlignment="Center">
+                        <Button
                             CommandParameter="{Binding}"
                             Command="{Binding DataContext.ClearBinCommand, ElementName=BinsItemsControl, Mode=OneWay}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <Image VerticalAlignment="Center" 
-                                   Width="25"
-                                   Source="{StaticResource EmptyBinImage}"/>
-                            <Label Grid.Column="1" VerticalAlignment="Center">Empty Bin</Label>
-                        </Grid>
-                    </Button>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Image VerticalAlignment="Center" 
+                                    Width="25"
+                                    Source="{StaticResource EmptyBinImage}"/>
+                                <Label Grid.Column="1" VerticalAlignment="Center" Content="Empty Bin"/>
+                            </Grid>
+                        </Button>
+                        <Button
+                            CommandParameter="{Binding}"
+                            Command="{Binding DataContext.OpenInBrowserCommand, ElementName=BinsItemsControl, Mode=OneWay}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Image VerticalAlignment="Center" 
+                                    Width="25"
+                                    Source="{StaticResource EmptyBinImage}"/>
+                                <Label Grid.Column="1" VerticalAlignment="Center" Content="Open in Browser"/>
+                            </Grid>
+                        </Button>
+                    </StackPanel>
                 </Grid>
             </Grid>
         </DataTemplate>

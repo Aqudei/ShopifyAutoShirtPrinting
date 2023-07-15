@@ -13,7 +13,7 @@
         <Style TargetType="Window">
             <Setter Property="dialogs:Dialog.WindowStartupLocation" Value="CenterScreen" />
             <Setter Property="ResizeMode" Value="NoResize"/>
-            <Setter Property="ShowInTaskbar" Value="False"/>
+            <!--<Setter Property="ShowInTaskbar" Value="False"/>-->
             <Setter Property="SizeToContent" Value="WidthAndHeight"/>
         </Style>
     </dialogs:Dialog.WindowStyle>
