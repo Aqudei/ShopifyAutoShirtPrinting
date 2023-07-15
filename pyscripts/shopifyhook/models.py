@@ -16,7 +16,7 @@ class Hook(models.Model):
     headers = models.JSONField(_("Headers"), null=True, blank=True)
     processed = models.BooleanField(
         _("Processed"), default=False, null=True, blank=True)
-    source = models.CharField(_("Source"), max_length=20, choices=SOURCES)
+    source = models.CharField(_("Source"), max_length=20, choices=SOURCES, default='Shopify')
 
     class Meta:
         verbose_name = _("hook")

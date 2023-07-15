@@ -8,14 +8,14 @@ import base64
 from django.conf import settings
 
 
-class ShipStationWebhookHandlerView(generics.CreateAPIView):
-    queryset = Hook.objects.all()
-    serializer_class = HookSerializer
-    permission_classes = [permissions.AllowAny]
+# class ShipStationWebhookHandlerView(generics.CreateAPIView):
+#     queryset = Hook.objects.all()
+#     serializer_class = HookSerializer
+#     permission_classes = [permissions.AllowAny]
 
-    def perform_create(self, serializer):
-        return serializer.save(
-            headers=self.request.headers, body=self.request.data, source='ShipStation')
+#     def perform_create(self, serializer):
+#         return serializer.save(
+#             headers=self.request.headers, body=self.request.data, source='ShipStation')
 
 
 class ShopifyWebhookHandlerView(generics.CreateAPIView):
