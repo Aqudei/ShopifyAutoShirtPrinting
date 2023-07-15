@@ -173,7 +173,6 @@ class ItemProcessingView(views.APIView):
         """
         docstring
         """
-        bin = None
         line_item = LineItem.objects.get(pk=pk)
 
         line_items_aggregate = line_item.Order.LineItems.aggregate(
@@ -192,24 +191,21 @@ class ItemProcessingView(views.APIView):
             return response.Response(serializer.data)
 
         order_info = line_item.Order
-
+        
         # Case 1, only one item, no need to assign Bin
         if line_items_aggregate['total_quantity'] <= 1:
             bin = Bin.objects.get(Number=0)
-
-        # Case 2, already assigned to bin
-        elif order_info.Bin:
-            bin = order_info.Bin
         else:
-            bin = Bin.objects.exclude(Number=0).filter(Active=False).first()
-            if not bin:
-                raise APIException(detail="No available Bin")
-            bin.Active = True
-            bin.save()
-            
-            order_info.Bin = bin
-            order_info.save()
-
+            if not order_info.Bin:
+                bin = Bin.objects.exclude(Number=0).filter(Active=False).first()
+                if not bin:
+                    raise APIException(detail="No available Bin")
+                bin.Active = True
+                bin.save()
+                
+                order_info.Bin = bin
+                order_info.save()
+    
         line_item.Status = "Processed"
         line_item.PrintedQuantity += 1
         line_item.save()
