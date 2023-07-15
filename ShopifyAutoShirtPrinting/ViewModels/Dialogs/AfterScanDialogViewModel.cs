@@ -61,8 +61,26 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             _apiClient = apiClient;
         }
 
-        public void OnDialogOpened(IDialogParameters parameters)
+        public async void OnDialogOpened(IDialogParameters parameters)
         {
+            if (parameters.TryGetValue<long?>("LineItemId", out var lineItemId))
+            {
+                var prams = new Dictionary<string, string> { { "LineItemId", $"{lineItemId}" } };
+                var lineItems = await _apiClient.ListItemsAsync(prams);
+                if (lineItems != null && lineItems.Any())
+                {
+                    await _dispatcher.InvokeAsync(() =>
+                    {
+                        MyLineItems.Clear();
+                        MyLineItems.Add(lineItems[0]);
+                        OrderNumber = lineItems[0].OrderNumber;
+                        BinNumber = lineItems[0].BinNumber;
+                        CustomerName = lineItems[0].Customer;
+                        CustomerEmail = lineItems[0].CustomerEmail;
+                    });
+                }
+            }
+
             if (parameters.TryGetValue<string>("Title", out var title))
             {
                 _title = title;
@@ -72,29 +90,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             if (parameters.TryGetValue<string>("Message", out var message))
             {
                 Message = message;
-            }
-
-            if (parameters.TryGetValue<long?>("LineItemId", out var lineItemId))
-            {
-                MyLineItems.Clear();
-
-                Task.Run(async () =>
-                {
-                    var prams = new Dictionary<string, string> { { "LineItemId", $"{lineItemId}" } };
-                    var lineItems = await _apiClient.ListItemsAsync(prams);
-                    if (lineItems != null && lineItems.Any())
-                    {
-                        await _dispatcher.InvokeAsync(() =>
-                        {
-                            MyLineItems.Add(lineItems[0]);
-                            OrderNumber = lineItems[0].OrderNumber;
-                            BinNumber = lineItems[0].BinNumber;
-                            CustomerName = lineItems[0].Customer;
-                            CustomerEmail = lineItems[0].CustomerEmail;
-                        });
-                    }
-                });
-
             }
         }
     }

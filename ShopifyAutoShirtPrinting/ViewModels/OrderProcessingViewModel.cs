@@ -658,7 +658,9 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                                 }
 
                                 await _binService.EmptyBinAsync(processingItemResult.LineItem.BinNumber);
-                                _browserService.NavigateToOrder(lineItem.OrderNumber);
+
+                                Task.Run(() => _browserService.NavigateToOrder(lineItem.OrderNumber));
+
                                 WindowHelper.FocusChrome();
                             }
                         });
