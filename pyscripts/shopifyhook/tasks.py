@@ -34,6 +34,7 @@ def process_hooks():
         except OrderInfo.DoesNotExist:
             pass
         except Exception as e:
+            logger.error(e)
             break
 
     if settings.BROADCAST_ENABLED:
