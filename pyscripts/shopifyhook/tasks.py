@@ -15,11 +15,11 @@ def process_hooks():
     docstring
     """
     removed_bins_number = []
-    
+    print("Processing wehook data...")
     for hook_data in Hook.objects.filter(processed=False):
         try:
             order = OrderInfo.objects.get(OrderNumber=hook_data.body['order_number'])
-            print(hook_data)
+
             if order.Bin:
                 bin = order.Bin
                 bin.Active = False
