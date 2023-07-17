@@ -36,4 +36,5 @@ def process_hooks():
         except Exception as e:
             break
 
-    broadcast.delay(json.dumps(removed_bins_number) ,"bins.destroyed")
+    if settings.BROADCAST_ENABLED:
+        broadcast.delay(json.dumps(removed_bins_number) ,"bins.destroyed")
