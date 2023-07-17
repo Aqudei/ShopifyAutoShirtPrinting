@@ -82,10 +82,10 @@ def broadcast_updated(ids: list[int]):
     """
     docstring
     """
-    exchange_name = 'thelonelykids'
-    creds = pika.PlainCredentials('warwick', 'warwickpass1')
+    exchange_name = settings.BROADCAST_EXCHANGE
+    creds = pika.PlainCredentials(settings.BROADCAST_USERNAME, settings.BROADCAST_PASSWORD)
     connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host='170.64.158.123', credentials=creds))
+        pika.ConnectionParameters(host=settings.BROADCAST_HOST, credentials=creds))
     channel = connection.channel()
 
     channel.exchange_declare(exchange=exchange_name, exchange_type='fanout')
@@ -100,14 +100,30 @@ def broadcast_added(ids: list[int]):
     """
     docstring
     """
-    exchange_name = 'thelonelykids'
-    creds = pika.PlainCredentials('warwick', 'warwickpass1')
+    exchange_name = settings.BROADCAST_EXCHANGE
+    creds = pika.PlainCredentials(settings.BROADCAST_USERNAME, settings.BROADCAST_PASSWORD)
     connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host='170.64.158.123', credentials=creds))
+        pika.ConnectionParameters(host=settings.BROADCAST_HOST, credentials=creds))
     channel = connection.channel()
 
     channel.exchange_declare(exchange=exchange_name, exchange_type='fanout')
     message = json.dumps(ids)
     channel.basic_publish(exchange=exchange_name,
                           routing_key='items.added', body=message)
+    connection.close()
+    
+@shared_task
+def broadcast(message, routing_key):
+    """
+    docstring
+    """
+    exchange_name = settings.BROADCAST_EXCHANGE
+    creds = pika.PlainCredentials(settings.BROADCAST_USERNAME, settings.BROADCAST_PASSWORD)
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(host=settings.BROADCAST_HOST, credentials=creds))
+    channel = connection.channel()
+
+    channel.exchange_declare(exchange=exchange_name, exchange_type='fanout')
+    channel.basic_publish(exchange=exchange_name,
+                          routing_key=routing_key, body=message)
     connection.close()

@@ -2,6 +2,7 @@
 using Prism.Commands;
 using Prism.Regions;
 using ShopifyEasyShirtPrinting.Helpers;
+using ShopifyEasyShirtPrinting.Messaging;
 using ShopifyEasyShirtPrinting.Services;
 using System;
 using System.Collections.ObjectModel;
@@ -17,6 +18,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly BinService _binService;
         private readonly IShipStationBrowserService _browserService;
+        private readonly MessageBus _messageBus;
         private DelegateCommand<Bin> clearBinCommand;
 
         public override string Title => "Bins";
@@ -59,14 +61,16 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             WindowHelper.FocusChrome();
         }
 
-        public BinsViewModel(IDialogCoordinator dialogCoordinator, BinService binService, IShipStationBrowserService browserService)
+        public BinsViewModel(IDialogCoordinator dialogCoordinator, BinService binService, IShipStationBrowserService browserService, MessageBus messageBus)
         {
             _dialogCoordinator = dialogCoordinator;
             _binService = binService;
             _browserService = browserService;
+            _messageBus = messageBus;
 
             Bins = CollectionViewSource.GetDefaultView(_bins);
 
+            _messageBus.BinsDestroyed += _messageBus_BinsDestroyed;
             PropertyChanged += (s, e) =>
             {
                 switch (e.PropertyName)
@@ -93,6 +97,20 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                         break;
                 }
             };
+        }
+
+        private void _messageBus_BinsDestroyed(object sender, int[] binNumbers)
+        {
+            foreach (var bin in _bins)
+            {
+                if (binNumbers.Contains(bin.BinNumber))
+                {
+                    _dispatcher.Invoke(() =>
+                    {
+                        _bins.Remove(bin);
+                    });
+                }
+            }
         }
 
         private async Task LoadBins()

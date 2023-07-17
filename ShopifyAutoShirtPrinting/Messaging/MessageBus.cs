@@ -18,6 +18,7 @@ namespace ShopifyEasyShirtPrinting.Messaging
         private IModel _channel;
         private bool disposedValue;
 
+        public event EventHandler<int[]> BinsDestroyed;
         public event EventHandler<int[]> ItemsUpdated;
         public event EventHandler<int[]> ItemsAdded;
 
@@ -59,6 +60,12 @@ namespace ShopifyEasyShirtPrinting.Messaging
                         {
                             var lineItemsIds = JsonConvert.DeserializeObject<int[]>(message);
                             ItemsAdded?.Invoke(this, lineItemsIds);
+                            break;
+                        }
+                    case "bins.destroyed":
+                        {
+                            var binNumbers = JsonConvert.DeserializeObject<int[]>(message);
+                            BinsDestroyed?.Invoke(this, binNumbers);
                             break;
                         }
                     default:
