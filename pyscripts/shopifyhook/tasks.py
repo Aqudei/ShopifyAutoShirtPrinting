@@ -32,7 +32,8 @@ def process_hooks():
             hook_data.processed=True
             hook_data.save()
         except OrderInfo.DoesNotExist:
-            pass
+            hook_data.processed=True
+            hook_data.save()
         except Exception as e:
             logger.error(e)
             break
