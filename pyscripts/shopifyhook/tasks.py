@@ -19,6 +19,7 @@ def process_hooks():
     for hook_data in Hook.objects.filter(processed=False):
         try:
             order = OrderInfo.objects.get(OrderNumber=hook_data.body['order_number'])
+            print(hook_data)
             if order.Bin:
                 bin = order.Bin
                 bin.Active = False
@@ -34,5 +35,5 @@ def process_hooks():
             pass
         except Exception as e:
             break
-        
+
     broadcast.delay(json.dumps(removed_bins_number) ,"bins.destroyed")
