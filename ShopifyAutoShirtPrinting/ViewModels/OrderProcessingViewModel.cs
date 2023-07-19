@@ -388,8 +388,10 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private async void _messageBus_ItemsArchived(object sender, int[] archivedItemsId)
     {
-        foreach (var archivedItem in _lineItems.Where(x => archivedItemsId.Contains(x.Id)))
+        var array = _lineItems.Where(x => archivedItemsId.Contains(x.Id)).ToArray();
+        for (int i = array.Length - 1; i >= 0; i--)
         {
+            var archivedItem = array[i];
             await _dispatcher.InvokeAsync(() =>
                     {
                         _lineItems.Remove(archivedItem);
