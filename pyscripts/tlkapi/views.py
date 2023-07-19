@@ -268,7 +268,8 @@ class ListBinsView(views.APIView):
             data.append({
                 "OrderNumber": order.OrderNumber,
                 "BinNumber": order.Bin.Number,
-                "LineItems": serializer.data
+                "LineItems": serializer.data,
+                "Notes" : order.Bin.Notes
             })
 
         return response.Response(data)
