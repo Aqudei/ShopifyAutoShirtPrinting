@@ -2,7 +2,7 @@ import json
 from celery import shared_task
 from .models import Hook
 import logging
-from tlkapi.models import Bin, OrderInfo
+from tlkapi.models import Bin, OrderInfo, LineItem
 from tlkapi.tasks import broadcast
 from django.conf import settings
 
@@ -16,18 +16,20 @@ def process_hooks():
     """
     removed_bins_number = []
     print("Processing wehook data...")
-    for hook_data in Hook.objects.filter(processed=False):
+    for hook_data in Hook.objects.filter(processed=False, event='orders/fulfilled'):
         try:
             order = OrderInfo.objects.get(OrderNumber=hook_data.body['order_number'])
-
             if order.Bin:
                 bin = order.Bin
                 bin.Active = False
                 bin.save()
                 order.Bin = None
                 order.save()
-
                 removed_bins_number.append(bin.Number)
+
+            LineItem.objects.filter(Order=order).update(
+                Status = 'Archived' 
+            )
 
             hook_data.processed=True
             hook_data.save()
