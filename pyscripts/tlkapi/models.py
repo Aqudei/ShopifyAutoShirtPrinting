@@ -13,7 +13,8 @@ from django.urls import reverse
 class Bin(models.Model):
     Number = models.IntegerField(_("Bin Number"), unique=True)
     Active = models.BooleanField(_("Active"), default=False)
-
+    Notes = models.TextField(_("Notes"), blank=True,null=True)
+    
     class Meta:
         verbose_name = _("Bin")
         verbose_name_plural = _("Bins")
