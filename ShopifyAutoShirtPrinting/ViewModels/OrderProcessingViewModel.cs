@@ -380,10 +380,22 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         PropertyChanged += OrderProcessingViewModel_PropertyChanged;
         _messageBus.ItemsUpdated += _messageBus_ItemsUpdated;
         _messageBus.ItemsAdded += _messageBus_ItemsAdded;
-
+        _messageBus.ItemsArchived += _messageBus_ItemsArchived;
         LineItemsView.CollectionChanged += LineItemsView_CollectionChanged;
 
         Task.Run(FetchLineItems);
+    }
+
+    private async void _messageBus_ItemsArchived(object sender, int[] archivedItemsId)
+    {
+        foreach (var archivedItem in _lineItems.Where(x => archivedItemsId.Contains(x.Id)))
+        {
+            await _dispatcher.InvokeAsync(() =>
+                    {
+                        _lineItems.Remove(archivedItem);
+                    });
+        }
+
     }
 
     private void LineItemsView_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

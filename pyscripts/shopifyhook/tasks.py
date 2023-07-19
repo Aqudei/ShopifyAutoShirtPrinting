@@ -15,10 +15,14 @@ def process_hooks():
     docstring
     """
     removed_bins_number = []
+    archived_items = []
+
     print("Processing wehook data...")
     for hook_data in Hook.objects.filter(processed=False, event='orders/fulfilled'):
         try:
-            order = OrderInfo.objects.get(OrderNumber=hook_data.body['order_number'])
+            order = OrderInfo.objects.get(
+                OrderNumber=hook_data.body['order_number'])
+            
             if order.Bin:
                 bin = order.Bin
                 bin.Active = False
@@ -28,17 +32,21 @@ def process_hooks():
                 removed_bins_number.append(bin.Number)
 
             LineItem.objects.filter(Order=order).update(
-                Status = 'Archived' 
+                Status='Archived'
             )
 
-            hook_data.processed=True
+            archived_items.extend(LineItem.objects.filter(
+                Order=order).values_list('Id', flat=True))
+
+            hook_data.processed = True
             hook_data.save()
         except OrderInfo.DoesNotExist:
-            hook_data.processed=True
+            hook_data.processed = True
             hook_data.save()
         except Exception as e:
             logger.error(e)
             break
 
     if settings.BROADCAST_ENABLED:
-        broadcast.delay(json.dumps(removed_bins_number) ,"bins.destroyed")
+        broadcast.delay(json.dumps(removed_bins_number), "bins.destroyed")
+        broadcast.delay(json.dumps(archived_items), "items.archived")
