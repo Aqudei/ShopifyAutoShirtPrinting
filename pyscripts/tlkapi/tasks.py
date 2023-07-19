@@ -23,6 +23,10 @@ def reset_database_task():
     Bin.objects.all().delete()
 
 
+    if settings.BROADCAST_ENABLED:
+        broadcast("database.reset","database.reset")
+
+
 def process_orders(orders_response):
     """
     docstring

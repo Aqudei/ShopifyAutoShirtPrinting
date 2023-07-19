@@ -22,6 +22,7 @@ namespace ShopifyEasyShirtPrinting.Messaging
         public event EventHandler<int[]> ItemsUpdated;
         public event EventHandler<int[]> ItemsAdded;
         public event EventHandler<int[]> ItemsArchived;
+        public event EventHandler DatabaseReset;
 
         public MessageBus()
         {
@@ -73,6 +74,11 @@ namespace ShopifyEasyShirtPrinting.Messaging
                         {
                             var lineItemsIds = JsonConvert.DeserializeObject<int[]>(message);
                             ItemsArchived?.Invoke(this, lineItemsIds);
+                            break;
+                        }
+                    case "database.reset":
+                        {
+                            DatabaseReset?.Invoke(this, null);
                             break;
                         }
                     default:

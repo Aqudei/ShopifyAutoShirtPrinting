@@ -196,12 +196,6 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     public DelegateCommand SaveQrTagsCommand => _saveQrTagsCommand ??= new DelegateCommand(HandleSaveQrTag, () => TotalSelected > 0)
         .ObservesProperty(() => TotalSelected);
 
-    private DelegateCommand _resetDatabaseCommand;
-
-    public DelegateCommand ResetDatabaseCommand
-    {
-        get { return _resetDatabaseCommand ??= new DelegateCommand(HandleResetDatabase); }
-    }
 
     private DelegateCommand _refreshCommand;
 
@@ -273,18 +267,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         await FetchLineItems();
     }
 
-    private async void HandleResetDatabase()
-    {
-        var prompt = await _dialogCoordinator.ShowMessageAsync(this, "Confirm Database Reset",
-            "Are you sure you want to cleanup database?", MessageDialogStyle.AffirmativeAndNegative);
 
-        if (prompt != MessageDialogResult.Affirmative)
-            return;
-
-        await _apiClient.ResetDatabase();
-        await Task.Delay(TimeSpan.FromSeconds(3));
-        await FetchLineItems();
-    }
 
     private async void HandleSaveQrTag()
     {
@@ -373,17 +356,26 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         _dbService = dbService;
         _apiClient = apiClient;
         _messageBus = messageBus;
+
         LineItemsView = CollectionViewSource.GetDefaultView(_lineItems);
         LineItemsView.SortDescriptions.Add(new SortDescription("OrderNumber", ListSortDirection.Descending));
 
         // _dispatcher.Invoke(() => ShippingLines.AddRange(_lineItems.Select(l => l.Shipping).Distinct().ToList()));
         PropertyChanged += OrderProcessingViewModel_PropertyChanged;
+
         _messageBus.ItemsUpdated += _messageBus_ItemsUpdated;
         _messageBus.ItemsAdded += _messageBus_ItemsAdded;
         _messageBus.ItemsArchived += _messageBus_ItemsArchived;
+        _messageBus.DatabaseReset += _messageBus_DatabaseReset;
+
         LineItemsView.CollectionChanged += LineItemsView_CollectionChanged;
 
         Task.Run(FetchLineItems);
+    }
+
+    private async void _messageBus_DatabaseReset(object sender, EventArgs e)
+    {
+        await FetchLineItems();
     }
 
     private async void _messageBus_ItemsArchived(object sender, int[] archivedItemsId)

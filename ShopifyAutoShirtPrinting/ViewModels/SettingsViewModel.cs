@@ -2,6 +2,8 @@
 using MahApps.Metro.Controls.Dialogs;
 using Prism.Commands;
 using ShopifyEasyShirtPrinting.Properties;
+using ShopifyEasyShirtPrinting.Services;
+using System;
 using System.Collections.ObjectModel;
 using System.Drawing.Printing;
 
@@ -9,6 +11,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 {
     public class SettingsViewModel : PageBase
     {
+        private readonly ApiClient _apiClient;
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly IMapper _mapper;
 
@@ -50,13 +53,33 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             set { SetProperty(ref _serverHost, value); }
         }
 
+        private DelegateCommand _resetDatabaseCommand;
+
+        public DelegateCommand ResetDatabaseCommand
+        {
+            get { return _resetDatabaseCommand ??= new DelegateCommand(HandleResetDatabase); }
+        }
+
+        private async void HandleResetDatabase()
+        {
+            var prompt = await _dialogCoordinator.ShowMessageAsync(this, "Confirm Database Reset",
+                "Are you sure you want to cleanup database?", MessageDialogStyle.AffirmativeAndNegative);
+
+            if (prompt != MessageDialogResult.Affirmative)
+                return;
+
+            await _apiClient.ResetDatabase();
+            await System.Threading.Tasks.Task.Delay(TimeSpan.FromSeconds(3));
+        }
+
 
         public override string Title => "Settings";
-        public SettingsViewModel(IDialogCoordinator dialogCoordinator, IMapper mapper)
+        public SettingsViewModel(IDialogCoordinator dialogCoordinator, IMapper mapper, ApiClient apiClient)
         {
-
-            _dialogCoordinator = dialogCoordinator;
             _mapper = mapper;
+            _apiClient = apiClient;
+            _dialogCoordinator = dialogCoordinator;
+            
             foreach (string printerName in PrinterSettings.InstalledPrinters)
             {
                 QrPrinters.Add(printerName);
