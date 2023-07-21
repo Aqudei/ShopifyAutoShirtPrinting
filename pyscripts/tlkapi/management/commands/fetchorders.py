@@ -16,6 +16,4 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        order = myshopify.find_order(21749)
-        import pdb; pdb.set_trace()
         fetch_orders()
