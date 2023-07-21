@@ -40,16 +40,16 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
 
 
-            Menu.Add(new MenuItem
-            {
-                Label = "Shipped",
-                NavigationPath = "ShippedView",
-                NavigationType = typeof(ShippedView),
-                Icon = new PackIconFontAwesome
-                {
-                    Kind = PackIconFontAwesomeKind.ShipSolid
-                }
-            });
+            //Menu.Add(new MenuItem
+            //{
+            //    Label = "Shipped",
+            //    NavigationPath = "ShippedView",
+            //    NavigationType = typeof(ShippedView),
+            //    Icon = new PackIconFontAwesome
+            //    {
+            //        Kind = PackIconFontAwesomeKind.ShipSolid
+            //    }
+            //});
 
 
             OptionsMenu.Add(new MenuItem

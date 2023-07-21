@@ -8,7 +8,6 @@ from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
-
 @shared_task
 def process_hooks():
     """

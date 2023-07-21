@@ -1,4 +1,5 @@
 import json
+import logging
 from uuid import uuid4
 from django.shortcuts import render
 from django.db.models import Sum, Count
@@ -34,8 +35,7 @@ from .serializers import (
 )
 from .tasks import reset_database_task
 
-# Create your views here.
-
+logger = logging.getLogger(__name__)
 
 class LineItemViewSet(viewsets.ModelViewSet):
     """
@@ -129,9 +129,6 @@ class DestroyBinView(views.APIView):
             tasks.broadcast.delay([bin.Number],"bins.destroyed")
             
         return response.Response()
-
-
-
 
 class ItemProcessingView(views.APIView):
     """

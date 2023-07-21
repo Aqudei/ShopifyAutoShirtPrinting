@@ -171,3 +171,61 @@ BROADCAST_EXCHANGE = 'thelonelykids'
 BROADCAST_USERNAME = 'warwick'
 BROADCAST_PASSWORD = 'warwickpass1'
 BROADCAST_HOST = '170.64.158.123'
+
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} - {asctime} - {module} - {message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "{levelname} - {module} - {message}",
+            "style": "{",
+        },
+    },
+    "filters": {
+        # "special": {
+        #     "()": "project.logging.SpecialFilter",
+        #     "foo": "bar",
+        # },
+        "require_debug_true": {
+            "()": "django.utils.log.RequireDebugTrue",
+        },
+    },
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "filters": ["require_debug_true"],
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+        "file": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename":  BASE_DIR /  "debug.log",
+            "formatter": "verbose",
+        },
+        # "mail_admins": {
+        #     "level": "ERROR",
+        #     "class": "django.utils.log.AdminEmailHandler",
+        #     "filters": ["special"],
+        # },
+    },
+    "loggers": {
+        "tlkapi": {
+            "handlers": ["console","file"],
+            "level": "INFO",
+            # "filters": ["special"],
+            "propagate": True,
+        },
+        "shopifyhook": {
+            "handlers": ["console","file"],
+            "level": "INFO",
+            # "filters": ["special"],
+            "propagate": True,
+        },
+    },
+}

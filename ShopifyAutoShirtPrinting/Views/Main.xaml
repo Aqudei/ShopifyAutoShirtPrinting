@@ -34,6 +34,7 @@
     <Grid>
         <mah:HamburgerMenu x:Name="HamburgerMenu"
                            ItemsSource="{Binding Menu}"
+                           IsPaneOpen="True"
                            ItemTemplate="{StaticResource MenuItemTemplate}"
                            OptionsItemsSource="{Binding OptionsMenu}"
                            OptionsItemTemplate="{StaticResource MenuItemTemplate}">

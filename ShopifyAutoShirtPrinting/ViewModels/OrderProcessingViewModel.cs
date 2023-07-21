@@ -361,16 +361,10 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         _messageBus.ItemsUpdated += _messageBus_ItemsUpdated;
         _messageBus.ItemsAdded += _messageBus_ItemsAdded;
         _messageBus.ItemsArchived += _messageBus_ItemsArchived;
-        _messageBus.DatabaseReset += _messageBus_DatabaseReset;
 
         LineItemsView.CollectionChanged += LineItemsView_CollectionChanged;
 
         Task.Run(FetchLineItems);
-    }
-
-    private async void _messageBus_DatabaseReset(object sender, EventArgs e)
-    {
-        await FetchLineItems();
     }
 
     private async void _messageBus_ItemsArchived(object sender, int[] archivedItemsId)

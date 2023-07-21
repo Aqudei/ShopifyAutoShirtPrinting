@@ -19,7 +19,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         private MyLineItem _theLineItem;
         private string _orderNumber;
         private IMapper _mapper;
-        private int _quantity;
+        private int _quantity = 1;
         private string notes;
         private string _name;
         private int _id;
