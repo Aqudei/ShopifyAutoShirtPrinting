@@ -67,16 +67,20 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             {
                 var prams = new Dictionary<string, string> { { "LineItemId", $"{lineItemId}" } };
                 var lineItems = await _apiClient.ListItemsAsync(prams);
+
                 if (lineItems != null && lineItems.Any())
                 {
+                    var customerName = lineItems.Where(l => !string.IsNullOrWhiteSpace(l.Customer)).FirstOrDefault()?.Customer;
+                    var customerEmail = lineItems.Where(l => !string.IsNullOrWhiteSpace(l.CustomerEmail)).FirstOrDefault()?.CustomerEmail;
+                    var orderNumber = lineItems.Where(l => !string.IsNullOrWhiteSpace(l.OrderNumber)).FirstOrDefault()?.OrderNumber;
                     await _dispatcher.InvokeAsync(() =>
                     {
                         MyLineItems.Clear();
                         MyLineItems.Add(lineItems[0]);
-                        OrderNumber = lineItems[0].OrderNumber;
                         BinNumber = lineItems[0].BinNumber;
-                        CustomerName = lineItems[0].Customer;
-                        CustomerEmail = lineItems[0].CustomerEmail;
+                        OrderNumber = orderNumber;
+                        CustomerName = customerName;
+                        CustomerEmail = customerEmail;
                     });
                 }
             }

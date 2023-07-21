@@ -1,3 +1,4 @@
+from uuid import uuid4
 from django.shortcuts import render
 from django.db.models import Sum, Count
 from django_filters import rest_framework as filters
@@ -54,11 +55,25 @@ class LineItemViewSet(viewsets.ModelViewSet):
             return WriteLineItemSerializer
 
     def perform_create(self, serializer):
-        instance = serializer.save()
+
+        order_number = serializer.validated_data.get("OrderNumber")
+
+        if order_number:
+            order = OrderInfo.objects.get(OrderNumber=order_number)
+            sample_line = LineItem.objects.filter(Order=order).first()
+
+            instance = serializer.save(Order=order, Customer=sample_line.Customer,
+                                       CustomerEmail=sample_line.CustomerEmail, 
+                                       Shipping=sample_line.Shipping)
+
+        else:
+            order = OrderInfo.objects.create(
+                OrderNumber=str(uuid4()).split("-")[0])
+            instance = serializer.save(Order=order)
 
         if settings.BROADCAST_ENABLED:
             tasks.broadcast_added.delay([instance.Id])
-        
+
         return instance
 
     def perform_update(self, serializer):
@@ -136,10 +151,10 @@ class ItemProcessingView(views.APIView):
 
         if line_item.PrintedQuantity >= 1:
             line_item.PrintedQuantity = line_item.PrintedQuantity - 1
-        
+
         if line_item.PrintedQuantity == 0:
             line_item.Status = "Pending"
-            
+
         line_item.save()
 
         line_items_aggregate = order_info.LineItems.aggregate(
@@ -147,8 +162,8 @@ class ItemProcessingView(views.APIView):
             total_printed=Sum('PrintedQuantity')
         )
 
-        if line_items_aggregate['total_printed']==0:
-            if order_info.Bin: 
+        if line_items_aggregate['total_printed'] == 0:
+            if order_info.Bin:
                 bin = order_info.Bin
                 bin.Active = False
                 bin.save()
@@ -165,7 +180,8 @@ class ItemProcessingView(views.APIView):
         }
 
         if settings.BROADCAST_ENABLED:
-            tasks.broadcast_updated.delay([l.Id for l in order_info.LineItems.all()])
+            tasks.broadcast_updated.delay(
+                [l.Id for l in order_info.LineItems.all()])
 
         return response.Response(data)
 
@@ -173,7 +189,7 @@ class ItemProcessingView(views.APIView):
         """
         docstring
         """
-        line_item = LineItem.objects.get(pk=pk)
+        line_item = LineItem.objects.get(Id=pk)
 
         line_items_aggregate = line_item.Order.LineItems.aggregate(
             total_quantity=Sum('Quantity'),
@@ -191,21 +207,22 @@ class ItemProcessingView(views.APIView):
             return response.Response(serializer.data)
 
         order_info = line_item.Order
-        
+
         # Case 1, only one item, no need to assign Bin
         if line_items_aggregate['total_quantity'] <= 1 and not "Sydney Warehouse / Studio" in line_item.Shipping:
             pass
         else:
             if not order_info.Bin:
-                bin = Bin.objects.exclude(Number=0).filter(Active=False).first()
+                bin = Bin.objects.exclude(
+                    Number=0).filter(Active=False).first()
                 if not bin:
                     raise APIException(detail="No available Bin")
                 bin.Active = True
                 bin.save()
-                
+
                 order_info.Bin = bin
                 order_info.save()
-    
+
         line_item.Status = "Processed"
         line_item.PrintedQuantity += 1
         line_item.save()
@@ -232,7 +249,8 @@ class ItemProcessingView(views.APIView):
         }
 
         if settings.BROADCAST_ENABLED:
-            tasks.broadcast_updated.delay([l.Id for l in order_info.LineItems.all()])
+            tasks.broadcast_updated.delay(
+                [l.Id for l in order_info.LineItems.all()])
 
         return response.Response(data)
 
@@ -269,7 +287,20 @@ class ListBinsView(views.APIView):
                 "OrderNumber": order.OrderNumber,
                 "BinNumber": order.Bin.Number,
                 "LineItems": serializer.data,
-                "Notes" : order.Bin.Notes
+                "Notes": order.Bin.Notes
             })
 
         return response.Response(data)
+
+
+class CreateCustom(generics.CreateAPIView):
+    """
+    docstring
+    """
+    serializer_class = WriteLineItemSerializer
+
+    def perform_create(self, serializer):
+        order_number = serializer.data.get('OrderNumber')
+        if order_number:
+            order_info = OrderInfo.objects.get(OrderNumber=order_number)
+            return serializer.save(Order=order_info)

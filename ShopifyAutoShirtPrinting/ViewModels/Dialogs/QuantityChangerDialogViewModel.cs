@@ -87,10 +87,12 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         {
 
         }
+        
         public QuantityChangerDialogViewModel(IMapper mapper)
         {
             _mapper = mapper;
         }
+
         public void OnDialogOpened(IDialogParameters parameters)
         {
             if (parameters.TryGetValue<MyLineItem>("LineItem", out var lineItem))

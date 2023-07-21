@@ -34,8 +34,8 @@ class Log(models.Model):
     ChangeDate = models.DateTimeField(
         db_column='ChangeDate', auto_now_add=True, blank=True)
     # Field name made lowercase.
-    ChangeStatus = models.TextField(
-        db_column='ChangeStatus', blank=True, null=True)
+    ChangeStatus = models.CharField(
+        db_column='ChangeStatus', blank=True, null=True, max_length=50)
     # Field name made lowercase,.
     LineItem = models.ForeignKey(
         'LineItem', models.SET_NULL, db_column='MyLineItemId', related_name='Logs', null=True)
@@ -51,18 +51,18 @@ class LineItem(models.Model):
     # Field name made lowercase.
     Id = models.AutoField(db_column='Id', primary_key=True)
     # Field name made lowercase.
-    OrderNumber = models.TextField(
-        db_column='OrderNumber', blank=True, null=True)
+    OrderNumber = models.CharField(
+        db_column='OrderNumber', blank=True, null=True, max_length=100)
     # Field name made lowercase.
-    Sku = models.TextField(db_column='Sku', blank=True, null=True)
+    Sku = models.CharField(db_column='Sku', blank=True, null=True, max_length=100)
     # Field name made lowercase.
-    Name = models.TextField(db_column='Name', blank=True, null=True)
+    Name = models.CharField(db_column='Name', blank=True, null=True, max_length=500)
     # Field name made lowercase.
     VariantId = models.BigIntegerField(
         db_column='VariantId', blank=True, null=True)
     # Field name made lowercase.
-    VariantTitle = models.TextField(
-        db_column='VariantTitle', blank=True, null=True)
+    VariantTitle = models.CharField(
+        db_column='VariantTitle', blank=True, null=True, max_length=500)
     # Field name made lowercase.
     LineItemId = models.BigIntegerField(
         db_column='LineItemId', blank=True, null=True, unique=True)
@@ -70,22 +70,22 @@ class LineItem(models.Model):
     Quantity = models.IntegerField(
         db_column='Quantity', blank=True, null=True, default=0)
     # Field name made lowercase.
-    FulfillmentStatus = models.TextField(
-        db_column='FulfillmentStatus', blank=True, null=True)
+    FulfillmentStatus = models.CharField(
+        db_column='FulfillmentStatus', blank=True, null=True, max_length=64)
     # Field name made lowercase.
-    FinancialStatus = models.TextField(
-        db_column='FinancialStatus', blank=True, null=True)
+    FinancialStatus = models.CharField(
+        db_column='FinancialStatus', blank=True, null=True, max_length=64)
     # Field name made lowercase.
-    Customer = models.TextField(db_column='Customer', blank=True, null=True)
+    Customer = models.CharField(db_column='Customer', blank=True, null=True, max_length=100)
     # Field name made lowercase.
-    CustomerEmail = models.TextField(
+    CustomerEmail = models.EmailField(
         db_column='CustomerEmail', blank=True, null=True)
     # Field name made lowercase.
     DateModified = models.DateTimeField(
         db_column='DateModified', blank=True, null=True, auto_now=True)
     # Field name made lowercase.
-    ProductImage = models.TextField(
-        db_column='ProductImage', blank=True, null=True)
+    ProductImage = models.CharField(
+        db_column='ProductImage', blank=True, null=True, max_length=500)
     # Field name made lowercase.
     Notes = models.TextField(db_column='Notes', blank=True, null=True)
     # Field name made lowercase.
@@ -95,9 +95,9 @@ class LineItem(models.Model):
     PrintedQuantity = models.IntegerField(
         db_column='PrintedQuantity', default=0)
     # Field name made lowercase.
-    Status = models.TextField(db_column='Status', blank=True, null=True)
+    Status = models.CharField(db_column='Status', blank=True, null=True, max_length=32)
     # Field name made lowercase.
-    Shipping = models.TextField(db_column='Shipping', blank=True, null=True)
+    Shipping = models.CharField(db_column='Shipping', blank=True, null=True, max_length=128)
     Order = models.ForeignKey(
         "tlkapi.OrderInfo", verbose_name=_("Order"), on_delete=models.SET_NULL, null=True, blank=True, related_name='LineItems')
 
@@ -124,8 +124,8 @@ class OrderInfo(models.Model):
     # Field name made lowercase.
     LabelData = models.TextField(db_column='LabelData', blank=True, null=True)
     # Field name made lowercase.
-    TrackingNumber = models.TextField(
-        db_column='TrackingNumber', blank=True, null=True)
+    TrackingNumber = models.CharField(
+        db_column='TrackingNumber', blank=True, null=True, max_length=500)
     # Field name made lowercase.
     InsuranceCost = models.FloatField(db_column='InsuranceCost', default=0.0)
     # Field name made lowercase.
