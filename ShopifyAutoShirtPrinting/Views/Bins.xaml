@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:ico="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:local="clr-namespace:ShopifyEasyShirtPrinting.Views"
              mah:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
@@ -23,6 +24,7 @@
 
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -48,9 +50,13 @@
                             <DataGridTextColumn Header="Qty" Binding="{Binding Quantity}"/>
                         </DataGrid.Columns>
                     </DataGrid>
+
+                    <TextBlock Grid.Row="4" 
+                               Text="{Binding Notes}"/>
+                    
                     <StackPanel Orientation="Horizontal" 
                                 HorizontalAlignment="Center"
-                                Grid.Row="3" VerticalAlignment="Center">
+                                Grid.Row="4" VerticalAlignment="Center">
                         <Button
                             CommandParameter="{Binding}"
                             Command="{Binding DataContext.ClearBinCommand, ElementName=BinsItemsControl, Mode=OneWay}">
@@ -73,10 +79,29 @@
                                     <ColumnDefinition/>
                                     <ColumnDefinition/>
                                 </Grid.ColumnDefinitions>
-                                <Image VerticalAlignment="Center" 
+                                <ico:PackIconMaterial VerticalAlignment="Center" 
                                     Width="25"
-                                    Source="{StaticResource EmptyBinImage}"/>
-                                <Label Grid.Column="1" VerticalAlignment="Center" Content="Open in Browser"/>
+                                    Kind="MicrosoftInternetExplorer"/>
+                                <Label Grid.Column="1" 
+                                       VerticalAlignment="Center" 
+                                       Content="Open in Browser"/>
+                            </Grid>
+                        </Button>
+                        <Button
+                            CommandParameter="{Binding}"
+                            Command="{Binding DataContext.EditNotesCommand, ElementName=BinsItemsControl, Mode=OneWay}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <ico:PackIconMaterial
+                                    VerticalAlignment="Center" 
+                                    Width="25"
+                                    Kind="BookEdit"/>
+                                <Label Grid.Column="1" 
+                                       VerticalAlignment="Center" 
+                                       Content="Edit Notes"/>
                             </Grid>
                         </Button>
                     </StackPanel>

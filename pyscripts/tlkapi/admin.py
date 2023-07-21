@@ -8,8 +8,9 @@ class BinAdmin(admin.ModelAdmin):
 
 @admin.register(OrderInfo)
 class OrderInfoAdmin(admin.ModelAdmin):
-    list_display = ['OrderId', 'Bin','AllItemsPrinted']
+    list_display = ['OrderId', 'Bin','AllItemsPrinted', 'OrderNumber']
     list_filter = ['AllItemsPrinted']
+    search_fields = ['OrderNumber']
 
 @admin.register(LineItem)
 class LineItemAdmin(admin.ModelAdmin):

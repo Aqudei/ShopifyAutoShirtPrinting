@@ -61,6 +61,27 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             WindowHelper.FocusChrome();
         }
 
+        private DelegateCommand<Bin> _editNotesCommand;
+
+        public DelegateCommand<Bin> EditNotesCommand
+        {
+            get { return _editNotesCommand ??= new DelegateCommand<Bin>(HandleEditNotes); }
+        }
+
+        private async void HandleEditNotes(Bin bin)
+        {
+            if (bin.HasNotes)
+            {
+                var result = await _dialogCoordinator.ShowInputAsync(this, "Edit Notes", "Old Note:\n\n" + bin.Notes);
+                if (string.IsNullOrEmpty(result))
+                {
+                    return;
+                }
+
+
+            }
+        }
+
         public BinsViewModel(IDialogCoordinator dialogCoordinator, BinService binService, IShipStationBrowserService browserService, MessageBus messageBus)
         {
             _dialogCoordinator = dialogCoordinator;

@@ -658,7 +658,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                                     await ApplyTagForLineItem(lineItem, "LabelPrinted");
                                 }
 
-                                await _binService.EmptyBinAsync(processingItemResult.LineItem.BinNumber);
+                                if (processingItemResult.LineItem.BinNumber.HasValue)
+                                    await _binService.EmptyBinAsync(processingItemResult.LineItem.BinNumber.Value);
 
                                 Task.Run(() => _browserService.NavigateToOrder(lineItem.OrderNumber));
 

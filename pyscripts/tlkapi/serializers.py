@@ -39,13 +39,7 @@ class OrderInfoSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class BinSerializer(serializers.Serializer):
+    OrderNumber = serializers.CharField()
     BinNumber = serializers.IntegerField()
     LineItems = ReadLineItemSerializer(many=True)
     Notes = serializers.CharField(required=False)
-    
-    class Meta:
-        """
-        docstring
-        """
-        model = Bin
-        fields = '__all__'

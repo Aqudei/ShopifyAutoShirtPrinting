@@ -289,5 +289,9 @@ class ListBinsView(views.APIView):
                 "LineItems": serializer.data,
                 "Notes": order.Bin.Notes
             })
-
-        return response.Response(data)
+        
+        serializer = BinSerializer(data=data, many=True)
+        if serializer.is_valid():
+            return response.Response(serializer.data, status=status.HTTP_200_OK)
+        
+        return response.Response(serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)

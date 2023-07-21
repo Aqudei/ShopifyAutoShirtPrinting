@@ -34,7 +34,7 @@ router.register(r'Orders', OrderInfoViewSet, basename='Order')
 urlpatterns = router.urls
 urlpatterns += [
     path('Logs/', LogAPIView.as_view()),
-    path('Bins/<int:BinNumber>/', DestroyBinView.as_view()),
+    path('EmptyBin/<int:BinNumber>/', DestroyBinView.as_view()),
     path('Bins/', ListBinsView.as_view()),
     path('ItemProcessing/<int:pk>/', ItemProcessingView.as_view()),
     path('ResetDatabase/', ResetDatabaseAPIView.as_view()),

@@ -22,13 +22,9 @@ namespace ShopifyEasyShirtPrinting.Services
             return await _apiClient.ListBinsAsync();
         }
 
-        public async Task EmptyBinAsync(int? binNumber)
+        public async Task EmptyBinAsync(int binNumber)
         {
-            if (binNumber.HasValue)
-            {
-                await _apiClient.EmptyBinAsync(binNumber.Value);
-            }
+            await _apiClient.EmptyBinAsync(binNumber);
         }
-
     }
 }
