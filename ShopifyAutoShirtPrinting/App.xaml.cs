@@ -102,6 +102,7 @@ namespace ShopifyEasyShirtPrinting
                     .ReverseMap();
                     cfg.CreateMap<OrderInfo, OrderInfo>();
                     cfg.CreateMap<Log, Log>();
+                    cfg.CreateMap<Bin, Bin>();
                     cfg.CreateMap<Settings, SettingsViewModel>()
                     .ReverseMap();
                 });

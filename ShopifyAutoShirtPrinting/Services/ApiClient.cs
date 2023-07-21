@@ -211,6 +211,25 @@ namespace ShopifyEasyShirtPrinting.Services
             throw new Exception(response.Content ?? response.ErrorMessage);
         }
 
+        public async Task<Bin[]> FindBinsAsync(Dictionary<string, string> queryParams = null)
+        {
+            var request = new RestRequest("/api/Bins/");
+            if (queryParams != null && queryParams.Count > 0)
+            {
+                foreach (var item in queryParams)
+                {
+                    request = request.AddParameter(item.Key, item.Value);
+                }
+            }
+            var response = await _client.ExecuteGetAsync<Bin[]>(request);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                return response.Data;
+            }
+
+            throw new Exception(response.Content ?? response.ErrorMessage);
+        }
+
 
         public async Task ResetDatabase()
         {
@@ -261,6 +280,20 @@ namespace ShopifyEasyShirtPrinting.Services
             {
                 return response.Data;
             }
+            throw new Exception(response.Content ?? response.ErrorMessage);
+        }
+
+        public async Task<Bin> UpdateBinAsync(Bin bin)
+        {
+            var request = new RestRequest($"/api/Bins/{bin.Id}/")
+                .AddBody(bin);
+
+            var response = await _client.ExecutePutAsync<Bin>(request);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                return response.Data;
+            }
+
             throw new Exception(response.Content ?? response.ErrorMessage);
         }
 

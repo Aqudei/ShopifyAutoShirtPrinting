@@ -22,7 +22,7 @@ from .views import (
     ListLineItemsView,
     LogAPIView,
     OrderInfoViewSet,
-    ListBinsView,
+    BinViewSet,
     ItemProcessingView,
     DestroyBinView,ResetDatabaseAPIView
 )
@@ -30,12 +30,13 @@ from .views import (
 router = routers.DefaultRouter()
 router.register(r'LineItems', LineItemViewSet, basename='LineItem')
 router.register(r'Orders', OrderInfoViewSet, basename='Order')
+router.register(r'Bins', BinViewSet, basename='Bin')
 
 urlpatterns = router.urls
 urlpatterns += [
     path('Logs/', LogAPIView.as_view()),
     path('EmptyBin/<int:BinNumber>/', DestroyBinView.as_view()),
-    path('Bins/', ListBinsView.as_view()),
+    # path('Bins/', BinViewSet.as_view()),
     path('ItemProcessing/<int:pk>/', ItemProcessingView.as_view()),
     path('ResetDatabase/', ResetDatabaseAPIView.as_view()),
     path('ListLineItems/',ListLineItemsView.as_view())

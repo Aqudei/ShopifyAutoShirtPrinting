@@ -19,9 +19,11 @@ namespace ShopifyEasyShirtPrinting.Messaging
         private bool disposedValue;
 
         public event EventHandler<int[]> BinsDestroyed;
+        public event EventHandler<int[]> BinsUpdated;
         public event EventHandler<int[]> ItemsUpdated;
         public event EventHandler<int[]> ItemsAdded;
         public event EventHandler<int[]> ItemsArchived;
+
         public event EventHandler DatabaseReset;
 
         public MessageBus()
@@ -68,6 +70,12 @@ namespace ShopifyEasyShirtPrinting.Messaging
                         {
                             var binNumbers = JsonConvert.DeserializeObject<int[]>(message);
                             BinsDestroyed?.Invoke(this, binNumbers);
+                            break;
+                        }
+                    case "bins.updated":
+                        {
+                            var binNumbers = JsonConvert.DeserializeObject<int[]>(message);
+                            BinsUpdated?.Invoke(this, binNumbers);
                             break;
                         }
                     case "items.archived":

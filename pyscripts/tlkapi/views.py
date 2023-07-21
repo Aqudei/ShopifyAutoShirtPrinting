@@ -1,3 +1,4 @@
+import json
 from uuid import uuid4
 from django.shortcuts import render
 from django.db.models import Sum, Count
@@ -24,11 +25,12 @@ from .models import (
     Bin
 )
 from .serializers import (
+    BinSerializer,
     ReadLineItemSerializer,
     WriteLineItemSerializer,
     LogSerializer,
     OrderInfoSerializer,
-    BinSerializer
+    ReadBinSerializer
 )
 from .tasks import reset_database_task
 
@@ -135,6 +137,13 @@ class DestroyBinView(views.APIView):
         order = OrderInfo.objects.get(Bin=bin)
         order.Bin = None
         order.save()
+
+        if settings.BROADCAST_ENABLED:
+            tasks.broadcast.delay([bin.Number],"bins.destroyed")
+            
+        return response.Response()
+
+
 
 
 class ItemProcessingView(views.APIView):
@@ -268,30 +277,33 @@ class ResetDatabaseAPIView(views.APIView):
         return response.Response({"detail", "Database reset"})
 
 
-class ListBinsView(views.APIView):
+class BinViewSet(viewsets.ModelViewSet):
     """
     docstring
     """
     serializer_class = BinSerializer
+    filterset_fields = ["id",  "Number"]
+    
+    def get_serializer_class(self):
+        if self.request.method == "GET":
+            return ReadBinSerializer
 
-    def get(self, request, *args, **kwargs):
-        active_bins = Bin.objects.filter(Active=True)
-        in_bin_orders = OrderInfo.objects.filter(Bin__in=active_bins)
+        return self.serializer_class
+    
+    def get_queryset(self):
+        return Bin.objects.filter(Active=True)
+    
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        if settings.BROADCAST_ENABLED:
+            tasks.broadcast.delay([instance.Number],"bins.updated")
+        return instance
+    
 
-        data = []
 
-        for order in in_bin_orders:
-            line_items = LineItem.objects.filter(Order=order)
-            serializer = ReadLineItemSerializer(line_items, many=True)
-            data.append({
-                "OrderNumber": order.OrderNumber,
-                "BinNumber": order.Bin.Number,
-                "LineItems": serializer.data,
-                "Notes": order.Bin.Notes
-            })
+    # def list(self):
+    #     active_bins = Bin.objects.filter(Active=True)
+    #     serializer = ReadBinSerializer(active_bins, many=True)
         
-        serializer = BinSerializer(data=data, many=True)
-        if serializer.is_valid():
-            return response.Response(serializer.data, status=status.HTTP_200_OK)
+    #     return response.Response(serializer.data)
         
-        return response.Response(serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)

@@ -113,8 +113,8 @@ class OrderInfo(models.Model):
     # Field name made lowercase.
     Id = models.AutoField(db_column='Id', primary_key=True)
     # Field name made lowercase.
-    Bin = models.ForeignKey("tlkapi.Bin", verbose_name=_(
-        "Bin"), on_delete=models.SET_NULL, null=True, blank=True, related_name='Orders')
+    Bin = models.OneToOneField("tlkapi.Bin", verbose_name=_(
+        "Bin"), on_delete=models.SET_NULL, null=True, blank=True, related_name='Order')
     # Field name made lowercase.
     OrderId = models.BigIntegerField(db_column='OrderId', null=True,blank=True)
     OrderNumber = models.CharField(_("OrderNumber"), max_length=50)

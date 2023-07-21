@@ -1,4 +1,5 @@
-﻿using MahApps.Metro.Controls.Dialogs;
+﻿using AutoMapper;
+using MahApps.Metro.Controls.Dialogs;
 using Prism.Commands;
 using Prism.Regions;
 using ShopifyEasyShirtPrinting.Helpers;
@@ -19,6 +20,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         private readonly BinService _binService;
         private readonly IShipStationBrowserService _browserService;
         private readonly MessageBus _messageBus;
+        private readonly ApiClient _apiClient;
+        private readonly IMapper _mapper;
         private DelegateCommand<Bin> clearBinCommand;
 
         public override string Title => "Bins";
@@ -44,7 +47,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             if (result == MessageDialogResult.Affirmative)
             {
                 await _binService.EmptyBinAsync(bin.BinNumber);
-                await LoadBins();
             }
         }
 
@@ -72,26 +74,48 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         {
             if (bin.HasNotes)
             {
-                var result = await _dialogCoordinator.ShowInputAsync(this, "Edit Notes", "Old Note:\n\n" + bin.Notes);
+                var result = await _dialogCoordinator.ShowInputAsync(this, "Edit Notes", $"Old Note:\n\n{bin.Notes}\n\nEnter New Notes:" );
                 if (string.IsNullOrEmpty(result))
                 {
                     return;
                 }
 
-
+                bin.Notes = result;
+                await _apiClient.UpdateBinAsync(bin);
+            } else
+            {
+                var result = await _dialogCoordinator.ShowInputAsync(this, "Edit Notes","");
+                bin.Notes = result;
+                await _apiClient.UpdateBinAsync(bin);
             }
         }
+        private DelegateCommand<Bin> _deleteNotesCommand;
 
-        public BinsViewModel(IDialogCoordinator dialogCoordinator, BinService binService, IShipStationBrowserService browserService, MessageBus messageBus)
+        public DelegateCommand<Bin> DeleteNotesCommand
         {
-            _dialogCoordinator = dialogCoordinator;
+            get { return _deleteNotesCommand ??= new DelegateCommand<Bin>(HandleDeleteNotes); }
+        }
+
+        private async void HandleDeleteNotes(Bin bin)
+        {
+            bin.Notes = "";
+            await _apiClient.UpdateBinAsync(bin);
+        }
+
+        public BinsViewModel(IDialogCoordinator dialogCoordinator, BinService binService,
+            IShipStationBrowserService browserService, MessageBus messageBus, ApiClient apiClient, IMapper mapper)
+        {
+            _mapper = mapper;
+            _apiClient = apiClient;
+            _messageBus = messageBus;
             _binService = binService;
             _browserService = browserService;
-            _messageBus = messageBus;
-
+            _dialogCoordinator = dialogCoordinator;
             Bins = CollectionViewSource.GetDefaultView(_bins);
 
             _messageBus.BinsDestroyed += _messageBus_BinsDestroyed;
+            _messageBus.BinsUpdated += _messageBus_BinsUpdated;
+
             PropertyChanged += (s, e) =>
             {
                 switch (e.PropertyName)
@@ -120,16 +144,30 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             };
         }
 
+        private async void _messageBus_BinsUpdated(object sender, int[] binNumbers)
+        {
+            foreach (var binNumber in binNumbers)
+            {
+                var q = new System.Collections.Generic.Dictionary<string, string> { { "Number", $"{binNumber}" } };
+                var result = await _apiClient.FindBinsAsync(q);
+                if (result != null && result.Length > 0)
+                {
+                    var uiBin = _bins.FirstOrDefault(x => x.BinNumber == result[0].BinNumber);
+                    if (uiBin != null)
+                    {
+                        await _dispatcher.InvokeAsync(() => _mapper.Map(result[0], uiBin));
+                    }
+                }
+            }
+        }
+
         private void _messageBus_BinsDestroyed(object sender, int[] binNumbers)
         {
             foreach (var bin in _bins)
             {
                 if (binNumbers.Contains(bin.BinNumber))
                 {
-                    _dispatcher.Invoke(() =>
-                    {
-                        _bins.Remove(bin);
-                    });
+                    _dispatcher.Invoke(() => _bins.Remove(bin));
                 }
             }
         }
