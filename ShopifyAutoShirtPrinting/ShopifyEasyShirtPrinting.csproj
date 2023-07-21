@@ -33,7 +33,7 @@
     <ProductName>ShopifyEasyShirtPrinting</ProductName>
     <PublisherName>Aqudei</PublisherName>
     <SuiteName>Tools</SuiteName>
-    <ApplicationRevision>41</ApplicationRevision>
+    <ApplicationRevision>42</ApplicationRevision>
     <ApplicationVersion>13.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -537,6 +537,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Views\Archived.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Bins.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -615,6 +619,7 @@
     <None Include="Migrations\Configuration.cs" />
     <Compile Include="Services\ApiClient.cs" />
     <Compile Include="Services\BinService.cs" />
+    <Compile Include="ViewModels\ArchivedViewModel.cs" />
     <Compile Include="ViewModels\Bin.cs" />
     <Compile Include="Models\Log.cs" />
     <Compile Include="Services\AusPost\Address.cs" />
@@ -664,6 +669,9 @@
     <Compile Include="ViewModels\OrganizerViewModel.cs" />
     <Compile Include="ViewModels\PrintQrViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
+    <Compile Include="Views\Archived.xaml.cs">
+      <DependentUpon>Archived.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Bins.xaml.cs">
       <DependentUpon>Bins.xaml</DependentUpon>
     </Compile>

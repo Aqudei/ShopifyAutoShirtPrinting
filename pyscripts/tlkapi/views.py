@@ -41,14 +41,18 @@ class LineItemViewSet(viewsets.ModelViewSet):
     """
     docstring
     """
+    filterset_fields = ["Id", 'LineItemId', "OrderId", "OrderNumber","Status"]
+    serializer_class = ReadLineItemSerializer
+    # queryset = LineItem.objects.exclude(Status='Archived')
 
     def get_queryset(self):
-        queryset = LineItem.objects.exclude(Status='Archived').annotate(
-            BinNumber=F('Order__Bin__Number'))
+        if self.request.query_params.get("Status") == 'Archived':
+            queryset = LineItem.objects.filter(Status='Archived').annotate(
+                BinNumber=F('Order__Bin__Number'))
+        else:
+            queryset = LineItem.objects.exclude(Status='Archived').annotate(
+                BinNumber=F('Order__Bin__Number'))
         return queryset
-
-    # queryset = LineItem.objects.exclude(Status='Archived')
-    serializer_class = ReadLineItemSerializer
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -73,7 +77,7 @@ class LineItemViewSet(viewsets.ModelViewSet):
 
         return instance
 
-    filterset_fields = ["Id", 'LineItemId', "OrderId", "OrderNumber"]
+
 
 
 class ListLineItemsView(views.APIView):

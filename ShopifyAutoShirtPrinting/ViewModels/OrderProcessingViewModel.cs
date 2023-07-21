@@ -409,7 +409,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     private async void _messageBus_ItemsAdded(object sender, int[] ids)
     {
         Debug.WriteLine($"@_messageBus_ItemsAdded() -> {ids}");
-        var items = await _apiClient.ListLineItemsAsync(ids);
+        var items = await _apiClient.ListLineItemsByIdAsync(ids);
         foreach (var item in items)
         {
             var lineItem = _lineItems.FirstOrDefault(x => x.Id == item.Id);
@@ -428,7 +428,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     {
         Debug.WriteLine($"@_messageBus_ItemsUpdated() -> {ids}");
 
-        var items = await _apiClient.ListLineItemsAsync(ids);
+        var items = await _apiClient.ListLineItemsByIdAsync(ids);
         foreach (var item in items)
         {
             var lineItem = _lineItems.FirstOrDefault(x => x.Id == item.Id);

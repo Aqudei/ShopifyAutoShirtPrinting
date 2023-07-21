@@ -271,7 +271,7 @@ namespace ShopifyEasyShirtPrinting.Services
             throw new Exception(response.Content ?? response.ErrorMessage);
         }
 
-        public async Task<MyLineItem[]> ListLineItemsAsync(int[] ids)
+        public async Task<MyLineItem[]> ListLineItemsByIdAsync(int[] ids)
         {
             var prams = string.Join("&", ids.Select(i => $"Id={i}"));
             var request = new RestRequest($"/api/ListLineItems/?{prams}");

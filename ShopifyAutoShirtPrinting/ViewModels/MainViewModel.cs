@@ -38,8 +38,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 }
             });
 
-
-
             //Menu.Add(new MenuItem
             //{
             //    Label = "Shipped",
@@ -51,6 +49,16 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             //    }
             //});
 
+            Menu.Add(new MenuItem
+            {
+                Label = "Archived",
+                NavigationPath = "Archived",
+                NavigationType = typeof(Archived),
+                Icon = new PackIconFontAwesome
+                {
+                    Kind = PackIconFontAwesomeKind.ArchiveSolid
+                }
+            });
 
             OptionsMenu.Add(new MenuItem
             {

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MahApps.Metro.Controls.Dialogs;
+using NLog;
 using Prism.Commands;
 using Prism.Regions;
 using ShopifyEasyShirtPrinting.Helpers;
@@ -23,6 +24,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         private readonly ApiClient _apiClient;
         private readonly IMapper _mapper;
         private DelegateCommand<Bin> clearBinCommand;
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
         public override string Title => "Bins";
         private ObservableCollection<Bin> _bins = new();
@@ -74,7 +76,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         {
             if (bin.HasNotes)
             {
-                var result = await _dialogCoordinator.ShowInputAsync(this, "Edit Notes", $"Old Note:\n\n{bin.Notes}\n\nEnter New Notes:" );
+                var result = await _dialogCoordinator.ShowInputAsync(this, "Edit Notes", $"Old Note:\n\n{bin.Notes}\n\nEnter New Notes:");
                 if (string.IsNullOrEmpty(result))
                 {
                     return;
@@ -82,9 +84,10 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
                 bin.Notes = result;
                 await _apiClient.UpdateBinAsync(bin);
-            } else
+            }
+            else
             {
-                var result = await _dialogCoordinator.ShowInputAsync(this, "Edit Notes","");
+                var result = await _dialogCoordinator.ShowInputAsync(this, "Edit Notes", "");
                 bin.Notes = result;
                 await _apiClient.UpdateBinAsync(bin);
             }
@@ -146,29 +149,43 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         private async void _messageBus_BinsUpdated(object sender, int[] binNumbers)
         {
-            foreach (var binNumber in binNumbers)
+            try
             {
-                var q = new System.Collections.Generic.Dictionary<string, string> { { "Number", $"{binNumber}" } };
-                var result = await _apiClient.FindBinsAsync(q);
-                if (result != null && result.Length > 0)
+                foreach (var binNumber in binNumbers)
                 {
-                    var uiBin = _bins.FirstOrDefault(x => x.BinNumber == result[0].BinNumber);
-                    if (uiBin != null)
+                    var q = new System.Collections.Generic.Dictionary<string, string> { { "Number", $"{binNumber}" } };
+                    var result = await _apiClient.FindBinsAsync(q);
+                    if (result != null && result.Length > 0)
                     {
-                        await _dispatcher.InvokeAsync(() => _mapper.Map(result[0], uiBin));
+                        var uiBin = _bins.FirstOrDefault(x => x.BinNumber == result[0].BinNumber);
+                        if (uiBin != null)
+                        {
+                            await _dispatcher.InvokeAsync(() => _mapper.Map(result[0], uiBin));
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
             }
         }
 
         private void _messageBus_BinsDestroyed(object sender, int[] binNumbers)
         {
-            foreach (var bin in _bins)
+            try
             {
-                if (binNumbers.Contains(bin.BinNumber))
+                foreach (var bin in _bins)
                 {
-                    _dispatcher.Invoke(() => _bins.Remove(bin));
+                    if (binNumbers.Contains(bin.BinNumber))
+                    {
+                        _dispatcher.Invoke(() => _bins.Remove(bin));
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
             }
         }
 

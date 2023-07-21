@@ -1,4 +1,5 @@
-﻿using Prism.Mvvm;
+﻿using NLog;
+using Prism.Mvvm;
 using System.Windows;
 using System.Windows.Threading;
 
