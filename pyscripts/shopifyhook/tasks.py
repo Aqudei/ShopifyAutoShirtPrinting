@@ -16,7 +16,7 @@ def process_hooks(forced=False):
     removed_bins_number = []
     archived_items = []
 
-    print("Processing wehook data...")
+    print(f"Processing wehook data using {forced} option...")
     if not forced:
         hook_data_list = Hook.objects.filter(processed=False, event='orders/fulfilled')
     else:
@@ -28,6 +28,9 @@ def process_hooks(forced=False):
                 OrderNumber=hook_data.body['order_number']).first()
             
             if order:
+                
+                logger.info(f"Found order {order}")
+
                 if order.Bin:
                     bin = order.Bin
                     bin.Active = False
