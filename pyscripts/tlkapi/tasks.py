@@ -142,6 +142,8 @@ def populate_info(line_pk):
                 OrderId = order_data.id,
                 OrderNumber = order_number
             )
+            line_item.Customer=f"{order_data.customer.first_name} {order_data.customer.last_name}",
+            line_item.CustomerEmail=order_data.customer.email,
 
     order_info.save()
     
