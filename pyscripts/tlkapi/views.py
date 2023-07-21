@@ -57,25 +57,11 @@ class LineItemViewSet(viewsets.ModelViewSet):
             return WriteLineItemSerializer
 
     def perform_create(self, serializer):
-
-        order_number = serializer.validated_data.get("OrderNumber")
-
-        if order_number:
-            order = OrderInfo.objects.get(OrderNumber=order_number)
-            sample_line = LineItem.objects.filter(Order=order).first()
-            instance = serializer.save(Order=order, Customer=sample_line.Customer,
-                                       CustomerEmail=sample_line.CustomerEmail, 
-                                       Shipping=sample_line.Shipping)
-            order.AllItemsPrinted = False
-            order.save()
-        else:
-            order = OrderInfo.objects.create(
-                OrderNumber=str(uuid4()).split("-")[0])
-            instance = serializer.save(Order=order, OrderNumber=order.OrderNumber)
+        instance = serializer.save()
 
         if settings.BROADCAST_ENABLED:
-            tasks.broadcast_added.delay([instance.Id])
-
+            tasks.broadcast([instance.Id],"items.added")
+        tasks.populate_info.delay(instance.Id)
         return instance
 
     def perform_update(self, serializer):

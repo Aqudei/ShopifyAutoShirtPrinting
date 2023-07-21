@@ -1,4 +1,5 @@
 import json
+from uuid import uuid4
 from celery import shared_task
 import shopify
 from django.conf import settings
@@ -10,7 +11,7 @@ from .models import (
 )
 import pikasender
 import pika
-
+from .myshopify import find_order
 
 @shared_task
 def reset_database_task():
@@ -116,6 +117,41 @@ def broadcast_added(ids: list[int]):
                           routing_key='items.added', body=message)
     connection.close()
     
+
+@shared_task
+def populate_info(line_pk):
+    """
+    docstring
+    """
+    line_item = LineItem.objects.get(Id=line_pk)
+    order_number = line_item.OrderNumber
+
+    if order_number in ['',None]:
+        new_order_number = str(uuid4()).split("-")[0]
+        order_info = OrderInfo.objects.create(OrderNumber=new_order_number)
+    else:
+        order_info_queryset = OrderInfo.objects.filter(OrderNumber=order_number)
+        if order_info_queryset.exists():
+            order_info  = order_info_queryset.first()
+            sample = order_info.LineItems.first()            
+            line_item.Customer = sample.Customer
+            line_item.CustomerEmail = sample.CustomerEmail
+        else:
+            order_data = find_order(order_number)
+            order_info  = OrderInfo.objects.create(
+                OrderId = order_data.id,
+                OrderNumber = order_number
+            )
+
+    order_info.save()
+    
+    line_item.Order = order_info
+    line_item.save()
+
+    if settings.BROADCAST_ENABLED:
+        broadcast([line_item.Id],"items.updated")
+
+
 @shared_task
 def broadcast(message, routing_key):
     """

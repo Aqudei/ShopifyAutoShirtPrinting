@@ -13,8 +13,8 @@ from django.urls import reverse
 class Bin(models.Model):
     Number = models.IntegerField(_("Bin Number"), unique=True)
     Active = models.BooleanField(_("Active"), default=False)
-    Notes = models.TextField(_("Notes"), blank=True,null=True)
-    
+    Notes = models.TextField(_("Notes"), blank=True, null=True)
+
     class Meta:
         verbose_name = _("Bin")
         verbose_name_plural = _("Bins")
@@ -54,9 +54,11 @@ class LineItem(models.Model):
     OrderNumber = models.CharField(
         db_column='OrderNumber', blank=True, null=True, max_length=100)
     # Field name made lowercase.
-    Sku = models.CharField(db_column='Sku', blank=True, null=True, max_length=100)
+    Sku = models.CharField(db_column='Sku', blank=True,
+                           null=True, max_length=100)
     # Field name made lowercase.
-    Name = models.CharField(db_column='Name', blank=True, null=True, max_length=500)
+    Name = models.CharField(db_column='Name', blank=True,
+                            null=True, max_length=500)
     # Field name made lowercase.
     VariantId = models.BigIntegerField(
         db_column='VariantId', blank=True, null=True)
@@ -76,7 +78,8 @@ class LineItem(models.Model):
     FinancialStatus = models.CharField(
         db_column='FinancialStatus', blank=True, null=True, max_length=64)
     # Field name made lowercase.
-    Customer = models.CharField(db_column='Customer', blank=True, null=True, max_length=100)
+    Customer = models.CharField(
+        db_column='Customer', blank=True, null=True, max_length=100)
     # Field name made lowercase.
     CustomerEmail = models.EmailField(
         db_column='CustomerEmail', blank=True, null=True)
@@ -95,9 +98,11 @@ class LineItem(models.Model):
     PrintedQuantity = models.IntegerField(
         db_column='PrintedQuantity', default=0)
     # Field name made lowercase.
-    Status = models.CharField(db_column='Status', blank=True, null=True, max_length=32)
+    Status = models.CharField(
+        db_column='Status', blank=True, null=True, max_length=32, default="Pending")
     # Field name made lowercase.
-    Shipping = models.CharField(db_column='Shipping', blank=True, null=True, max_length=128)
+    Shipping = models.CharField(
+        db_column='Shipping', blank=True, null=True, max_length=128)
     Order = models.ForeignKey(
         "tlkapi.OrderInfo", verbose_name=_("Order"), on_delete=models.SET_NULL, null=True, blank=True, related_name='LineItems')
 
@@ -116,7 +121,8 @@ class OrderInfo(models.Model):
     Bin = models.OneToOneField("tlkapi.Bin", verbose_name=_(
         "Bin"), on_delete=models.SET_NULL, null=True, blank=True, related_name='Order')
     # Field name made lowercase.
-    OrderId = models.BigIntegerField(db_column='OrderId', null=True,blank=True)
+    OrderId = models.BigIntegerField(
+        db_column='OrderId', null=True, blank=True)
     OrderNumber = models.CharField(_("OrderNumber"), max_length=50)
     # Field name made lowercase.
     # Field name made lowercase.
