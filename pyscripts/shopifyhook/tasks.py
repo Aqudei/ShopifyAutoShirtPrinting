@@ -22,7 +22,7 @@ def process_hooks():
         try:
             order = OrderInfo.objects.get(
                 OrderNumber=hook_data.body['order_number'])
-            
+
             if order.Bin:
                 bin = order.Bin
                 bin.Active = False
@@ -35,8 +35,8 @@ def process_hooks():
                 Status='Archived'
             )
 
-            archived_items.extend(LineItem.objects.filter(
-                Order=order).values_list('Id', flat=True))
+            for id in LineItem.objects.filter(Order=order).values_list('Id', flat=True):
+                archived_items.append(id)
 
             hook_data.processed = True
             hook_data.save()
@@ -48,5 +48,7 @@ def process_hooks():
             break
 
     if settings.BROADCAST_ENABLED:
-        broadcast.delay(json.dumps(removed_bins_number), "bins.destroyed")
-        broadcast.delay(json.dumps(archived_items), "items.archived")
+        if removed_bins_number and len(removed_bins_number)>0:
+            broadcast.delay(json.dumps(removed_bins_number), "bins.destroyed")
+        if archived_items and len(archived_items)>0:
+            broadcast.delay(json.dumps(archived_items), "items.archived")
