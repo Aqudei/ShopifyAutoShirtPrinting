@@ -8,6 +8,8 @@ class Command(BaseCommand):
     docstring
     """
 
+    def add_arguments(self, parser: CommandParser) -> None:
+        parser.add_argument("--forced", action='store_true')
 
     def handle(self, *args, **options):
-        process_hooks()
+        process_hooks(options['forced'])

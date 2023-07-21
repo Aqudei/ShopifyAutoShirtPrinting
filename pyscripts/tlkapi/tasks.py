@@ -151,7 +151,7 @@ def populate_info(line_pk):
     line_item.save()
 
     if settings.BROADCAST_ENABLED:
-        broadcast([line_item.Id],"items.updated")
+        broadcast.delay([line_item.Id],"items.updated")
 
 
 @shared_task
