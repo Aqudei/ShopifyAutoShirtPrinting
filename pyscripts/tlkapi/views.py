@@ -61,15 +61,15 @@ class LineItemViewSet(viewsets.ModelViewSet):
         if order_number:
             order = OrderInfo.objects.get(OrderNumber=order_number)
             sample_line = LineItem.objects.filter(Order=order).first()
-
             instance = serializer.save(Order=order, Customer=sample_line.Customer,
                                        CustomerEmail=sample_line.CustomerEmail, 
                                        Shipping=sample_line.Shipping)
-
+            order.AllItemsPrinted = False
+            order.save()
         else:
             order = OrderInfo.objects.create(
                 OrderNumber=str(uuid4()).split("-")[0])
-            instance = serializer.save(Order=order)
+            instance = serializer.save(Order=order, OrderNumber=order.OrderNumber)
 
         if settings.BROADCAST_ENABLED:
             tasks.broadcast_added.delay([instance.Id])
@@ -84,7 +84,7 @@ class LineItemViewSet(viewsets.ModelViewSet):
 
         return instance
 
-    filterset_fields = ["Id", 'LineItemId', "OrderId"]
+    filterset_fields = ["Id", 'LineItemId', "OrderId", "OrderNumber"]
 
 
 class ListLineItemsView(views.APIView):
@@ -110,7 +110,7 @@ class OrderInfoViewSet(viewsets.ModelViewSet):
     """
     queryset = OrderInfo.objects.all()
     serializer_class = OrderInfoSerializer
-    filterset_fields = ["OrderId"]
+    filterset_fields = ["OrderId",'Id','OrderNumber']
 
 
 class LogAPIView(generics.ListCreateAPIView):
@@ -291,16 +291,3 @@ class ListBinsView(views.APIView):
             })
 
         return response.Response(data)
-
-
-class CreateCustom(generics.CreateAPIView):
-    """
-    docstring
-    """
-    serializer_class = WriteLineItemSerializer
-
-    def perform_create(self, serializer):
-        order_number = serializer.data.get('OrderNumber')
-        if order_number:
-            order_info = OrderInfo.objects.get(OrderNumber=order_number)
-            return serializer.save(Order=order_info)

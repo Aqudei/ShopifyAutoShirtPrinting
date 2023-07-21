@@ -267,8 +267,6 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         await FetchLineItems();
     }
 
-
-
     private async void HandleSaveQrTag()
     {
         var dlg = new CommonOpenFileDialog
@@ -283,7 +281,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             foreach (var orderItem in _lineItems.Where(l => l.IsSelected))
             {
                 using var combinedImage = GenerateQrImageForItem(orderItem);
-                var outputName = $"{orderItem.OrderId}-{orderItem.LineItemId}-{orderItem.Name}.png";
+                var outputName = $"{orderItem.OrderNumber}-{orderItem.Id}-{orderItem.Name}.png";
                 outputName = outputName.Replace("/", "-").Replace("\\", "-").Replace(" ", "-");
                 outputName = RemoveRedundantChars(Path.Combine(dlg.FileName, outputName), "-");
                 combinedImage.Save(outputName);
@@ -293,24 +291,21 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
     }
 
-    private Bitmap GenerateQrImageForItem(MyLineItem orderItem)
+    private Bitmap GenerateQrImageForItem(MyLineItem lineItem)
     {
-
-        var qrData = new[]
-                        {
-                    $"{orderItem.OrderId}",
-                    $"{orderItem.LineItemId}",
-                    $"{orderItem.OrderNumber}"
+        var qrData = new[] {
+                    $"{lineItem.Id}",
+                    $"{lineItem.OrderNumber}"
                 };
 
-        var hasNotes = !string.IsNullOrWhiteSpace(orderItem.Notes);
+        var hasNotes = !string.IsNullOrWhiteSpace(lineItem.Notes);
 
         var qrDataText = EncodeText(string.Join($"{Environment.NewLine}", qrData));
 
         var qrHelper = new QrHelper();
 
         using var qrImage = qrHelper.GenerateBitmapQr(qrDataText);
-        using var textImage = qrHelper.DrawTextImage(orderItem.Name, qrImage, orderItem.OrderNumber, hasNotes);
+        using var textImage = qrHelper.DrawTextImage(lineItem.Name, qrImage, lineItem.OrderNumber, hasNotes);
         var combinedImage = qrHelper.CombineImage(qrImage, textImage);
 
         return combinedImage;
@@ -591,7 +586,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                         if (parsedQr != null)
                         {
                             // QrInfo = FetchQrInfo(parsedQr);
-                            var lineItem = await _apiClient.GetItemByLineItemIdAsync(parsedQr.LineItemId.Value);
+                            var lineItem = await _apiClient.GetLineItemByIdAsync(parsedQr.LineItemDatabaseId);
                             if (lineItem == null)
                             {
                                 return;
@@ -636,14 +631,14 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
 
             await ActivateLineItemInView(processingItemResult.LineItem);
-
-            var lineItems = await _apiClient.ListItemsAsync(new Dictionary<string, string> { { "OrderId", $"{lineItem.OrderId}" } });
+            var prams = new Dictionary<string, string> { { "OrderNumber", $"{lineItem.OrderNumber}" } };
+            var lineItems = await _apiClient.ListItemsAsync(prams);
 
             if (processingItemResult.AllItemsPrinted)
             {
                 if (lineItem.Shipping == "Sydney Warehouse / Studio")
                 {
-                    _dialogService.ShowAfterScanDialog("For Pickup", "Pick up order is ready.", lineItem.LineItemId, async result =>
+                    _dialogService.ShowAfterScanDialog("For Pickup", "Pick up order is ready.", lineItem.Id, async result =>
                     {
                         foreach (var lineItem in lineItems)
                         {
@@ -654,7 +649,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 else
                     await _dispatcher.InvokeAsync(() =>
                     {
-                        _dialogService.ShowLabelPrintingDialog(lineItem.OrderId.Value, "Ready to Print Shipping label?", async result =>
+                        _dialogService.ShowLabelPrintingDialog(lineItem.OrderNumber, "Ready to Print Shipping label?", async result =>
                         {
                             if (result.Result == ButtonResult.Yes)
                             {
@@ -674,8 +669,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             }
             else
             {
-                var prams = new Dictionary<string, string> { { "OrderId", $"{lineItem.OrderId}" } };
-                var orderInfo = _apiClient.GetOrderInfoBy(prams);
+                var prams2 = new Dictionary<string, string> { { "OrderNumber", $"{lineItem.OrderNumber}" } };
+                var orderInfo = _apiClient.GetOrderInfoBy(prams2);
 
                 if (lineItems.Where(l => l.BinNumber > 0 && l.OrderId == lineItem.OrderId).Sum(x => x.PrintedQuantity) > 1)
                 {
@@ -683,7 +678,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                     {
                         var dlgParams = new DialogParameters
                                         {
-                                            { "LineItemId", lineItem.LineItemId },
+                                            { "Id", lineItem.Id },
                                             { "Message", "Added item to exisiting bin:" },
                                             { "Title", "BIN NUMBER ASSIGNED" }
                                         };
@@ -698,7 +693,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                     {
                         var dlgParams = new DialogParameters
                                         {
-                                            { "LineItemId", lineItem.LineItemId },
+                                            { "Id", lineItem.Id },
                                             { "Message", "This item goes into new bin:" },
                                             { "Title", "NEW BIN CREATED" }
                                         };

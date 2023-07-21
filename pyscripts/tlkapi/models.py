@@ -116,7 +116,7 @@ class OrderInfo(models.Model):
     Bin = models.ForeignKey("tlkapi.Bin", verbose_name=_(
         "Bin"), on_delete=models.SET_NULL, null=True, blank=True, related_name='Orders')
     # Field name made lowercase.
-    OrderId = models.BigIntegerField(db_column='OrderId')
+    OrderId = models.BigIntegerField(db_column='OrderId', null=True,blank=True)
     OrderNumber = models.CharField(_("OrderNumber"), max_length=50)
     # Field name made lowercase.
     # Field name made lowercase.

@@ -103,7 +103,7 @@ namespace ShopifyEasyShirtPrinting.Services
             throw new Exception(response.Content ?? response.ErrorMessage);
         }
 
-        public async Task<MyLineItem> GetLineItemByIdAsync(int lineItemDbId)
+        public async Task<MyLineItem> GetLineItemByIdAsync(long lineItemDbId)
         {
             var request = new RestRequest($"/api/LineItems/{lineItemDbId}/");
             var response = await _client.ExecuteGetAsync<MyLineItem>(request);
@@ -114,9 +114,9 @@ namespace ShopifyEasyShirtPrinting.Services
             throw new Exception(response.Content ?? response.ErrorMessage);
         }
 
-        public async Task<MyLineItem> GetItemByLineItemIdAsync(long lineItemId)
+        public async Task<MyLineItem> GetLineItemByDatabaseIdAsync(long lineItemDatabaseId)
         {
-            var request = new RestRequest($"/api/LineItems/?LineItemId={lineItemId}");
+            var request = new RestRequest($"/api/LineItems/?Id={lineItemDatabaseId}");
             var response = await _client.ExecuteGetAsync<MyLineItem[]>(request);
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {

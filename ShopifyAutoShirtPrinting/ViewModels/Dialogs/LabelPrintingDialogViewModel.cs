@@ -62,12 +62,12 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
                 Message = message;
             }
 
-            if (parameters.TryGetValue<long?>("OrderId", out var orderId))
+            if (parameters.TryGetValue<string>("OrderNumber", out var orderNumber))
             {
                 Orders.Clear();
                 Task.Run(async () =>
                 {
-                    var prams = new Dictionary<string, string>() { { "OrderId", $"{orderId}" } };
+                    var prams = new Dictionary<string, string>() { { "OrderNumber", $"{orderNumber}" } };
                     var lineItems = await _apiClient.ListItemsAsync(prams);
 
                     if (lineItems != null && lineItems.Any())

@@ -63,9 +63,9 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
         public async void OnDialogOpened(IDialogParameters parameters)
         {
-            if (parameters.TryGetValue<long?>("LineItemId", out var lineItemId))
+            if (parameters.TryGetValue<int>("Id", out var id))
             {
-                var prams = new Dictionary<string, string> { { "LineItemId", $"{lineItemId}" } };
+                var prams = new Dictionary<string, string> { { "Id", $"{id}" } };
                 var lineItems = await _apiClient.ListItemsAsync(prams);
 
                 if (lineItems != null && lineItems.Any())
