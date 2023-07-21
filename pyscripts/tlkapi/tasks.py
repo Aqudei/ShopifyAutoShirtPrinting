@@ -11,7 +11,7 @@ from .models import (
 )
 import pikasender
 import pika
-from .myshopify import find_order
+from tlkapi.myshopify import find_order
 
 @shared_task
 def reset_database_task():
