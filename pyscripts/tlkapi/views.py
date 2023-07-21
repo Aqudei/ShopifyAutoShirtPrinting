@@ -60,8 +60,9 @@ class LineItemViewSet(viewsets.ModelViewSet):
         instance = serializer.save()
 
         if settings.BROADCAST_ENABLED:
-            tasks.broadcast([instance.Id],"items.added")
-        tasks.populate_info.delay(instance.Id)
+            tasks.broadcast_added.delay([instance.Id])
+            tasks.populate_info.delay(instance.Id)
+
         return instance
 
     def perform_update(self, serializer):

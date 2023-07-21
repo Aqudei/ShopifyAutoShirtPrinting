@@ -165,5 +165,5 @@ def broadcast(message, routing_key):
 
     channel.exchange_declare(exchange=exchange_name, exchange_type='fanout')
     channel.basic_publish(exchange=exchange_name,
-                          routing_key=routing_key, body=message)
+                          routing_key=routing_key, body=json.dumps(message))
     connection.close()
