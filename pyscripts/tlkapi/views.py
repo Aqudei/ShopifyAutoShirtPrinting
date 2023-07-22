@@ -206,7 +206,7 @@ class ItemProcessingView(views.APIView):
         order_info = line_item.Order
 
         # Case 1, only one item, no need to assign Bin
-        if line_items_aggregate['total_quantity'] <= 1 and not "Sydney Warehouse / Studio" in line_item.Shipping:
+        if line_items_aggregate['total_quantity'] <= 1 and "Sydney Warehouse / Studio" != line_item.Shipping:
             pass
         else:
             if not order_info.Bin:
