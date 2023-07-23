@@ -117,6 +117,15 @@ def broadcast_added(ids: list[int]):
                           routing_key='items.added', body=message)
     connection.close()
     
+def clean_email(email:str):
+    """
+    docstring
+    """
+    if email in [None,'']:
+        return email
+    
+
+    return email.strip(" \r\n\t().,")
 
 @shared_task
 def populate_info(line_pk):
@@ -145,7 +154,7 @@ def populate_info(line_pk):
                 OrderNumber = order_number
             )
             line_item.Customer=f"{order_data.customer.first_name} {order_data.customer.last_name}",
-            line_item.CustomerEmail=order_data.customer.email,
+            line_item.CustomerEmail=clean_email(order_data.customer.email),
             line_item.OrderId = order_data.id
             line_item.Shipping = shipping_line
 
