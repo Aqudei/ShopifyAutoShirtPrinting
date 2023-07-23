@@ -4,6 +4,7 @@ from tlkapi.tasks import fetch_orders, populate_info
 from django.conf import settings
 import shopify
 import logging
+from tlkapi.myshopify import find_order
 
 
 logger = logging.getLogger(__name__)
@@ -16,4 +17,7 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        populate_info(7569)
+
+        order = find_order(21911)
+        import pdb; pdb.set_trace()
+        # populate_info(7014)

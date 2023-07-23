@@ -132,6 +132,7 @@ def populate_info(line_pk):
     """
     docstring
     """
+
     line_item = LineItem.objects.get(Id=line_pk)
     order_number = line_item.OrderNumber
 
@@ -153,8 +154,8 @@ def populate_info(line_pk):
                 OrderId = order_data.id,
                 OrderNumber = order_number
             )
-            line_item.Customer=f"{order_data.customer.first_name} {order_data.customer.last_name}",
-            line_item.CustomerEmail=clean_email(order_data.customer.email),
+            line_item.Customer=f"{order_data.customer.first_name} {order_data.customer.last_name}"
+            line_item.CustomerEmail=order_data.customer.email
             line_item.OrderId = order_data.id
             line_item.Shipping = shipping_line
 
