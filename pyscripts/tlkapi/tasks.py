@@ -138,6 +138,8 @@ def populate_info(line_pk):
             line_item.CustomerEmail = sample.CustomerEmail
         else:
             order_data = find_order(order_number)
+            shipping_line = order_data.shipping_lines[0].code
+
             order_info  = OrderInfo.objects.create(
                 OrderId = order_data.id,
                 OrderNumber = order_number
@@ -145,6 +147,7 @@ def populate_info(line_pk):
             line_item.Customer=f"{order_data.customer.first_name} {order_data.customer.last_name}",
             line_item.CustomerEmail=order_data.customer.email,
             line_item.OrderId = order_data.id
+            line_item.Shipping = shipping_line
 
     order_info.save()
     
