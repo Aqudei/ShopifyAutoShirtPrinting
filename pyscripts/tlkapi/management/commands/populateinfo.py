@@ -17,7 +17,4 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-
-        order = find_order(21911)
-        import pdb; pdb.set_trace()
-        # populate_info(7014)
+        populate_info(7014)
