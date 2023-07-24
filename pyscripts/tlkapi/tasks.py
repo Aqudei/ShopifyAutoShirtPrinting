@@ -139,6 +139,7 @@ def populate_info(line_pk):
     if order_number in ['',None]:
         new_order_number = str(uuid4()).split("-")[0]
         order_info = OrderInfo.objects.create(OrderNumber=new_order_number)
+        line_item.OrderNumber = new_order_number
     else:
         order_info_queryset = OrderInfo.objects.filter(OrderNumber=order_number)
         if order_info_queryset.exists():
