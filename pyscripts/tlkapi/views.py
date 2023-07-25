@@ -42,12 +42,17 @@ class LineItemViewSet(viewsets.ModelViewSet):
     docstring
     """
     filterset_fields = ["Id", 'LineItemId', "OrderId", "OrderNumber","Status"]
-    serializer_class = ReadLineItemSerializer
-    queryset = LineItem.objects2.active_items()
-
+    
+    def get_queryset(self):
+        if self.request.method == 'GET':
+            return LineItem.objects2.active_items().annotate(
+                BinNumber=F('Order__Bin__Number'))
+        else:
+            return LineItem.objects.all()
+        
     def get_serializer_class(self):
         if self.request.method == 'GET':
-            return self.serializer_class
+            return ReadLineItemSerializer
         else:
             return WriteLineItemSerializer
 
@@ -158,7 +163,8 @@ class ItemProcessingView(views.APIView):
         serializer = ReadLineItemSerializer(line_item)
         data = {
             "LineItem": serializer.data,
-            "AllItemsPrinted": all_items_printed
+            "AllItemsPrinted": all_items_printed,
+            "BinNumber" : 0
         }
 
         if settings.BROADCAST_ENABLED:
@@ -227,7 +233,8 @@ class ItemProcessingView(views.APIView):
         serializer = ReadLineItemSerializer(line_item)
         data = {
             "LineItem": serializer.data,
-            "AllItemsPrinted": all_items_printed
+            "AllItemsPrinted": all_items_printed,
+            "BinNumber":order_info.Bin.Number
         }
 
         if settings.BROADCAST_ENABLED:

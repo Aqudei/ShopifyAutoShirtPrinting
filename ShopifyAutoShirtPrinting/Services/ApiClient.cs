@@ -26,6 +26,7 @@ namespace ShopifyEasyShirtPrinting.Services
     {
         public MyLineItem LineItem { get; set; }
         public bool AllItemsPrinted { get; set; }
+        public int BinNumber { get; set; }
     }
 
 
