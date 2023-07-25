@@ -81,7 +81,7 @@
                                 <Image VerticalAlignment="Center" 
                                     Width="25"
                                     Source="{StaticResource EmptyBinImage}"/>
-                                <Label Grid.Column="1" VerticalAlignment="Center" Content="Empty Bin"/>
+                                <Label Grid.Column="1" VerticalAlignment="Center" Content="Archive All"/>
                             </Grid>
                         </Button>
                         <Button

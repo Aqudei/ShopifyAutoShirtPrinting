@@ -168,6 +168,22 @@ def populate_info(line_pk):
     if settings.BROADCAST_ENABLED:
         broadcast.delay([line_item.Id],"items.updated")
 
+@shared_task
+def archive_bin_task(BinNumber):
+        bin = Bin.objects.get(Number=BinNumber)
+        bin.Active = False
+        bin.save()
+
+        order = OrderInfo.objects.get(Bin=bin)
+        order.Bin = None
+        order.save()
+
+        LineItem.objects.filter(Order=order).update(
+            Status = 'Archived'
+        )
+
+        if settings.BROADCAST_ENABLED:
+            broadcast([bin.Number],"bins.destroyed")
 
 @shared_task
 def broadcast(message, routing_key):

@@ -121,18 +121,12 @@ class DestroyBinView(views.APIView):
         """
         docstring
         """
-        bin = Bin.objects.get(Number=BinNumber)
-        bin.Active = False
-        bin.save()
 
-        order = OrderInfo.objects.get(Bin=bin)
-        order.Bin = None
-        order.save()
+        tasks.archive_bin_task.delay(BinNumber)
+        return response.Response({
+            "message":"Bin emptied and items archived"
+        })
 
-        if settings.BROADCAST_ENABLED:
-            tasks.broadcast.delay([bin.Number],"bins.destroyed")
-            
-        return response.Response()
 
 class ItemProcessingView(views.APIView):
     """
