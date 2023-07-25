@@ -52,7 +52,7 @@ class LineItem(models.Model):
     Id = models.AutoField(db_column='Id', primary_key=True)
     # Field name made lowercase.
     OrderNumber = models.CharField(
-        db_column='OrderNumber', blank=True, null=True, max_length=100)
+        db_column='OrderNumber', max_length=50)
     # Field name made lowercase.
     Sku = models.CharField(db_column='Sku', blank=True,
                            null=True, max_length=100)
@@ -114,6 +114,29 @@ class LineItem(models.Model):
         ordering = ['-OrderNumber']
 
 
+class OrderInfoManager(models.Manager):
+    """
+    docstring
+    """
+
+    def __parse_int(self, intstr):
+        """
+        docstring
+        """
+        try:
+            return int(intstr)
+        except:
+            return 0
+
+    def new_order_number(self):
+        order = self.order_by("OrderNumber").first()
+    
+        if order and self.__parse_int(order.OrderNumber) <= 0:
+            return self.__parse_int(order.OrderNumber) - 1
+        else:
+            return -1
+
+
 class OrderInfo(models.Model):
     # Field name made lowercase.
     Id = models.AutoField(db_column='Id', primary_key=True)
@@ -123,7 +146,8 @@ class OrderInfo(models.Model):
     # Field name made lowercase.
     OrderId = models.BigIntegerField(
         db_column='OrderId', null=True, blank=True)
-    OrderNumber = models.CharField(_("OrderNumber"), max_length=50)
+    OrderNumber = models.CharField(
+        _("OrderNumber"), max_length=50, default="0")
     # Field name made lowercase.
     # Field name made lowercase.
     LabelPrinted = models.BooleanField(db_column='LabelPrinted', default=False)
@@ -139,6 +163,7 @@ class OrderInfo(models.Model):
     # Field name made lowercase.
     ShipmentId = models.IntegerField(db_column='ShipmentId', default=0)
     AllItemsPrinted = models.BooleanField(_("All Printed"), default=False)
+    objects = OrderInfoManager()
 
     def __str__(self) -> str:
         return f"{self.OrderId} - {self.Bin.Number if self.Bin else 0}"

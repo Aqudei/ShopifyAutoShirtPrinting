@@ -137,7 +137,7 @@ def populate_info(line_pk):
     order_number = line_item.OrderNumber
 
     if order_number in ['',None]:
-        new_order_number = str(uuid4()).split("-")[0]
+        new_order_number = f"{OrderInfo.objects.new_order_number():0{8}}" 
         order_info = OrderInfo.objects.create(OrderNumber=new_order_number)
         line_item.OrderNumber = new_order_number
     else:

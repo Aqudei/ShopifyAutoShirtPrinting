@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from tlkapi.models import OrderInfo, LineItem
 from tlkapi.tasks import fetch_orders, populate_info
 from django.conf import settings
+from django.db.models import F, Value
 import shopify
 import logging
 from tlkapi.myshopify import find_order
@@ -17,4 +18,4 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        populate_info(7014)
+        pass
