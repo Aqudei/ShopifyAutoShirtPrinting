@@ -1,5 +1,6 @@
 ﻿using DryIoc;
 using ImTools;
+using NLog;
 using RestSharp;
 using RestSharp.Authenticators;
 using RestSharp.Serializers.NewtonsoftJson;
@@ -8,6 +9,7 @@ using ShopifyEasyShirtPrinting.ViewModels;
 using ShopifySharp;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -31,9 +33,11 @@ namespace ShopifyEasyShirtPrinting.Services
     {
         private readonly RestClient _client;
         private readonly string _baseUrl = $"{Properties.Settings.Default.ApiBaseUrl}";
+        private static Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
         public ApiClient()
         {
+
             var opts = new RestClientOptions
             {
                 BaseUrl = new Uri(_baseUrl),
@@ -92,15 +96,23 @@ namespace ShopifyEasyShirtPrinting.Services
 
         public async Task<Log[]> ListLogsAsync(long myLineItemId)
         {
-            var request = new RestRequest($"/api/Logs/?LineItem={myLineItemId}");
 
-            var response = await _client.ExecuteGetAsync<Log[]>(request);
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            try
             {
-                return response.Data;
+                var request = new RestRequest($"/api/Logs/?LineItem={myLineItemId}");
+
+                var response = await _client.ExecuteGetAsync<Log[]>(request);
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    return response.Data;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
             }
 
-            throw new Exception(response.Content ?? response.ErrorMessage);
+            return null;
         }
 
         public async Task<MyLineItem> GetLineItemByIdAsync(long lineItemDbId)
