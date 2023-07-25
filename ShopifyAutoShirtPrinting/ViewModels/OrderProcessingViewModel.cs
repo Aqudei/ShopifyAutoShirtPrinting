@@ -375,6 +375,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             var archivedItem = array[i];
             await _dispatcher.InvokeAsync(() =>
                     {
+                        archivedItem.PropertyChanged -= OrderProcessingViewModel_PropertyChanged;
                         _lineItems.Remove(archivedItem);
                     });
         }

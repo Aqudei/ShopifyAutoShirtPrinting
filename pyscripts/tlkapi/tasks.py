@@ -182,9 +182,12 @@ def archive_bin_task(BinNumber):
             Status = 'Archived'
         )
 
+        archived_items = list(LineItem.objects.filter(Order=order).values_list('Id',flat=True))
+        
         if settings.BROADCAST_ENABLED:
             broadcast([bin.Number],"bins.destroyed")
-
+            broadcast(archived_items,"items.archived")
+            
 @shared_task
 def broadcast(message, routing_key):
     """
