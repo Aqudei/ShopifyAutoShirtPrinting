@@ -47,6 +47,20 @@ namespace ShopifyEasyShirtPrinting.Services
             _client = new RestClient(opts);
         }
 
+
+        public async Task<MyLineItem[]> ListArchivedItemsAsync()
+        {
+            var request = new RestRequest("/api/ArchivedItems/");
+           
+            var response = await _client.ExecuteGetAsync<MyLineItem[]>(request);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                return response.Data;
+            }
+
+            throw new Exception(response.Content ?? response.ErrorMessage);
+        }
+
         public async Task<MyLineItem[]> ListItemsAsync(Dictionary<string, string> queryParams = null)
         {
             var request = new RestRequest("/api/LineItems/");

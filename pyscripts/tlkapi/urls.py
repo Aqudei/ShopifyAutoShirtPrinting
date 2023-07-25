@@ -24,7 +24,9 @@ from .views import (
     OrderInfoViewSet,
     BinViewSet,
     ItemProcessingView,
-    DestroyBinView,ResetDatabaseAPIView
+    DestroyBinView,
+    ResetDatabaseAPIView,
+    ArchivedItemsListView
 )
 
 router = routers.DefaultRouter()
@@ -39,5 +41,6 @@ urlpatterns += [
     # path('Bins/', BinViewSet.as_view()),
     path('ItemProcessing/<int:pk>/', ItemProcessingView.as_view()),
     path('ResetDatabase/', ResetDatabaseAPIView.as_view()),
-    path('ListLineItems/',ListLineItemsView.as_view())
+    path('ListLineItems/', ListLineItemsView.as_view()),
+    path('ArchivedItems/', ArchivedItemsListView.as_view())
 ]

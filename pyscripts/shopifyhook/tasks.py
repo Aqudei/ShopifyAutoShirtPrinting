@@ -43,7 +43,7 @@ def process_hooks(forced=False):
                     Status='Archived'
                 )
 
-                for id in LineItem.objects.filter(Order=order).values_list('Id', flat=True):
+                for id in LineItem.objects2.active_items().filter(Order=order).values_list('Id', flat=True):
                     archived_items.append(id)
 
             hook_data.processed = True

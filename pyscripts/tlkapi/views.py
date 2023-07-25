@@ -43,16 +43,7 @@ class LineItemViewSet(viewsets.ModelViewSet):
     """
     filterset_fields = ["Id", 'LineItemId', "OrderId", "OrderNumber","Status"]
     serializer_class = ReadLineItemSerializer
-    # queryset = LineItem.objects.exclude(Status='Archived')
-
-    def get_queryset(self):
-        if self.request.query_params.get("Status") == 'Archived':
-            queryset = LineItem.objects.filter(Status='Archived').annotate(
-                BinNumber=F('Order__Bin__Number'))
-        else:
-            queryset = LineItem.objects.exclude(Status='Archived').annotate(
-                BinNumber=F('Order__Bin__Number'))
-        return queryset
+    queryset = LineItem.objects2.active_items()
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -182,7 +173,7 @@ class ItemProcessingView(views.APIView):
         """
         line_item = LineItem.objects.get(Id=pk)
 
-        line_items_aggregate = line_item.Order.LineItems.aggregate(
+        line_items_aggregate = LineItem.objects2.active_items().filter(Order=line_item.Order).aggregate(
             total_quantity=Sum('Quantity'),
             total_printed=Sum('PrintedQuantity')
         )
@@ -223,7 +214,7 @@ class ItemProcessingView(views.APIView):
             LineItem=line_item
         )
 
-        line_items_aggregate = line_item.Order.LineItems.aggregate(
+        line_items_aggregate = LineItem.objects2.active_items().filter(Order=line_item.Order).aggregate(
             total_quantity=Sum('Quantity'),
             total_printed=Sum('PrintedQuantity')
         )
@@ -288,4 +279,10 @@ class BinViewSet(viewsets.ModelViewSet):
     #     serializer = ReadBinSerializer(active_bins, many=True)
         
     #     return response.Response(serializer.data)
-        
+class ArchivedItemsListView(generics.ListAPIView):
+    """
+    docstring
+    """
+    queryset = LineItem.objects2.archived_items()
+    serializer_class = ReadLineItemSerializer
+    filterset_fields = ["Id", 'LineItemId', "OrderId", "OrderNumber","Status"]

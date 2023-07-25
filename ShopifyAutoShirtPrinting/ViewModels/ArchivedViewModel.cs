@@ -49,8 +49,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         {
             await _dispatcher.InvokeAsync(() => _items.Clear());
 
-            var prams = new Dictionary<string, string>() { { "Status", "Archived" } };
-            var items = await _apiClient.ListItemsAsync(prams);
+            var items = await _apiClient.ListArchivedItemsAsync();
             foreach (var item in items)
             {
                 await _dispatcher.InvokeAsync(() => _items.Add(item));

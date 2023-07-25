@@ -6,6 +6,7 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
+from django.db.models.query import QuerySet
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
 
@@ -45,8 +46,23 @@ class Log(models.Model):
 
     class Meta:
         db_table = 'Logs'
-
-
+    
+class LineItemQueryset(models.QuerySet):
+    """
+    docstring
+    """
+    def archived_items(self):
+        """
+        docstring
+        """
+        return self.filter(Status='Archived')
+    
+    def active_items(self):
+        """
+        docstring
+        """
+        return self.exclude(Status='Archived')
+    
 class LineItem(models.Model):
     # Field name made lowercase.
     Id = models.AutoField(db_column='Id', primary_key=True)
@@ -105,6 +121,9 @@ class LineItem(models.Model):
         db_column='Shipping', blank=True, null=True, max_length=128)
     Order = models.ForeignKey(
         "tlkapi.OrderInfo", verbose_name=_("Order"), on_delete=models.CASCADE, null=True, blank=True, related_name='LineItems')
+    
+    objects  = models.Manager()
+    objects2 = LineItemQueryset.as_manager()
 
     def __str__(self):
         return self.Name
@@ -130,7 +149,7 @@ class OrderInfoManager(models.Manager):
 
     def new_order_number(self):
         order = self.order_by("OrderNumber").first()
-    
+
         if order and self.__parse_int(order.OrderNumber) <= 0:
             return self.__parse_int(order.OrderNumber) - 1
         else:
