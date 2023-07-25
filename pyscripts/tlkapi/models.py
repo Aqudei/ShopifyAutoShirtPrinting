@@ -148,7 +148,7 @@ class OrderInfoManager(models.Manager):
             return 0
 
     def new_order_number(self):
-        order = self.order_by("OrderNumber").first()
+        order = self.filter(OrderNumber__startswith='-').order_by("-OrderNumber").first()
 
         if order and self.__parse_int(order.OrderNumber) <= 0:
             return self.__parse_int(order.OrderNumber) - 1
