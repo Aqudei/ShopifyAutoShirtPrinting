@@ -104,7 +104,7 @@ class LineItem(models.Model):
     Shipping = models.CharField(
         db_column='Shipping', blank=True, null=True, max_length=128)
     Order = models.ForeignKey(
-        "tlkapi.OrderInfo", verbose_name=_("Order"), on_delete=models.SET_NULL, null=True, blank=True, related_name='LineItems')
+        "tlkapi.OrderInfo", verbose_name=_("Order"), on_delete=models.CASCADE, null=True, blank=True, related_name='LineItems')
 
     def __str__(self):
         return self.Name
