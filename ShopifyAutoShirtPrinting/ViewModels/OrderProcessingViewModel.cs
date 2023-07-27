@@ -264,7 +264,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private async void RefreshData()
     {
-        await FetchLineItems();
+        await FetchActiveLineItemsAsync();
     }
 
     private async void HandleSaveQrTag()
@@ -364,7 +364,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
         LineItemsView.CollectionChanged += LineItemsView_CollectionChanged;
 
-        Task.Run(FetchLineItems);
+        Task.Run(FetchActiveLineItemsAsync);
     }
 
     private async void _messageBus_ItemsArchived(object sender, int[] archivedItemsId)
@@ -375,7 +375,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             var archivedItem = array[i];
             await _dispatcher.InvokeAsync(() =>
                     {
-                        archivedItem.PropertyChanged -= OrderProcessingViewModel_PropertyChanged;
+                        archivedItem.PropertyChanged -= LineItem_PropertyChanged;
                         _lineItems.Remove(archivedItem);
                     });
         }
@@ -487,8 +487,18 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         // QR code not found or could not be decoded
     }
 
-    private void HandleTagFilter(string statusTag)
+    private async void HandleTagFilter(string statusTag)
     {
+        if (statusTag == "Archived")
+        {
+            await FetchArchivedLineItemsAsync();
+        }
+        else
+        {
+            if (LastTagFilter == "Archived")
+                await FetchActiveLineItemsAsync();
+        }
+
         LineItemsView.Filter = s =>
         {
             return (s as MyLineItem)?.Status == statusTag;
@@ -526,6 +536,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             case nameof(SelectedTagFilter):
                 {
                     HandleTagFilter(SelectedTagFilter);
+                    LastTagFilter = SelectedTagFilter;
                     break;
                 }
             case nameof(SelectedLineItem):
@@ -533,16 +544,19 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                     if (SelectedLineItem != null)
                     {
                         CurrentImage = null;
-                        await FetchProductImageAsync(SelectedLineItem);
+         
+                        Notes = SelectedLineItem.Notes;
 
-                        Logs.Clear();
+                        await _dispatcher.InvokeAsync(Logs.Clear);
+
                         var logs = await _apiClient.ListLogsAsync(SelectedLineItem.Id);
-                        if (logs != null)
+
+                        if (logs != null && logs.Any())
                         {
                             await _dispatcher.InvokeAsync(() => Logs.AddRange(logs));
                         }
+                        
 
-                        Notes = SelectedLineItem.Notes;
                     }
                     break;
                 }
@@ -913,7 +927,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         return imagePath;
     }
 
-    private async Task FetchLineItems()
+    private async Task FetchArchivedLineItemsAsync()
     {
         var waitDialog = await _dialogCoordinator.ShowProgressAsync(this, "Please wait", "Fetching orders @ page # 1...");
         waitDialog.SetIndeterminate();
@@ -921,7 +935,56 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         try
         {
             // Update UI
-            await _dispatcher.InvokeAsync(() => _lineItems.Clear());
+            await ClearUILineItems();
+
+            var lineItems = await _apiClient.ListArchivedItemsAsync();
+
+            if (lineItems == null)
+            {
+                return;
+            }
+
+            foreach (var lineItem in lineItems)
+            {
+                lineItem.PropertyChanged += LineItem_PropertyChanged;
+                await _dispatcher.InvokeAsync(() =>
+                {
+                    _lineItems.Add(lineItem);
+                });
+            }
+
+            await _dispatcher.InvokeAsync(() => RaisePropertyChanged(nameof(TotalItems)));
+        }
+        catch (Exception e)
+        {
+            Debug.WriteLine($"{e}\n{e.StackTrace}");
+        }
+        finally
+        {
+            await waitDialog.CloseAsync();
+        }
+    }
+
+    private async Task ClearUILineItems()
+    {
+        for (int i = _lineItems.Count - 1; i >= 0; i--)
+        {
+            var item = _lineItems[i];
+            item.PropertyChanged -= LineItem_PropertyChanged;
+            await _dispatcher.InvokeAsync(() => _lineItems.Remove(item));
+        }
+    }
+
+    private async Task FetchActiveLineItemsAsync()
+    {
+        var waitDialog = await _dialogCoordinator.ShowProgressAsync(this, "Please wait", "Fetching orders @ page # 1...");
+        waitDialog.SetIndeterminate();
+
+        try
+        {
+            // Update UI
+            await ClearUILineItems();
+
             var lineItems = await _apiClient.ListItemsAsync();
 
             if (lineItems == null)
@@ -966,6 +1029,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     private bool _isScanOnly;
     private DelegateCommand<bool?> checkBoxCommand;
     private bool? _masterCheckBoxState;
+    private string LastTagFilter;
 
     public DelegateCommand<IEnumerable<object>> ProcessSelectedCommand => _processSelectedCommand ??=
         new DelegateCommand<IEnumerable<object>>(ProcessSelectedOrders);

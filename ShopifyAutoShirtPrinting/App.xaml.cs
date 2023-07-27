@@ -91,7 +91,7 @@ namespace ShopifyEasyShirtPrinting
                 var regionManager = Container.Resolve<IRegionManager>();
 
                 containerRegistry.RegisterForNavigation<OrderProcessingView>();
-                containerRegistry.RegisterForNavigation<Archived>();
+                // containerRegistry.RegisterForNavigation<Archived>();
                 containerRegistry.RegisterForNavigation<Bins>();
                 containerRegistry.RegisterForNavigation<SettingsView>();
 
