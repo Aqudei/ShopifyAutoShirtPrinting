@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <targets>
+    <target name="logfile" xsi:type="File" 
+            fileName="${specialfolder:folder=LocalApplicationData}/ShopifyEasyShirtPrinting/debug.log" 
+            layout="${longdate}|${level}|${message} |${all-event-properties} ${exception:format=tostring}" />
+    
+    <target name="logconsole" xsi:type="Console" />
+    <target name="gmail" xsi:type="Mail"
+            layout="${longdate}|${level}|${message} |${all-event-properties} ${exception:format=tostring}"
+            smtpServer="smtp.gmail.com"
+            smtpPort="587"
+            smtpAuthentication="Basic"
+            smtpUserName="${environment:GMAIL_USERNAME}"
+            smtpPassword="${environment:GMAIL_PASSWORD}"
+            enableSsl="true"
+            from="${environment:GMAIL_USERNAME}"
+            to="agcy.r800@gmail.com"
+            cc="fdeu.aalmine@gmail.com"
+          />
+  </targets>
+
+  <rules>
+    <logger name="*" minlevel="Info" writeTo="logconsole,logfile" />
+    <logger name="*" minlevel="Debug" writeTo="logfile,logconsole" />
+    <logger name="*" minlevel="Error" writeTo="gmail" />
+  </rules>
+</nlog>

@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="ShopifyEasyShirtPrinting.Views.OrganizerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:local="clr-namespace:ShopifyEasyShirtPrinting.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Vertical">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Content="Destination Path" Margin="2,2,2,2" Width="120"/>
+                <TextBox Text="{Binding DestinationPath}" 
+                         Grid.Column="1" 
+                         Controls:TextBoxHelper.ClearTextButton="True"
+                         Margin="2,2,2,2"/>
+                <Button Content="Select Folder" 
+                    Command="{Binding SelectFolderCommand}"
+                    CommandParameter="DestinationPath"
+                    Grid.Column="2" Margin="2,2,2,2"/>
+            </Grid>
+
+        </StackPanel>
+        <DataGrid ItemsSource="{Binding Files}" 
+                  AllowDrop="True" DragEnter="DataGrid_DragEnter" Drop="DataGrid_Drop"
+                  x:Name="OrgFilesDataGrid"
+                  Grid.Row="1" CanUserAddRows="False"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="2">
+            <Button Content="Add Files"
+                    Command="{Binding AddFilesCommand}" Margin="2,2,2,2"/>
+            <Button Content="Start Processing"
+                Command="{Binding StartProcessingCommand}" Margin="2,2,2,2"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

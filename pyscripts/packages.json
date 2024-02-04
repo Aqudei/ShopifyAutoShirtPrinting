@@ -1,0 +1,65 @@
+[
+ {
+  "carrierCode": "australia_post",
+  "code": "package",
+  "name": "Package",
+  "domestic": true,
+  "international": true
+ },
+ {
+  "carrierCode": "australia_post",
+  "code": "aust_post_bag",
+  "name": "Bag",
+  "domestic": true,
+  "international": false
+ },
+ {
+  "carrierCode": "australia_post",
+  "code": "aust_post_carton",
+  "name": "Carton",
+  "domestic": true,
+  "international": false
+ },
+ {
+  "carrierCode": "australia_post",
+  "code": "aust_post_envelope",
+  "name": "Envelope",
+  "domestic": true,
+  "international": false
+ },
+ {
+  "carrierCode": "australia_post",
+  "code": "aust_post_item",
+  "name": "Item",
+  "domestic": true,
+  "international": false
+ },
+ {
+  "carrierCode": "australia_post",
+  "code": "aust_post_jiffy_bag",
+  "name": "Jiffy Bag",
+  "domestic": true,
+  "international": false
+ },
+ {
+  "carrierCode": "australia_post",
+  "code": "aust_post_pallet",
+  "name": "Pallet",
+  "domestic": true,
+  "international": false
+ },
+ {
+  "carrierCode": "australia_post",
+  "code": "aust_post_satchel",
+  "name": "Satchel",
+  "domestic": true,
+  "international": false
+ },
+ {
+  "carrierCode": "australia_post",
+  "code": "aust_post_skid",
+  "name": "Skid",
+  "domestic": true,
+  "international": false
+ }
+]

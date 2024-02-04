@@ -1,0 +1,709 @@
+[
+    {
+        "carrierCode": "australia_post",
+        "code": "australia_post_parcel_post",
+        "name": "T28 - Parcel Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "australia_post_parcel_post_signature",
+        "name": "7B05 - Parcel Post w/ Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "australia_post_express_post",
+        "name": "E34 - Express Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "australia_post_express_post_signature",
+        "name": "7H05 - Express Post w/ Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "australia_post_national_full_rate",
+        "name": "NFR - National Full Rate",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "australia_post_express_national_full_rate",
+        "name": "XNFR - Express National Full Rate",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "australia_post_eparcel",
+        "name": "S1 - eParcel",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "australia_post_express_post_eparcel",
+        "name": "X1 - Express Post eParcel",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_signature_7C85",
+        "name": "7C85 - Parcel Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_signature_7D05",
+        "name": "7D05 - Parcel Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_signature_7D35",
+        "name": "7D35 - Parcel Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_signature_7D55",
+        "name": "7D55 - Parcel Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_signature_7D85",
+        "name": "7D85 - Parcel Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_signature_3K55",
+        "name": "3K55 - Express Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_signature_3I05",
+        "name": "3I05 - Express Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_signature_3I35",
+        "name": "3I35 - Express Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_signature_3I55",
+        "name": "3I55 - Express Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_signature_3I85",
+        "name": "3I85 - Express Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_signature_3J05",
+        "name": "3J05 - Express Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_signature_3J35",
+        "name": "3J35 - Express Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_signature_3J55",
+        "name": "3J55 - Express Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_signature_3J85",
+        "name": "3J85 - Express Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_signature_7I55",
+        "name": "7I55 - Express Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_signature_7I85",
+        "name": "7I85 - Express Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_signature_7J05",
+        "name": "7J05 - Express Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_signature_7J55",
+        "name": "7J55 - Express Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_signature_7J85",
+        "name": "7J85 - Express Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_3I83",
+        "name": "3I83 - Express Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_3J03",
+        "name": "3J03 - Express Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_3J33",
+        "name": "3J33 - Express Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_7I33",
+        "name": "7I33 - Express Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_7I53",
+        "name": "7I53 - Express Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_7I83",
+        "name": "7I83 - Express Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_7J53",
+        "name": "7J53 - Express Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_7J83",
+        "name": "7J83 - Express Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_3C03",
+        "name": "3C03 - Parcel Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_3C83",
+        "name": "3C83 - Parcel Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_3D03",
+        "name": "3D03 - Parcel Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_3D33",
+        "name": "3D33 - Parcel Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_3D53",
+        "name": "3D53 - Parcel Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_3D83",
+        "name": "3D83 - Parcel Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_7C33",
+        "name": "7C33 - Parcel Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_7C53",
+        "name": "7C53 - Parcel Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_7C83",
+        "name": "7C83 - Parcel Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_7D03",
+        "name": "7D03 - Parcel Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_7D33",
+        "name": "7D33 - Parcel Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_7D53",
+        "name": "7D53 - Parcel Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_7D83",
+        "name": "7D83 - Parcel Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_wine",
+        "name": "7O83 - Parcel Post Wine",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_wine_signature_7U85",
+        "name": "7U85 - Express Post Wine + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_wine_signature_3V85",
+        "name": "3V85 - Express Post Wine + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_wine_signature_7O35",
+        "name": "7O35 - Parcel Post Wine + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_wine_signature_7O85",
+        "name": "7O85 - Parcel Post Wine + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_wine_signature_3P85",
+        "name": "3P85 - Parcel Post Wine + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_eparcel_express_returns",
+        "name": "XPR - Express eParcel Post Returns",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_eparcel_express_returns_zonal_1",
+        "name": "XPR1 - Express eParcel Post Returns - Zonal 1",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_eparcel_returns",
+        "name": "PR - eParcel Post Returns",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_eparcel_returns_zonal_1",
+        "name": "PR1 - eParcel Post Returns - Zonal 1",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_pack_and_track_international_PTI7",
+        "name": "PTI7 - International Standard with Signature",
+        "domestic": false,
+        "international": true
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_pack_and_track_international_PTI8",
+        "name": "PTI8 - International Standard",
+        "domestic": false,
+        "international": true
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_courier_international_merch_8z",
+        "name": "ECM8 - International Express - Merchandise",
+        "domestic": false,
+        "international": true
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_signature_3C05",
+        "name": "3C05 - Parcel Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_signature_3C35",
+        "name": "3C35 - Parcel Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_signature_3C55",
+        "name": "3C55 - Parcel Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_signature_3C85",
+        "name": "3C85 - Parcel Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_signature_3D05",
+        "name": "3D05 - Parcel Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_signature_3D35",
+        "name": "3D35 - Parcel Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_signature_3D55",
+        "name": "3D55 - Parcel Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_signature_3D85",
+        "name": "3D85 - Parcel Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_signature_7C05",
+        "name": "7C05 - Parcel Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_signature_7C35",
+        "name": "7C35 - Parcel Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_signature_7C55",
+        "name": "7C55 - Parcel Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_signature_7E55",
+        "name": "7E55 - Parcel Post + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_3J53",
+        "name": "3J53 - Express Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_3I03",
+        "name": "3I03 - Express Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_3Y83",
+        "name": "3Y83- Express Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_3J83",
+        "name": "3J83 - Express Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_3H03",
+        "name": "3H03 - Express Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_post_7H53",
+        "name": "7H53 - Express Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "australia_post_express_post_signature_3Y85",
+        "name": "3Y85 - Express Post w/ Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "australia_post_express_post_signature_3H05",
+        "name": "3H05 - Express Post w/ Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "australia_post_express_post_signature_7J35",
+        "name": "7J35 - Express Post w/ Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "australia_post_parcel_post_7B53",
+        "name": "7B53 - Parcel Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "australia_post_parcel_post_3C33",
+        "name": "3C33 - Parcel Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "australia_post_parcel_post_7B83",
+        "name": "7B83 - Parcel Post",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "australia_post_parcel_post_signature_3X85",
+        "name": "3X85 - Parcel Post w/ Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_wine_signature_7N85",
+        "name": "7N85 - Parcel Post Wine + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_wine_signature_7N35",
+        "name": "7N35 - Parcel Post Wine + Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_parcel_post_wine_7N33",
+        "name": "7N33 - Parcel Post Wine",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "australia_post_parcel_post_plus_3W83",
+        "name": "3W83 - Parcel Post Plus",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "australia_post_parcel_post_non_signature_3X83",
+        "name": "3X83 - Parcel Post Non-Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "australia_post_parcel_post_plus_signature_3W85",
+        "name": "3W85 - Parcel Post Plus w/ Signature",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "australia_post_express_post_eparcel6",
+        "name": "X6 - Express Post eParcel 6",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "australia_post_express_post_eparcel9",
+        "name": "S9 - Express Post eParcel 9",
+        "domestic": true,
+        "international": false
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "au_post_express_courier_international_docs_edidocs_ECD8",
+        "name": "ECD8 - International Express - Docs/EDI Docs",
+        "domestic": false,
+        "international": true
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "international_returns_standard_airmail",
+        "name": "ARI - International Returns - Standard/Airmail",
+        "domestic": false,
+        "international": true
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "international_returns_express_eci",
+        "name": "ERI - International Returns - Express/ECI",
+        "domestic": false,
+        "international": true
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "australia_post_global_logistics_nz_express_ic5",
+        "name": "IC5 - Global Logistics - NZ Express",
+        "domestic": false,
+        "international": true
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "australia_post_global_logistics_nz_express_signature_ic6",
+        "name": "IC6 - Global Logistics - NZ Express + Signature",
+        "domestic": false,
+        "international": true
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "australia_post_global_logistics_nz_supply_express_ic7",
+        "name": "IC7 - Global Logistics - NZ Supply Express",
+        "domestic": false,
+        "international": true
+    },
+    {
+        "carrierCode": "australia_post",
+        "code": "australia_post_global_logistics_nz_supply_express_signature_ic8",
+        "name": "IC8 - Global Logistics - NZ Supply Express + Signature",
+        "domestic": false,
+        "international": true
+    }
+]

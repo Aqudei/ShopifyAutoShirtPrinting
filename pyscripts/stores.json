@@ -1,0 +1,42 @@
+[
+    {
+        "storeId": 295641,
+        "storeName": "Lonely Kids Club",
+        "marketplaceId": 14,
+        "marketplaceName": "Shopify",
+        "accountName": "the-lonely-kids-club.myshopify.com",
+        "email": null,
+        "integrationUrl": "the-lonely-kids-club.myshopify.com",
+        "active": true,
+        "companyName": "Lonely Kids Club",
+        "phone": "",
+        "publicEmail": "mail@lonelykidsclub.com",
+        "website": "",
+        "refreshDate": "2023-04-20T20:34:46.637",
+        "lastRefreshAttempt": "2023-04-20T20:35:24.05",
+        "createDate": "2021-06-15T18:27:33.173",
+        "modifyDate": "2022-12-27T15:35:57.183",
+        "autoRefresh": false,
+        "statusMappings": null
+    },
+    {
+        "storeId": 285474,
+        "storeName": "Manual Orders",
+        "marketplaceId": 0,
+        "marketplaceName": "ShipStation",
+        "accountName": null,
+        "email": null,
+        "integrationUrl": null,
+        "active": true,
+        "companyName": "Lonely Kids Club",
+        "phone": null,
+        "publicEmail": null,
+        "website": null,
+        "refreshDate": null,
+        "lastRefreshAttempt": null,
+        "createDate": "2021-04-28T19:03:28.53",
+        "modifyDate": "2021-04-28T19:03:28.53",
+        "autoRefresh": false,
+        "statusMappings": null
+    }
+]
