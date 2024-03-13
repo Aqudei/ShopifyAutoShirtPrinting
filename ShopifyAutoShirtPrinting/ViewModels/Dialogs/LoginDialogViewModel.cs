@@ -18,6 +18,7 @@ using ShopifyEasyShirtPrinting.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -270,6 +271,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         {
             if (Settings.Default.UseBrowser)
             {
+                Debug.WriteLine("Setting up Browser Integration");
                 _container.RegisterSingleton<IShipStationBrowserService, ShipStationBrowserService>();
             }
 

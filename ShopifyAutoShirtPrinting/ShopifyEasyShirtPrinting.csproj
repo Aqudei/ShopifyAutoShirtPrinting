@@ -63,10 +63,10 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>C4D94F869CA8D839AD629EA86B2140D89F45E769</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>49308AA46792AC4C0C36752659B16C599D61F1A8</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>ShopifyEasyShirtPrinting_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>ShopifyEasyShirtPrinting_2_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <TargetZone>LocalIntranet</TargetZone>
@@ -88,8 +88,8 @@
     <StartupObject>ShopifyEasyShirtPrinting.App</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AngleSharp, Version=1.0.7.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
-      <HintPath>..\packages\AngleSharp.1.0.7\lib\net472\AngleSharp.dll</HintPath>
+    <Reference Include="AngleSharp, Version=1.1.0.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
+      <HintPath>..\packages\AngleSharp.1.1.0\lib\net472\AngleSharp.dll</HintPath>
     </Reference>
     <Reference Include="AutoMapper, Version=10.0.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
       <HintPath>..\packages\AutoMapper.10.1.1\lib\net461\AutoMapper.dll</HintPath>
@@ -280,7 +280,7 @@
       <HintPath>..\packages\Netco.1.5.1\lib\net45\Netco.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.13.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\packages\NLog.5.1.3\lib\net46\NLog.dll</HintPath>
@@ -503,8 +503,8 @@
     <Reference Include="WebDriver.Support, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Selenium.Support.4.16.2\lib\netstandard2.0\WebDriver.Support.dll</HintPath>
     </Reference>
-    <Reference Include="WebDriverManager, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WebDriverManager.2.17.1\lib\net462\WebDriverManager.dll</HintPath>
+    <Reference Include="WebDriverManager, Version=2.17.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebDriverManager.2.17.2\lib\net472\WebDriverManager.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
@@ -769,6 +769,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="ShopifyEasyShirtPrinting_2_TemporaryKey.pfx" />
     <None Include="ShopifyEasyShirtPrinting_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
