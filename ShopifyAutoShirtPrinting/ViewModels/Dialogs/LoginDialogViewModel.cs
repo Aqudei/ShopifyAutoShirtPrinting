@@ -25,7 +25,9 @@ using System.Security;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 {
@@ -73,6 +75,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         private readonly SessionVariables _sessionVariables;
         private readonly IContainerExtension _container;
         private readonly string _dbPath;
+        private readonly Dispatcher _dispatcher;
         private DelegateCommand loginCommand;
         private bool _isBusy = false;
         public bool CanLogin => !IsBusy;
@@ -114,7 +117,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             _container = container;
             _dbPath = System.IO.Path.Combine(_sessionVariables.DataPath, "local_data.db");
 
-
+            _dispatcher = Application.Current.Dispatcher;
             LoadServers();
 
             SelectedServer = Servers.FirstOrDefault()?.Url;
@@ -133,13 +136,18 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         public ObservableCollection<Server> Servers { get; set; } = new();
         private string _errorMessage;
         private string _userName;
+        private string _message;
 
         public string ErrorMessage
         {
             get { return _errorMessage; }
             set { SetProperty(ref _errorMessage, value); }
         }
-
+        public string Message
+        {
+            get { return _message; }
+            set { SetProperty(ref _message, value); }
+        }
         private void LoadServers()
         {
             using (var db = new LiteDatabase(_dbPath))
@@ -201,9 +209,17 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
         private async void OnLogin()
         {
+            await LoginTask();
+        }
+
+        private async Task LoginTask()
+        {
             try
             {
-                IsBusy = true;
+                await _dispatcher.InvokeAsync(() => IsBusy = true);
+                await _dispatcher.InvokeAsync(() => ErrorMessage = "");
+                await _dispatcher.InvokeAsync(() => Message = "");
+
 
                 if (!Servers.Any(s => s.Url == SelectedServer))
                 {
@@ -216,17 +232,19 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
                             Url = newServerUrl
                         };
                         db.GetCollection<Server>().Insert(newServer);
-                        Servers.Add(newServer);
+
+                        await _dispatcher.InvokeAsync(() => Servers.Add(newServer));
                     }
                 }
 
                 var password = ConvertToUnsecureString(Password);
                 if (string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(UserName))
                 {
-                    ErrorMessage = "Login Failed. Please provide username and password.";
+                    await _dispatcher.InvokeAsync(() => ErrorMessage = "Login Failed. Please provide username and password.");
                     return;
                 }
 
+                await _dispatcher.InvokeAsync(() => Message = "Logging you in...");
                 using (var db = new LiteDatabase(_dbPath))
                 {
                     var client = new RestClient(SelectedServer);
@@ -237,9 +255,12 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
                     var authResponse = await client.ExecutePostAsync<LoginResultBody>(request);
                     if (!authResponse.IsSuccessStatusCode)
                     {
-                        ErrorMessage = $"Login Failed. {authResponse.ErrorMessage ?? authResponse.Content} ";
+                        await _dispatcher.InvokeAsync(() => Message = "");
+                        await _dispatcher.InvokeAsync(() => ErrorMessage = $"Login Failed. {authResponse.ErrorMessage ?? authResponse.Content} ");
                         return;
                     }
+
+                    await _dispatcher.InvokeAsync(() => Message = "Fetching user info from remote server...");
 
                     LoginResult = authResponse.Data;
 
@@ -248,14 +269,22 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
                     var sessionResponse = await client.ExecuteGetAsync<SessionInfo>(request);
                     if (!sessionResponse.IsSuccessStatusCode)
+                    {
+                        await _dispatcher.InvokeAsync(() => Message = "");
+                        await _dispatcher.InvokeAsync(() => ErrorMessage = $"Login Failed. {authResponse.ErrorMessage ?? authResponse.Content} ");
                         return;
+                    }
 
                     _sessionVariables.ServerUrl = SelectedServer;
                     _mapper.Map(authResponse.Data, _sessionVariables);
                     _mapper.Map(sessionResponse.Data, _sessionVariables);
 
                     SetupEmailErrorLogging(sessionResponse.Data.LoggingEmail, sessionResponse.Data.LoggingPassword);
+
+                    await _dispatcher.InvokeAsync(() => Message = "Setting up Communication Bus...");
+
                     SetupMessageBus();
+                    await _dispatcher.InvokeAsync(() => Message = "Setting up Browser integration....");
                     await SetupShipStationBrowser();
 
                     RequestClose?.Invoke(new DialogResult(ButtonResult.OK));
