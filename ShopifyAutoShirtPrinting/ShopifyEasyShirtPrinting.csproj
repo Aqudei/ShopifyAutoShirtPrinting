@@ -31,7 +31,7 @@
     <ProductName>ShopifyEasyShirtPrinting</ProductName>
     <PublisherName>Aqudei</PublisherName>
     <SuiteName>Tools</SuiteName>
-    <ApplicationRevision>4</ApplicationRevision>
+    <ApplicationRevision>5</ApplicationRevision>
     <ApplicationVersion>16.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -63,7 +63,7 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>49308AA46792AC4C0C36752659B16C599D61F1A8</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>2E53352A784AA9172032B9A73AC4C3950D653012</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>ShopifyEasyShirtPrinting_2_TemporaryKey.pfx</ManifestKeyFile>
