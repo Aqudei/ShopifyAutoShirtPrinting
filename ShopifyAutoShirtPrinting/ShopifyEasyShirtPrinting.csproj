@@ -31,7 +31,7 @@
     <ProductName>ShopifyEasyShirtPrinting</ProductName>
     <PublisherName>Aqudei</PublisherName>
     <SuiteName>Tools</SuiteName>
-    <ApplicationRevision>6</ApplicationRevision>
+    <ApplicationRevision>8</ApplicationRevision>
     <ApplicationVersion>16.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -586,7 +586,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ShippedView.xaml">
+    <Page Include="Views\ShipmentsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -683,7 +683,7 @@
     <Compile Include="ViewModels\Dialogs\QuantityChangerDialogViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\PageBase.cs" />
-    <Compile Include="ViewModels\ShippedViewModel.cs" />
+    <Compile Include="ViewModels\ShipmentsViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\LabelPrintingDialogViewModel.cs" />
     <Compile Include="ViewModels\OrderProcessingViewModel.cs" />
     <Compile Include="ViewModels\OrganizerViewModel.cs" />
@@ -704,8 +704,8 @@
     <Compile Include="Views\Main.xaml.cs">
       <DependentUpon>Main.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ShippedView.xaml.cs">
-      <DependentUpon>ShippedView.xaml</DependentUpon>
+    <Compile Include="Views\ShipmentsView.xaml.cs">
+      <DependentUpon>ShipmentsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialogs\LabelPrintingDialog.xaml.cs">
       <DependentUpon>LabelPrintingDialog.xaml</DependentUpon>
@@ -752,10 +752,11 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="Resources\section_sign.png" />
     <Resource Include="Resources\padlock-login3.png" />
     <Resource Include="Resources\padlock-login.jpg" />
-    <None Include="Resources\equals.png" />
-    <None Include="Resources\arrow.png" />
+    <Resource Include="Resources\equals.png" />
+    <Resource Include="Resources\arrow.png" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

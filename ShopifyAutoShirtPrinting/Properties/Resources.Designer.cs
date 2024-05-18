@@ -133,6 +133,16 @@ namespace ShopifyEasyShirtPrinting.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap section_sign {
+            get {
+                object obj = ResourceManager.GetObject("section_sign", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap uncheck2 {
             get {
                 object obj = ResourceManager.GetObject("uncheck2", resourceCulture);

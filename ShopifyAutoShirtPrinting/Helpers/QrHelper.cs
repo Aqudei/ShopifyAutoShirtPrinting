@@ -87,7 +87,7 @@ namespace ShopifyEasyShirtPrinting.Helpers
             return qrCode;
         }
 
-        public Bitmap DrawQrTagInfo(string text, Bitmap refImage, string orderNumber, bool hasNotes, bool? color, bool? hasBackPrint=false)
+        public Bitmap DrawQrTagInfo(string text, Bitmap refImage, string orderNumber, bool hasNotes, bool? color, bool? hasBackPrint = false, bool? isDtf = false)
         {
             var aspectRatio = Properties.Settings.Default.PaperWidth / Properties.Settings.Default.PaperHeight;
             var width = (int)(aspectRatio * refImage.Height) - refImage.Width;
@@ -148,22 +148,37 @@ namespace ShopifyEasyShirtPrinting.Helpers
             var tagFont = new Font(new FontFamily("Arial"), Properties.Settings.Default.FontSize + 4, FontStyle.Bold);
             graphics.DrawString($"#{orderNumber} {asterisk}".Trim(), tagFont, brush, new RectangleF(0, 20, width, height));
 
+
+            var icon_size = 45; // width equals heigh for square image
+            var offset = width - icon_size - 20; 
+            nextLine += 16;
+
             if (color.HasValue)
             {
                 if (color == false)
                 {
-                    graphics.FillEllipse(brush, (width / 2) - 15, nextLine, 30, 30);
+                    graphics.FillEllipse(brush, offset, nextLine, icon_size, icon_size);
+                    offset = offset - icon_size - 5;
                 }
                 else
                 {
-                    graphics.DrawEllipse(new Pen(brush, 2), (width / 2) - 15, nextLine, 30, 30);
+                    graphics.DrawEllipse(new Pen(brush, 2), offset, nextLine, icon_size, icon_size);
+                    offset = offset - icon_size - 5;
                 }
             }
 
             if (hasBackPrint.HasValue && hasBackPrint.Value)
             {
                 var image = Properties.Resources.equals_icon;
-                graphics.DrawImage(image, (width / 2) + 20, nextLine, 32, 32);
+                graphics.DrawImage(image, offset, nextLine, icon_size, icon_size);
+                offset = offset - icon_size - 5;
+            }
+
+            if (isDtf.HasValue && isDtf.Value)
+            {
+                var image = Properties.Resources.section_sign;
+                graphics.DrawImage(image, offset, nextLine, icon_size, icon_size);
+                offset = offset - icon_size - 5;
             }
 
             return textImage;

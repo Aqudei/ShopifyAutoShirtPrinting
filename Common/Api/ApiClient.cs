@@ -589,5 +589,30 @@ namespace Common.Api
 
             return new Variant[] { null };
         }
+
+        public async Task<IEnumerable<Shipment>> FetchShipmentsAsync(int offset)
+        {
+            var request = new RestRequest("/api/Shipments/")
+                .AddParameter("limit", 100)
+                .AddParameter("offset", offset);
+
+            var response = await _client.ExecuteGetAsync<PaginatedResult<Shipment>>(request);
+            if (response.StatusCode == HttpStatusCode.OK) { return response.Data.Results; }
+
+            return new Shipment[] { null };
+
+        }
+
+        public async Task CreateShipmentAsync(string orderNumber)
+        {
+            var request = new RestRequest($"/api/ShipItem/{orderNumber}/");
+
+            var response = await _client.ExecutePostAsync(request);
+            if (response.StatusCode == HttpStatusCode.OK)
+                return;
+
+            throw new Exception(response.ErrorMessage ?? response.Content);
+
+        }
     }
 }

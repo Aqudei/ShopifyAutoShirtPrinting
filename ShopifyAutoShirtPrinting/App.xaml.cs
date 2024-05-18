@@ -88,6 +88,7 @@ namespace ShopifyEasyShirtPrinting
                 containerRegistry.RegisterForNavigation<Tooling>();
                 containerRegistry.RegisterForNavigation<Archived>();
                 containerRegistry.RegisterForNavigation<Products>();
+                containerRegistry.RegisterForNavigation<ShipmentsView>();
                 containerRegistry.RegisterInstance<IMessageBus>(new DummyMessageBus());
 
                 var config = new MapperConfiguration(cfg =>

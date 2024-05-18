@@ -51,7 +51,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
         private readonly ApiClient _apiClient;
         private readonly IDialogCoordinator _dialogCoordinator;
 
-        public DelegateCommand ApplySearchCommand => _applySearch ??= new DelegateCommand(ApplySearch);
+        public DelegateCommand ApplySearchCommand => _applySearch ??= new DelegateCommand(OnApplySearch);
         private DelegateCommand _browseGcrFileCommand;
 
         public DelegateCommand BrowseGcrFileCommand => _browseGcrFileCommand ??= new DelegateCommand(HandleBrowseGcr);
@@ -76,7 +76,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
 
 
 
-        private async void ApplySearch()
+        private async void OnApplySearch()
         {
             var progress = await _dialogCoordinator.ShowProgressAsync(this, "Please wait", $"Searching for product similar to '{SearchText}'...");
             try

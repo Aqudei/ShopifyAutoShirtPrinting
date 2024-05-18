@@ -79,11 +79,17 @@
             <Button Command="{Binding DialogCommand}" 
                         CommandParameter="YES"
                         Width="100" Content="Yes" Margin="10" />
+
+            <Button Width="158" 
+                    Command="{Binding DialogCommand}"    
+                    Margin="10" Content="YES - (AusPost Direct)" 
+                    CommandParameter="AUSPOST"/>
+
             <Button Width="100" 
                         Command="{Binding DialogCommand}"
                         CommandParameter="NO"
                         Margin="10" Content="No" />
-        </StackPanel>
 
+        </StackPanel>
     </Grid>
 </UserControl>

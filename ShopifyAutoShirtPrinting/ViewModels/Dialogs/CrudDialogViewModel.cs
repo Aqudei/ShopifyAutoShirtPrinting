@@ -25,8 +25,9 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         private string _name;
         private int _id;
         private string _title;
-
         private DelegateCommand _selectNoneCommand;
+
+
 
         public DelegateCommand SelectNoneCommand
         {

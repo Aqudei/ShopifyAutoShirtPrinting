@@ -31,6 +31,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Label Content="Order  Number" Margin="2,2,2,2"/>
@@ -74,21 +75,27 @@
                     <ColumnDefinition/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <ComboBox
-                    ItemsSource="{Binding VariantsCollectionView}"
-                    SelectedItem="{Binding SelectedVariant}"/>
+                <ComboBox Margin="2"
+                          ItemsSource="{Binding VariantsCollectionView}"
+                          SelectedItem="{Binding SelectedVariant}"/>
+                
                 <Button Content="Select None"
+                        Margin="2"
                         Grid.Column="1"
                         Command="{Binding SelectNoneCommand}"/>
             </Grid>
         </StackPanel>
 
-
+        <Grid Grid.Row="6"
+              Grid.Column="1">
+              
+        </Grid>
+        
         <Button Content="Save"
                 Margin="4"
                 Width="200"
                 Grid.Column="1"
-                Grid.Row="6"
+                Grid.Row="7"
                 Command="{Binding DialogCommand}"
                 CommandParameter="Create"/>
     </Grid>

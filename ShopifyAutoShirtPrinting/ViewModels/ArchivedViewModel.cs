@@ -299,20 +299,22 @@ public class ArchivedViewModel : PageBase, INavigationAware
                 };
 
         bool? color = null;
+        bool? isDtf = null;
 
         if (!string.IsNullOrWhiteSpace(lineItem.Sku))
         {
             color = lineItem.Sku.ToUpper().EndsWith("-LT") ? true : false;
+            isDtf = lineItem.Sku.ToUpper().EndsWith("-DTF") ? true : false;
         }
 
         var hasNotes = !string.IsNullOrWhiteSpace(lineItem.Notes);
-
+        
         var qrDataText = EncodeText(string.Join($"{Environment.NewLine}", qrData));
 
         var qrHelper = new QrHelper();
 
         using var qrImage = qrHelper.GenerateBitmapQr(qrDataText);
-        using var textImage = qrHelper.DrawQrTagInfo(lineItem.Name, qrImage, lineItem.OrderNumber, hasNotes, color);
+        using var textImage = qrHelper.DrawQrTagInfo(lineItem.Name, qrImage, lineItem.OrderNumber, hasNotes, color, isDtf);
         var combinedImage = qrHelper.CombineImage(qrImage, textImage);
 
         return combinedImage;

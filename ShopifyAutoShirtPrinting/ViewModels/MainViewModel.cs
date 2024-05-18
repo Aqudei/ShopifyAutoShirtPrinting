@@ -84,6 +84,17 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 }
             });
 
+            Menu.Add(new MenuItem
+            {
+                Label = "Shipments",
+                NavigationPath = "ShipmentsView",
+                NavigationType = typeof(ShipmentsView),
+                Icon = new PackIconMaterial
+                {
+                    Kind = PackIconMaterialKind.ShippingPallet
+                }
+            });
+
             OptionsMenu.Add(new MenuItem
             {
                 Label = "Settings",

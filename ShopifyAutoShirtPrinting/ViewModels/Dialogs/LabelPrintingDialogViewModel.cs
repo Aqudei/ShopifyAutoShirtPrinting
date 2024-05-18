@@ -33,6 +33,15 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             {
                 RequestClose?.Invoke(new DialogResult(ButtonResult.Yes));
             }
+            else if (cmd.ToUpper() == "AUSPOST")
+            {
+                var dlgParams = new DialogParameters
+                {
+                    { "auspost", true }
+                };
+
+                RequestClose?.Invoke(new DialogResult(ButtonResult.Yes, dlgParams));
+            }
             else
             {
                 RequestClose?.Invoke(new DialogResult(ButtonResult.No));
@@ -113,6 +122,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             set => SetProperty(ref _orderNumber, value);
         }
 
+
+     
         public override string Title => "Print Shipment Label";
 
         public event Action<IDialogResult> RequestClose;

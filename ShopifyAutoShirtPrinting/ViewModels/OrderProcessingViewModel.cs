@@ -333,10 +333,12 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 };
 
         bool? color = null;
+        bool? isDtf = null;
 
         if (!string.IsNullOrWhiteSpace(lineItem.Sku))
         {
             color = lineItem.Sku.ToUpper().EndsWith("-LT") ? true : false;
+            isDtf = lineItem.Sku.ToUpper().EndsWith("-DTF") ? true : false;
         }
 
         var hasNotes = !string.IsNullOrWhiteSpace(lineItem.Notes);
@@ -346,7 +348,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         var qrHelper = new QrHelper();
 
         using var qrImage = qrHelper.GenerateBitmapQr(qrDataText);
-        using var textImage = qrHelper.DrawQrTagInfo(lineItem.Name, qrImage, lineItem.OrderNumber, hasNotes, color, hasBackPrint);
+        using var textImage = qrHelper.DrawQrTagInfo(lineItem.Name, qrImage, lineItem.OrderNumber, hasNotes, color, hasBackPrint, isDtf);
         var combinedImage = qrHelper.CombineImage(qrImage, textImage);
 
         return combinedImage;
@@ -801,25 +803,24 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             ScanInfo.Add(new KeyValuePair<string, string>("Order#", lineItem.OrderNumber));
             ScanInfo.Add(new KeyValuePair<string, string>("SKU", lineItem.Sku));
         });
-
     }
 
-    private async Task ProcessItemForPrintingAsync(LineItemViewModel lineItem)
+    private async Task ProcessItemForPrintingAsync(LineItemViewModel lineItemVm)
     {
         try
         {
-            await _myPrintService.PrintItem(lineItem);
-            var processingItemResult = await _apiClient.ProcessItemAsync(lineItem.Id);
+            await _myPrintService.PrintItem(lineItemVm);
+            var processingItemResult = await _apiClient.ProcessItemAsync(lineItemVm.Id);
 
             await ActivateLineItemInView(_mapper.Map<LineItemViewModel>(processingItemResult.LineItem));
-            var dialogParameters = new Dictionary<string, string> { { "OrderNumber", $"{lineItem.OrderNumber}" } };
+            var dialogParameters = new Dictionary<string, string> { { "OrderNumber", $"{lineItemVm.OrderNumber}" } };
             var relatedLineItems = await _apiClient.ListItemsAsync(dialogParameters);
 
             if (processingItemResult.AllItemsPrinted)
             {
-                if (lineItem.ForPickup)
+                if (lineItemVm.ForPickup)
                 {
-                    _dialogService.ShowAfterScanDialog("For Pickup", "Pick up order is ready.", lineItem.Id, async result =>
+                    _dialogService.ShowAfterScanDialog("For Pickup", "Pick up order is ready.", lineItemVm.Id, async result =>
                     {
                         foreach (var lineItem in relatedLineItems.Select(_mapper.Map<LineItemViewModel>))
                         {
@@ -830,47 +831,53 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 else
                     await _dispatcher.InvokeAsync(() =>
                     {
-                        _dialogService.ShowLabelPrintingDialog(lineItem.OrderNumber, "Ready to Print Shipping label?", async result =>
+                        _dialogService.ShowLabelPrintingDialog(lineItemVm.OrderNumber, "Ready to Print Shipping label?", async result =>
                         {
                             if (result.Result == ButtonResult.Yes)
                             {
-                                foreach (var lineItem in relatedLineItems.Select(_mapper.Map<LineItemViewModel>))
+                                if (result.Parameters.TryGetValue<bool>("auspost", out var isAusPost))
                                 {
-                                    await ApplyTagForLineItem(lineItem, "LabelPrinted");
+                                    await _apiClient.CreateShipmentAsync(lineItemVm.OrderNumber);
                                 }
-
-                                if (processingItemResult.LineItem.BinNumber.HasValue)
-                                    await _binService.EmptyBinAsync(processingItemResult.LineItem.BinNumber.Value);
-
-
-                                Task.Run(async () =>
+                                else
                                 {
-                                    var shipStationResult = await _browserService.NavigateToOrderAsync(lineItem.OrderNumber);
-                                    if (!shipStationResult)
+                                    foreach (var lineItem in relatedLineItems.Select(_mapper.Map<LineItemViewModel>))
                                     {
-                                        WindowHelper.FocusSelf();
-                                        await _dialogCoordinator.ShowMessageAsync(this, "Order Not Found!", $"Cannot find Order #{lineItem.OrderNumber} in ShipStation!\nYou may need to refresh/reload your store in Shipstaion.");
-
+                                        await ApplyTagForLineItem(lineItem, "LabelPrinted");
                                     }
-                                });
 
-                                WindowHelper.FocusChrome();
+                                    if (processingItemResult.LineItem.BinNumber.HasValue)
+                                        await _binService.EmptyBinAsync(processingItemResult.LineItem.BinNumber.Value);
+
+                                    Task.Run(async () =>
+                                    {
+                                        var shipStationResult = await _browserService.NavigateToOrderAsync(lineItemVm.OrderNumber);
+                                        if (!shipStationResult)
+                                        {
+                                            WindowHelper.FocusSelf();
+                                            await _dialogCoordinator.ShowMessageAsync(this, "Order Not Found!", $"Cannot find Order #{lineItemVm.OrderNumber} in ShipStation!\nYou may need to refresh/reload your store in Shipstaion.");
+
+                                        }
+                                    });
+
+                                    WindowHelper.FocusChrome();
+                                }
                             }
                         });
                     });
             }
             else
             {
-                var prams2 = new Dictionary<string, string> { { "OrderNumber", $"{lineItem.OrderNumber}" } };
+                var prams2 = new Dictionary<string, string> { { "OrderNumber", $"{lineItemVm.OrderNumber}" } };
                 var orderInfo = _apiClient.GetOrderInfoBy(prams2);
 
-                if (relatedLineItems.Where(l => l.BinNumber > 0 && l.OrderId == lineItem.OrderId).Sum(x => x.PrintedQuantity) > 1)
+                if (relatedLineItems.Where(l => l.BinNumber > 0 && l.OrderId == lineItemVm.OrderId).Sum(x => x.PrintedQuantity) > 1)
                 {
                     await _dispatcher.InvokeAsync(new Action(() =>
                     {
                         var dlgParams = new DialogParameters
                                         {
-                                            { "Id", lineItem.Id },
+                                            { "Id", lineItemVm.Id },
                                             { "Message", "Added item to exisiting bin:" },
                                             { "Title", "BIN NUMBER ASSIGNED" }
                                         };
@@ -884,7 +891,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                     {
                         var dlgParams = new DialogParameters
                                         {
-                                            { "Id", lineItem.Id },
+                                            { "Id", lineItemVm.Id },
                                             { "Message", "This item goes into new bin:" },
                                             { "Title", "NEW BIN CREATED" }
                                         };
@@ -1042,6 +1049,9 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private async Task<string> FetchProductImageAsync(LineItemViewModel lineItem)
     {
+        if (lineItem == null)
+            return null;
+
         var lineItemOrderId = lineItem.OrderId;
         var lineItemVariantId = lineItem.VariantId;
 
