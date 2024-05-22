@@ -337,8 +337,16 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
         if (!string.IsNullOrWhiteSpace(lineItem.Sku))
         {
-            color = lineItem.Sku.ToUpper().EndsWith("-LT") ? true : false;
             isDtf = lineItem.Sku.ToUpper().EndsWith("-DTF") ? true : false;
+
+            if (isDtf.Value)
+            {
+                color = null;
+            }
+            else
+            {
+                color = lineItem.Sku.ToUpper().EndsWith("-LT") ? true : false;
+            }
         }
 
         var hasNotes = !string.IsNullOrWhiteSpace(lineItem.Notes);
