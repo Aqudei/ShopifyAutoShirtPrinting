@@ -630,7 +630,7 @@ namespace Common.Api
         public async Task SetBackPrintAsync(string sku)
         {
             var request = new RestRequest($"/api/tools/Variants/set_backprint/")
-                .AddParameter("sku",sku);
+                .AddQueryParameter("sku", sku);
 
             var response = await _client.ExecutePostAsync(request);
             if (response.StatusCode == HttpStatusCode.OK)

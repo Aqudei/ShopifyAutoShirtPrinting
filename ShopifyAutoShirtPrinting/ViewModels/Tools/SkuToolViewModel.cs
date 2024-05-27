@@ -254,12 +254,25 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
 
         private async void OnSyncBackPrints()
         {
-            await _apiClient.ResetBackPrintsAsync();
-            var files = Directory.EnumerateFiles(BackPrintsFolder, "*.*", SearchOption.AllDirectories);
-            foreach (var file in files)
+            var progress = await _dialogCoordinator.ShowProgressAsync(this, "Please wait", "Syncing back prints...");
+            progress.SetIndeterminate();
+
+            try
             {
-                var sku = Path.GetFileNameWithoutExtension(file);
-                await _apiClient.SetBackPrintAsync(sku);
+                await _apiClient.ResetBackPrintsAsync();
+                var files = Directory.EnumerateFiles(BackPrintsFolder, "*.*", SearchOption.AllDirectories);
+                foreach (var file in files)
+                {
+                    var sku = Path.GetFileNameWithoutExtension(file);
+                    progress.SetMessage($"Syncing variant with sku {sku}");
+                    await _apiClient.SetBackPrintAsync(sku);
+                }
+            }
+            catch (Exception)
+            { }
+            finally
+            {
+                await progress.CloseAsync();
             }
         }
 
