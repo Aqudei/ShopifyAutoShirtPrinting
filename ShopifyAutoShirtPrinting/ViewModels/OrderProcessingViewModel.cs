@@ -308,7 +308,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                     var variant = await _apiClient.FindVariant(orderItem.VariantId);
                     if (variant != null && variant.Product != null)
                     {
-                        hasBackPrintValue = variant.Product.HasBackPrint;
+                        hasBackPrintValue = variant.HasBackPrint;
                     }
                 }
 
@@ -1243,7 +1243,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                     var variant = await _apiClient.FindVariant(lineItem.VariantId);
                     if (variant != null && variant.Product != null)
                     {
-                        hasBackPrintValue = variant.Product.HasBackPrint;
+                        hasBackPrintValue = variant.HasBackPrint;
                     }
                 }
 

@@ -4,8 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ShopifyEasyShirtPrinting.Views"
+             xmlns:converters="clr-namespace:ShopifyEasyShirtPrinting.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:GenericBooleanConverter x:Key="GenericBooleanConverter"/>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="3*"/>
@@ -28,8 +32,24 @@
             </StackPanel>
             <DataGrid ItemsSource="{Binding Products}"
                 SelectedItem="{Binding SelectedProduct}"
+                      AutoGenerateColumns="False"
                 IsReadOnly="True"
-                      Grid.Row="1"/>
+                      Grid.Row="1">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Id" Width="*" Binding="{Binding Id}"/>
+                    <DataGridTextColumn Header="Handle" Width="2*" Binding="{Binding Handle}"/>
+                    <DataGridTextColumn Header="Shopify Id" Width="*" Binding="{Binding ShopifyId}"/>
+                    <DataGridTextColumn Header="Product Type" Width="*" Binding="{Binding ProductType}"/>
+                    <DataGridTextColumn 
+                        Header="Title" 
+                        Width="2*" 
+                        Binding="{Binding Title}"/>
+                    <DataGridTextColumn 
+                        Header="Has Back Print" Width="*"                 
+                        Binding="{Binding HasBackPrint, ConverterParameter=Yes;No, Converter={StaticResource GenericBooleanConverter}}"/>
+                </DataGrid.Columns>
+                
+            </DataGrid>
         </Grid>
         <DataGrid ItemsSource="{Binding Variants}"
                   IsReadOnly="True"

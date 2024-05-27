@@ -614,5 +614,29 @@ namespace Common.Api
             throw new Exception(response.ErrorMessage ?? response.Content);
 
         }
+
+        public async Task ResetBackPrintsAsync()
+        {
+            var request = new RestRequest($"/api/tools/Variants/reset_backprints/");
+
+            var response = await _client.ExecutePostAsync(request);
+            if (response.StatusCode == HttpStatusCode.OK)
+                return;
+
+            throw new Exception(response.ErrorMessage ?? response.Content);
+
+        }
+
+        public async Task SetBackPrintAsync(string sku)
+        {
+            var request = new RestRequest($"/api/tools/Variants/set_backprint/")
+                .AddParameter("sku",sku);
+
+            var response = await _client.ExecutePostAsync(request);
+            if (response.StatusCode == HttpStatusCode.OK)
+                return;
+
+            throw new Exception(response.ErrorMessage ?? response.Content);
+        }
     }
 }

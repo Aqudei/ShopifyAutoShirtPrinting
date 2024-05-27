@@ -30,6 +30,9 @@ namespace Common.Models
         [JsonPropertyName("option3")]
         public string Option3 { get; set; }
 
+
+        [JsonPropertyName("has_backprint")]
+        public bool HasBackPrint { get; set; }
         public override string ToString()
         {
             return $"{Product.Title} - {Title}";

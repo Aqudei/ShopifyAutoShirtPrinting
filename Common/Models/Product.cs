@@ -21,9 +21,6 @@ namespace Common.Models
         [JsonPropertyName("title")]
         public string Title { get; set; }
 
-
-        [JsonPropertyName("has_backprint")]
-        public bool HasBackPrint { get; set; }
         public override string ToString()
         {
             return $"{Handle}";

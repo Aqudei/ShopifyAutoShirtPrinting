@@ -20,19 +20,38 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal" 
-                    VerticalAlignment="Center"
-                    Grid.ColumnSpan="2">
+        <Grid       
+            VerticalAlignment="Center"
+            Grid.ColumnSpan="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            
             <TextBlock VerticalAlignment="Center">
                 <Run FontWeight="Bold" Text="Print Files Folder Location: "/>
                 <Run Text="{Binding PrintFilesFolder}"/>
                 <Run Text="(Can be changed in Settings)"/>
             </TextBlock>
 
-            <Button Content="Open Folder"
-                    VerticalAlignment="Center"
-                    Command="{Binding OpenPrintFilesFolderLocationCommand}"/>
-        </StackPanel>
+            <Button 
+                Content="Open Folder"
+                Width="112"
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                Margin="2"
+                Command="{Binding OpenPrintFilesFolderLocationCommand}"/>
+
+            <Button 
+                Content="Sync Backprints"
+                HorizontalAlignment="Right"
+                Width="113"
+                Grid.Column="2"
+                Margin="2"
+                VerticalAlignment="Center"
+                Command="{Binding SyncBackPrintsCommand}"/>
+        </Grid>
 
 
         <StackPanel Orientation="Horizontal" 
@@ -83,6 +102,7 @@
             <Button Content="Duplicate GCR/PNG File" 
                     Background="{StaticResource MahApps.Brushes.Accent2}"
                     Command="{Binding DuplicateGcrCommand}" Margin="2,2,2,2"/>
+
         </StackPanel>
         <DataGrid Grid.Column="2"
                   IsReadOnly="True"

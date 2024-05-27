@@ -521,6 +521,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\GenericBooleanConverter.cs" />
     <Compile Include="Helpers\DirectoryHelper.cs" />
     <Compile Include="Models\ImageItem.cs" />
     <Compile Include="ViewModels\Dialogs\EditTextDialogViewModel.cs" />

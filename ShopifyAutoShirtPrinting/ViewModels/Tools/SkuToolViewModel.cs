@@ -160,7 +160,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
 
         private DelegateCommand _duplicateGcrCommand;
 
-        public DelegateCommand DuplicateGcrCommand => _duplicateGcrCommand ??= new DelegateCommand(HandleDuplicateGcr, CanDuplicateGcr)
+        public DelegateCommand DuplicateGcrCommand => _duplicateGcrCommand ??= new DelegateCommand(OnDuplicateGcr, CanDuplicateGcr)
             .ObservesProperty(() => GCRFile)
             .ObservesProperty(() => PrintFilesFolder);
 
@@ -169,7 +169,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
             return !string.IsNullOrWhiteSpace(GCRFile) && !string.IsNullOrWhiteSpace(PrintFilesFolder);
         }
 
-        private async void HandleDuplicateGcr()
+        private async void OnDuplicateGcr()
         {
             var erringFiles = new Dictionary<string, string>();
 
@@ -228,6 +228,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
         }
 
         private DelegateCommand _openPrintFilesFolderLocationCommand;
+        private DelegateCommand _syncBackprintsCommand;
 
         public DelegateCommand OpenPrintFilesFolderLocationCommand => _openPrintFilesFolderLocationCommand ??= new DelegateCommand(HandleOpenPrintFilesLoc);
 
@@ -247,6 +248,19 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
             BackPrintsFolder = Path.Combine(PrintFilesFolder, "backprints");
 
             EnsureFolder(BackPrintsFolder);
+        }
+
+        public DelegateCommand SyncBackPrintsCommand { get => _syncBackprintsCommand ??= new DelegateCommand(OnSyncBackPrints); }
+
+        private async void OnSyncBackPrints()
+        {
+            await _apiClient.ResetBackPrintsAsync();
+            var files = Directory.EnumerateFiles(BackPrintsFolder, "*.*", SearchOption.AllDirectories);
+            foreach (var file in files)
+            {
+                var sku = Path.GetFileNameWithoutExtension(file);
+                await _apiClient.SetBackPrintAsync(sku);
+            }
         }
 
         private void EnsureFolder(string folder)
