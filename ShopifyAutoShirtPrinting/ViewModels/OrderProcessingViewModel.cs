@@ -317,7 +317,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
                 var outputName = $"{orderItem.OrderNumber}-{orderItem.Id}-{orderItem.Name}.png";
                 outputName = outputName.Replace("/", "-").Replace("\\", "-").Replace(" ", "-");
-                outputName = RemoveRedundantChars(Path.Combine(dlg.FileName, outputName), "-");
+                outputName = DirectoryHelper.SanitizeFilename(RemoveRedundantChars(Path.Combine(dlg.FileName, outputName), "-"));
                 combinedImage.Save(outputName);
             }
             await progress.CloseAsync();

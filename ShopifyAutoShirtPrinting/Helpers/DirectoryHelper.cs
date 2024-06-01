@@ -36,6 +36,32 @@ namespace ShopifyEasyShirtPrinting.Helpers
             return size;
         }
 
+
+        // Replace invalid filename characters with underscores
+        public static string SanitizeFilename(string filename, char replacementChar = '_')
+        {
+            // Get the array of invalid characters for file names in the current OS
+            char[] invalidChars = Path.GetInvalidFileNameChars();
+
+            // Replace each invalid character with the replacement character
+            foreach (char invalidChar in invalidChars)
+            {
+                filename = filename.Replace(invalidChar, replacementChar);
+            }
+
+            // Optional: Trim whitespace from the ends of the filename
+            filename = filename.Trim();
+
+            // Optional: Restrict the length of the filename to a certain maximum length (e.g., 255 characters)
+            int maxLength = 255;
+            if (filename.Length > maxLength)
+            {
+                filename = filename.Substring(0, maxLength);
+            }
+
+            return filename;
+        }
+
         public static string FormatSize(long bytes)
         {
             const int scale = 1024;
