@@ -305,6 +305,8 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                     <DataGridTextColumn Header="Order No." Binding="{Binding OrderNumber}"/>
+                    <DataGridTextColumn Header="Qty" Binding="{Binding Quantity}"/>
+                    <DataGridTextColumn Header="Printed Qty" Binding="{Binding PrintedQuantity}"/>
                     <DataGridTemplateColumn Header="Name" >
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -327,9 +329,9 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
+                    
                     <DataGridTextColumn Header="SKU" Binding="{Binding Sku}"/>
-                    <DataGridTextColumn Header="Qty" Binding="{Binding Quantity}"/>
-                    <DataGridTextColumn Header="Printed Qty" Binding="{Binding PrintedQuantity}"/>
+                    
                     <DataGridTextColumn Header="Status" Binding="{Binding Status}"/>
                     <DataGridTextColumn Header="Shipping" Binding="{Binding Shipping}"/>
                     <DataGridTextColumn Header="Bin" Binding="{Binding BinNumber}"/>

@@ -52,7 +52,17 @@
             </DataGrid>
         </Grid>
         <DataGrid ItemsSource="{Binding Variants}"
+                  AutoGenerateColumns="False"
                   IsReadOnly="True"
-                  Grid.Row="1"/>
+                  Grid.Row="1">
+            <DataGrid.Columns>
+                <DataGridTextColumn Width="*" Header="Sku" Binding="{Binding Sku}"/>
+                <DataGridTextColumn Width="2*" Header="Title" Binding="{Binding Title}"/>
+                <DataGridTextColumn Width="*" Header="Option 1" Binding="{Binding Option1}"/>
+                <DataGridTextColumn Width="*" Header="Option 2" Binding="{Binding Option2}"/>
+                <DataGridTextColumn Width="*" Header="Option 3" Binding="{Binding Option3}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        
     </Grid>
 </UserControl>
