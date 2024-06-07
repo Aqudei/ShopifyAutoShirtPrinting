@@ -44,10 +44,7 @@
                         Header="Title" 
                         Width="2*" 
                         Binding="{Binding Title}"/>
-                    <DataGridTextColumn 
-                        Header="Has Back Print" Width="*"                 
-                        Binding="{Binding HasBackPrint, ConverterParameter=Yes;No, Converter={StaticResource GenericBooleanConverter}}"/>
-                </DataGrid.Columns>
+                 </DataGrid.Columns>
                 
             </DataGrid>
         </Grid>
@@ -61,6 +58,8 @@
                 <DataGridTextColumn Width="*" Header="Option 1" Binding="{Binding Option1}"/>
                 <DataGridTextColumn Width="*" Header="Option 2" Binding="{Binding Option2}"/>
                 <DataGridTextColumn Width="*" Header="Option 3" Binding="{Binding Option3}"/>
+                <DataGridTextColumn Header="Has Back Print" Width="*"                 
+                                    Binding="{Binding HasBackPrint, ConverterParameter=Yes;No, Converter={StaticResource GenericBooleanConverter}}"/>
             </DataGrid.Columns>
         </DataGrid>
         
