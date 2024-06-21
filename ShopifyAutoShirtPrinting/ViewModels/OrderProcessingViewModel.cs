@@ -213,7 +213,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         await _apiClient.UpdateLineItemStatusAsync(myLineItem.Id, tag);
     }
 
-    public DelegateCommand SaveQrTagsCommand => _saveQrTagsCommand ??= new DelegateCommand(HandleSaveQrTag, () => TotalSelected > 0)
+    public DelegateCommand SaveQrTagsCommand => _saveQrTagsCommand ??= new DelegateCommand(OnSaveQrTag, () => TotalSelected > 0)
         .ObservesProperty(() => TotalSelected);
 
 
@@ -287,7 +287,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         await FetchActiveLineItemsAsync();
     }
 
-    private async void HandleSaveQrTag()
+    private async void OnSaveQrTag()
     {
         var dlg = new CommonOpenFileDialog
         {
@@ -316,9 +316,9 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 using var combinedImage = GenerateQrImageForItem(orderItem, hasBackPrintValue);
 
                 var outputName = $"{orderItem.OrderNumber}-{orderItem.Id}-{orderItem.Name}.png";
-                outputName = outputName.Replace("/", "-").Replace("\\", "-").Replace(" ", "-");
-                outputName = DirectoryHelper.SanitizeFilename(RemoveRedundantChars(Path.Combine(dlg.FileName, outputName), "-"));
-                combinedImage.Save(outputName);
+                outputName = DirectoryHelper.SanitizeFilename(RemoveRedundantChars(outputName.Replace("/", "-").Replace("\\", "-").Replace(" ", "-"), "-"));
+                var finalQrPath = Path.Combine(dlg.FileName, outputName);
+                combinedImage.Save(finalQrPath);
             }
             await progress.CloseAsync();
             Process.Start("explorer.exe", $"\"{dlg.FileName}\"");
