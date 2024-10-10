@@ -25,8 +25,10 @@ namespace ShopifyEasyShirtPrinting.Services
         private readonly string _username;
         private readonly string _password;
         private readonly SessionVariables _sessionVariables;
-        const string LoginUrl = "https://ss.shipstation.com/";
+        const string LoginUrl = "https://ship.shipstation.com/";
+        // const string LoginUrl = "https://ss.shipstation.com/";
         private const int TWO_MINUTES = 120;
+        private const int _30_SECONDS = 30;
 
         public bool LoginCompleted { get; private set; }
 
@@ -34,55 +36,77 @@ namespace ShopifyEasyShirtPrinting.Services
         {
             new DriverManager().SetUpDriver(new ChromeConfig());
 
-            _driver = new ChromeDriver();
-            _apiClient = new SSApi2();
-
-            _driver.Manage().Window.Maximize();
             _sessionVariables = sessionVariables;
 
             _username = _sessionVariables.ShipStationUsername;
             _password = _sessionVariables.ShipStationPassword;
+
+            // Path to the User Data directory where Chrome stores profiles
+            var userDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Google\\Chrome\\User Data");
+            // string userDataDir = @"C:\Users\<YourUsername>\AppData\Local\Google\Chrome\User Data";
+
+            // Name of the specific profile you want to use (e.g., "Default" or "Profile 1")
+            var profileName = "Default";
+            // Setup Chrome options to use a specific profile
+            var chromeOptions = new ChromeOptions();
+            chromeOptions.AddArgument($"user-data-dir={userDataDir}");
+            chromeOptions.AddArgument($"profile-directory={profileName}");
+            _driver = new ChromeDriver(chromeOptions);
+            _apiClient = new SSApi2();
+
+            _driver.Manage().Window.Maximize();
         }
 
+       
 
         public void DoLogin()
         {
             try
             {
                 _driver.Navigate().GoToUrl(LoginUrl);
-                var element =
-                    new WebDriverWait(_driver, TimeSpan.FromMinutes(60)).Until(
-                        ExpectedConditions.ElementExists(By.Id("username")));
 
-                element.SendKeys(_username);
-                element = new WebDriverWait(_driver, TimeSpan.FromMinutes(60)).Until(
-                    ExpectedConditions.ElementExists(By.Id("password")));
-                element.SendKeys(_password);
+                var wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(_30_SECONDS));
 
-                element = new WebDriverWait(_driver, TimeSpan.FromMinutes(60)).Until(
-                    ExpectedConditions.ElementExists(By.Id("btn-login")));
-                element.Click();
+                // Helper function to simplify element finding
+                IWebElement FindElement(By locator) => wait.Until(ExpectedConditions.ElementExists(locator));
 
+                // Input credentials and login
+                FindElement(By.Id("username")).SendKeys(_username);
+                FindElement(By.Id("password")).SendKeys(_password);
+                FindElement(By.Id("btn-login")).Click();
+
+                // Wait for the Orders link and complete login
+                var ordersWait = new WebDriverWait(_driver, TimeSpan.FromSeconds(_30_SECONDS));
+
+                if (ordersWait.Until(ExpectedConditions.ElementExists(By.LinkText("Orders"))) != null)
+                {
+                    LoginCompleted = true;
+                    _apiClient.InitCookies(_driver); // Initialize cookies after successful login
+                }
+            }
+            catch (WebDriverTimeoutException ex) // Specific exception handling for timeouts
+            {
+                Debug.WriteLine($"Login Timeout: {ex.Message}\n\n{ex.StackTrace}");
+                LoginCompleted = false;
+            }
+            catch (Exception ex) // General exception handling for other issues
+            {
+                Debug.WriteLine($"Login failed: {ex.Message}\n\n{ex.StackTrace}");
 
                 try
                 {
-                    element = new WebDriverWait(_driver, TimeSpan.FromMinutes(120)).Until(
-                        ExpectedConditions.ElementExists(By.LinkText("Orders")));
-                    LoginCompleted = true;
-
-                    _apiClient.InitCookies(_driver);
-
+                    // Check if already logged in via URL redirection
+                    var wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(20));
+                    if (wait.Until(ExpectedConditions.UrlContains("ship12.shipstation.com/orders/awaiting-shipment")))
+                    {
+                        LoginCompleted = true;
+                    }
                 }
-                catch (Exception)
+                catch (WebDriverTimeoutException urlEx)
                 {
+                    Debug.WriteLine($"URL check Timeout: {urlEx.Message}\n\n{urlEx.StackTrace}");
                     LoginCompleted = false;
                 }
-
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"{ex.Message}\n\n{ex.StackTrace}");
-                LoginCompleted = false;
             }
         }
 

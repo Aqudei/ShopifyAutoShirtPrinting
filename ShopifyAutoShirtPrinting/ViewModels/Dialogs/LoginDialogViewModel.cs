@@ -310,6 +310,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             }
 
             await Task.Run(() => _container.Resolve<IShipStationBrowserService>().DoLogin());
+            Debug.WriteLine("Finish Browser Setup.");
+
         }
 
         private void SetupMessageBus()

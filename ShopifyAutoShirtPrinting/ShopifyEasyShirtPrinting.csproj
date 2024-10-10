@@ -88,8 +88,8 @@
     <StartupObject>ShopifyEasyShirtPrinting.App</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AngleSharp, Version=1.1.0.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
-      <HintPath>..\packages\AngleSharp.1.1.0\lib\net472\AngleSharp.dll</HintPath>
+    <Reference Include="AngleSharp, Version=1.1.2.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
+      <HintPath>..\packages\AngleSharp.1.1.2\lib\net472\AngleSharp.dll</HintPath>
     </Reference>
     <Reference Include="AutoMapper, Version=10.0.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
       <HintPath>..\packages\AutoMapper.10.1.1\lib\net461\AutoMapper.dll</HintPath>
@@ -498,13 +498,13 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="WebDriver, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selenium.WebDriver.4.16.2\lib\netstandard2.0\WebDriver.dll</HintPath>
+      <HintPath>..\packages\Selenium.WebDriver.4.25.0\lib\netstandard2.0\WebDriver.dll</HintPath>
     </Reference>
     <Reference Include="WebDriver.Support, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selenium.Support.4.16.2\lib\netstandard2.0\WebDriver.Support.dll</HintPath>
+      <HintPath>..\packages\Selenium.Support.4.25.0\lib\netstandard2.0\WebDriver.Support.dll</HintPath>
     </Reference>
-    <Reference Include="WebDriverManager, Version=2.17.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WebDriverManager.2.17.2\lib\net472\WebDriverManager.dll</HintPath>
+    <Reference Include="WebDriverManager, Version=2.17.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebDriverManager.2.17.4\lib\net472\WebDriverManager.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
@@ -821,9 +821,9 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.Extensions.Logging.Abstractions.6.0.0\build\Microsoft.Extensions.Logging.Abstractions.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Extensions.Logging.Abstractions.6.0.0\build\Microsoft.Extensions.Logging.Abstractions.targets'))" />
     <Error Condition="!Exists('..\packages\Magick.NET-Q8-x64.13.3.0\build\netstandard20\Magick.NET-Q8-x64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Magick.NET-Q8-x64.13.3.0\build\netstandard20\Magick.NET-Q8-x64.targets'))" />
-    <Error Condition="!Exists('..\packages\Selenium.WebDriver.4.16.2\build\Selenium.WebDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Selenium.WebDriver.4.16.2\build\Selenium.WebDriver.targets'))" />
+    <Error Condition="!Exists('..\packages\Selenium.WebDriver.4.25.0\build\Selenium.WebDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Selenium.WebDriver.4.25.0\build\Selenium.WebDriver.targets'))" />
   </Target>
   <Import Project="..\packages\Microsoft.Extensions.Logging.Abstractions.6.0.0\build\Microsoft.Extensions.Logging.Abstractions.targets" Condition="Exists('..\packages\Microsoft.Extensions.Logging.Abstractions.6.0.0\build\Microsoft.Extensions.Logging.Abstractions.targets')" />
   <Import Project="..\packages\Magick.NET-Q8-x64.13.3.0\build\netstandard20\Magick.NET-Q8-x64.targets" Condition="Exists('..\packages\Magick.NET-Q8-x64.13.3.0\build\netstandard20\Magick.NET-Q8-x64.targets')" />
-  <Import Project="..\packages\Selenium.WebDriver.4.16.2\build\Selenium.WebDriver.targets" Condition="Exists('..\packages\Selenium.WebDriver.4.16.2\build\Selenium.WebDriver.targets')" />
+  <Import Project="..\packages\Selenium.WebDriver.4.25.0\build\Selenium.WebDriver.targets" Condition="Exists('..\packages\Selenium.WebDriver.4.25.0\build\Selenium.WebDriver.targets')" />
 </Project>
