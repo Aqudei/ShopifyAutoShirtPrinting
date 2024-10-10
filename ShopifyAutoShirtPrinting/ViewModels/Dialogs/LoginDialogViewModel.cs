@@ -300,7 +300,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         {
             if (Settings.Default.UseBrowser)
             {
-                Debug.WriteLine("Setting up Browser Integration");
+                Debug.WriteLine("Setting up Browser.");
                 _container.RegisterSingleton<IShipStationBrowserService, ShipStationBrowserService>();
             }
 
