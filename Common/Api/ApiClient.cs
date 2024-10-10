@@ -638,5 +638,18 @@ namespace Common.Api
 
             throw new Exception(response.ErrorMessage ?? response.Content);
         }
+
+        public async Task ManifestShipmentsAsync()
+        {
+            var request = new RestRequest($"/api/OrderShipments/");
+
+            var response = await _client.ExecutePostAsync(request);
+            if (response.StatusCode == HttpStatusCode.OK)
+                return;
+
+            throw new Exception(response.ErrorMessage ?? response.Content);
+        }
+
+
     }
 }

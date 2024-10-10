@@ -9,8 +9,8 @@ namespace Common.Models
 {
     public class Shipment
     {
-        [JsonPropertyName("dispatched")]
-        public bool Dispatched { get; set; }
+        [JsonPropertyName("manifested")]
+        public bool Manifested { get; set; }
         [JsonPropertyName("has_label")]
         public bool HasLabel { get; set; }
         [JsonPropertyName("shipment_id")]
@@ -30,5 +30,11 @@ namespace Common.Models
 
         [JsonPropertyName("items")]
         public IEnumerable<ShipmentItem> ShipmentItems { get; set; }
+
+        public string ManifestFileName => $"shipment-manifest-{ShipmentOrder}.pdf";
+
+        [JsonPropertyName("shipment_order")]
+
+        public ShipmentOrder ShipmentOrder { get; set; }
     }
 }

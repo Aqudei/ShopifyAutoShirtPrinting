@@ -23,14 +23,41 @@
             </Grid.ColumnDefinitions>
 
             <TextBox Grid.Column="0" Text="{Binding SearchText}"/>
-            <Button Grid.Column="1" Content="Search" Command="{Binding SearchCommand}" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button Content="Search" Command="{Binding SearchCommand}" />
+                <Button Content="Manifest Pending" Command="{Binding ManifestPendingCommand}" />
+            </StackPanel>
         </Grid>
         <DataGrid Grid.Row="1" 
                   ItemsSource="{Binding ShippedItems}"
-                  x:Name="ArchivesDataGrid"
+                  x:Name="ShipmentsDataGrid"
                   CanUserAddRows="False"
                   IsReadOnly="True" 
-                  AutoGeneratingColumn="ArchivesDataGrid_AutoGeneratingColumn"/>
+                  AutoGenerateColumns="False"
+                  AutoGeneratingColumn="ArchivesDataGrid_AutoGeneratingColumn">
+            <DataGrid.Columns>
+
+                <DataGridTextColumn Header="Manifested" Binding="{Binding Manifested}"/>
+                <DataGridTextColumn Header="Shipment Id" Binding="{Binding ShipmentId}"/>
+                <DataGridTextColumn Header="Order Number" Binding="{Binding OrderNumber}"/>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Command="{Binding DataContext.ViewManifestCommand, ElementName=ShipmentsDataGrid}"
+                                        CommandParameter="{Binding}"
+                                        Content="View Manifest"/>
+                                <Button Command="{Binding DataContext.ViewLabelCommand, ElementName=ShipmentsDataGrid}"
+                                        CommandParameter="{Binding}"
+                                        Content="View Label"/>
+                            </StackPanel>
+                            
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+            </DataGrid.Columns>
+        </DataGrid>
 
         <ItemsControl Grid.Row="2" 
                       ItemsSource="{Binding Pages}">
