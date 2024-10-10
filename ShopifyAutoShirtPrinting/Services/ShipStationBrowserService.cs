@@ -57,7 +57,7 @@ namespace ShopifyEasyShirtPrinting.Services
             _driver.Manage().Window.Maximize();
         }
 
-       
+
 
         public void DoLogin()
         {
@@ -87,12 +87,6 @@ namespace ShopifyEasyShirtPrinting.Services
             catch (WebDriverTimeoutException ex) // Specific exception handling for timeouts
             {
                 Debug.WriteLine($"Login Timeout: {ex.Message}\n\n{ex.StackTrace}");
-                LoginCompleted = false;
-            }
-            catch (Exception ex) // General exception handling for other issues
-            {
-                Debug.WriteLine($"Login failed: {ex.Message}\n\n{ex.StackTrace}");
-
                 try
                 {
                     // Check if already logged in via URL redirection
@@ -100,6 +94,7 @@ namespace ShopifyEasyShirtPrinting.Services
                     if (wait.Until(ExpectedConditions.UrlContains("ship12.shipstation.com/orders/awaiting-shipment")))
                     {
                         LoginCompleted = true;
+                        _apiClient.InitCookies(_driver); // Initialize cookies after successful login
                     }
                 }
                 catch (WebDriverTimeoutException urlEx)
@@ -107,6 +102,11 @@ namespace ShopifyEasyShirtPrinting.Services
                     Debug.WriteLine($"URL check Timeout: {urlEx.Message}\n\n{urlEx.StackTrace}");
                     LoginCompleted = false;
                 }
+            }
+            catch (Exception ex) // General exception handling for other issues
+            {
+                Debug.WriteLine($"Login failed: {ex.Message}\n\n{ex.StackTrace}");
+                LoginCompleted = false;
             }
         }
 
