@@ -11,8 +11,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using WebDriverManager;
-using WebDriverManager.DriverConfigs.Impl;
 
 namespace ShopifyEasyShirtPrinting.Services
 {
@@ -34,8 +32,6 @@ namespace ShopifyEasyShirtPrinting.Services
 
         public ShipStationBrowserService(SessionVariables sessionVariables)
         {
-            new DriverManager().SetUpDriver(new ChromeConfig());
-
             _sessionVariables = sessionVariables;
 
             _username = _sessionVariables.ShipStationUsername;
