@@ -38,7 +38,7 @@ namespace ShopifyEasyShirtPrinting.Services
             _password = _sessionVariables.ShipStationPassword;
 
             // Path to the User Data directory where Chrome stores profiles
-            var userDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Google\\Chrome\\User Data");
+            var userDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Google\\Chrome for Testing\\User Data");
             // string userDataDir = @"C:\Users\<YourUsername>\AppData\Local\Google\Chrome\User Data";
 
             // Name of the specific profile you want to use (e.g., "Default" or "Profile 1")
@@ -47,6 +47,8 @@ namespace ShopifyEasyShirtPrinting.Services
             var chromeOptions = new ChromeOptions();
             chromeOptions.AddArgument($"user-data-dir={userDataDir}");
             chromeOptions.AddArgument($"profile-directory={profileName}");
+            chromeOptions.BinaryLocation = "C:\\chrome-win64\\chrome.exe";
+
             _driver = new ChromeDriver(chromeOptions);
             _apiClient = new SSApi2();
 
@@ -58,6 +60,8 @@ namespace ShopifyEasyShirtPrinting.Services
             try
             {
                 // Check if already logged in via URL redirection
+                _driver.Navigate().GoToUrl(LoginUrl);
+
                 var wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(20));
                 if (wait.Until(ExpectedConditions.UrlContains("ship12.shipstation.com/orders/awaiting-shipment")))
                 {
