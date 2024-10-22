@@ -1,4 +1,5 @@
-﻿using Common.Api;
+﻿using AutoMapper;
+using Common.Api;
 using Common.Models;
 using Prism.Commands;
 using Prism.Services.Dialogs;
@@ -21,8 +22,98 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         private string _message;
         private string _notes;
         private readonly ApiClient _apiClient;
+        private readonly IMapper _mapper;
+        private string _shippingFirstName;
+        public string ShippingFirstName
+        {
+            get => _shippingFirstName;
+            set => SetProperty(ref _shippingFirstName, value);
+        }
 
-        public ObservableCollection<MyLineItem> Orders { get; set; } = new();
+        private string _shippingLastName;
+        public string ShippingLastName
+        {
+            get => _shippingLastName;
+            set => SetProperty(ref _shippingLastName, value);
+        }
+
+        private string _shippingAddress1;
+        public string ShippingAddress1
+        {
+            get => _shippingAddress1;
+            set => SetProperty(ref _shippingAddress1, value);
+        }
+
+        private string _shippingAddress2;
+        public string ShippingAddress2
+        {
+            get => _shippingAddress2;
+            set => SetProperty(ref _shippingAddress2, value);
+        }
+
+        private string _shippingPhone;
+        public string ShippingPhone
+        {
+            get => _shippingPhone;
+            set => SetProperty(ref _shippingPhone, value);
+        }
+
+        private string _shippingCity;
+        public string ShippingCity
+        {
+            get => _shippingCity;
+            set => SetProperty(ref _shippingCity, value);
+        }
+
+        private string _shippingZip;
+        public string ShippingZip
+        {
+            get => _shippingZip;
+            set => SetProperty(ref _shippingZip, value);
+        }
+
+        private string _shippingProvince;
+        public string ShippingProvince
+        {
+            get => _shippingProvince;
+            set => SetProperty(ref _shippingProvince, value);
+        }
+
+        private string _shippingCountry;
+        public string ShippingCountry
+        {
+            get => _shippingCountry;
+            set => SetProperty(ref _shippingCountry, value);
+        }
+
+        private string _shippingCompany;
+        public string ShippingCompany
+        {
+            get => _shippingCompany;
+            set => SetProperty(ref _shippingCompany, value);
+        }
+
+        private string _shippingCountryCode;
+        public string ShippingCountryCode
+        {
+            get => _shippingCountryCode;
+            set => SetProperty(ref _shippingCountryCode, value);
+        }
+
+        private string _shippingProvinceCode;
+        public string ShippingProvinceCode
+        {
+            get => _shippingProvinceCode;
+            set => SetProperty(ref _shippingProvinceCode, value);
+        }
+
+        private string _shippingFullName;
+        public string ShippingFullName
+        {
+            get => _shippingFullName;
+            set => SetProperty(ref _shippingFullName, value);
+        }
+        public ObservableCollection<MyLineItem> LineItems { get; set; } = new();
         public string Notes { get => _notes; set => SetProperty(ref _notes, value); }
 
         public DelegateCommand<string> DialogCommand => _dialogCommand ??= new DelegateCommand<string>(OnCommand);
@@ -58,9 +149,10 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
         }
 
-        public LabelPrintingDialogViewModel(ApiClient apiClient)
+        public LabelPrintingDialogViewModel(ApiClient apiClient, IMapper mapper)
         {
             _apiClient = apiClient;
+            _mapper = mapper;
         }
 
         public void OnDialogOpened(IDialogParameters parameters)
@@ -72,28 +164,33 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
             if (parameters.TryGetValue<string>("OrderNumber", out var orderNumber))
             {
-                Orders.Clear();
-                Task.Run(async () =>
+                LineItems.Clear();
+                OrderNumber = orderNumber;
+                Task.Run(LoadData);
+            }
+        }
+
+        private async Task LoadData()
+        {
+            var prams = new Dictionary<string, string>() { { "OrderNumber", $"{OrderNumber}" } };
+            var lineItems = await _apiClient.ListItemsAsync(prams);
+            var orderInfo = await _apiClient.GetOrderInfoBy(new Dictionary<string, string> { { "OrderNumber", OrderNumber } });
+
+            if (lineItems != null && lineItems.Any())
+            {
+                var customerName = lineItems.Where(l => !string.IsNullOrWhiteSpace(l.Customer)).FirstOrDefault()?.Customer;
+                var customerEmail = lineItems.Where(l => !string.IsNullOrWhiteSpace(l.CustomerEmail)).FirstOrDefault()?.CustomerEmail;
+
+                await _dispatcher.InvokeAsync(() =>
                 {
-                    var prams = new Dictionary<string, string>() { { "OrderNumber", $"{orderNumber}" } };
-                    var lineItems = await _apiClient.ListItemsAsync(prams);
 
-                    if (lineItems != null && lineItems.Any())
-                    {
-                        var customerName = lineItems.Where(l => !string.IsNullOrWhiteSpace(l.Customer)).FirstOrDefault()?.Customer;
-                        var customerEmail = lineItems.Where(l => !string.IsNullOrWhiteSpace(l.CustomerEmail)).FirstOrDefault()?.CustomerEmail;
-                        var orderNumber = lineItems.Where(l => !string.IsNullOrWhiteSpace(l.OrderNumber)).FirstOrDefault()?.OrderNumber;
+                    _mapper.Map(orderInfo, this);
 
-                        await _dispatcher.InvokeAsync(() =>
-                         {
-                             Orders.AddRange(lineItems);
-                             OrderNumber = orderNumber;
-                             BinNumber = lineItems.FirstOrDefault()?.BinNumber;
-                             Notes = lineItems.FirstOrDefault()?.Notes;
-                             CustomerName = customerName;
-                             CustomerEmail = customerEmail;
-                         });
-                    }
+                    LineItems.AddRange(lineItems);
+                    BinNumber = lineItems.FirstOrDefault()?.BinNumber;
+                    Notes = lineItems.FirstOrDefault()?.Notes;
+                    CustomerName = customerName;
+                    CustomerEmail = customerEmail;
                 });
             }
         }
@@ -123,7 +220,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         }
 
 
-     
+
         public override string Title => "Print Shipment Label";
 
         public event Action<IDialogResult> RequestClose;

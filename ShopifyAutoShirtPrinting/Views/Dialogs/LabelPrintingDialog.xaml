@@ -7,7 +7,7 @@
              xmlns:dialogs="http://prismlibrary.com/"
              Margin="30"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="713.102" d:DesignWidth="884.543">
 
     <dialogs:Dialog.WindowStyle>
         <Style TargetType="Window">
@@ -25,6 +25,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -53,13 +54,13 @@
                                Text="{Binding BinNumber}" />
             </StackPanel>
         </Grid>
-        <DataGrid ItemsSource="{Binding Orders}" 
+        <DataGrid ItemsSource="{Binding LineItems}" 
                   Grid.Row="2"
-                      IsReadOnly="True"
-                      CanUserAddRows="False"
-                      ScrollViewer.VerticalScrollBarVisibility="Visible"
-                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                      AutoGenerateColumns="False">
+                    IsReadOnly="True"
+                    CanUserAddRows="False"
+                    ScrollViewer.VerticalScrollBarVisibility="Visible"
+                    ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                    AutoGenerateColumns="False">
 
             <DataGrid.Columns>
                 <DataGridTextColumn Header="SKU" Binding="{Binding Sku}"/>
@@ -74,8 +75,44 @@
                    Grid.Row="4"
                    FontStyle="Italic"/>
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" 
-                    Grid.Row="5">
+        <GroupBox Header="Shipping" Grid.Row="5">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Vertical" Grid.Column="0">
+
+                    <StackPanel Orientation="Vertical">
+                        <Label Content="First Name"/>
+                        <TextBox Text="{Binding ShippingFirstName}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical">
+                        <Label Content="Last Name"/>
+                        <TextBox Text="{Binding ShippingLastName}"/>
+                    </StackPanel>
+
+
+                    <StackPanel Orientation="Vertical">
+                        <Label Content="Address Line 1"/>
+                        <TextBox Text="{Binding ShippingAddress1}"
+                                 MinLines="2"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical">
+                        <Label Content="Address Line 2"/>
+                        <TextBox Text="{Binding ShippingAddress2}"
+                                 MinLines="2"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+        <StackPanel Orientation="Horizontal" 
+                    HorizontalAlignment="Center" 
+                    Grid.Row="6">
             <Button Command="{Binding DialogCommand}" 
                         CommandParameter="YES"
                         Width="100" Content="Yes" Margin="10" />

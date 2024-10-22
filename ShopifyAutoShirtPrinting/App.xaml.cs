@@ -109,6 +109,8 @@ namespace ShopifyEasyShirtPrinting
 
                     cfg.CreateMap<LoginDialogViewModel.SessionInfo, SessionVariables>();
                     cfg.CreateMap<LoginDialogViewModel.LoginResultBody, SessionVariables>();
+                    cfg.CreateMap<OrderInfo, LabelPrintingDialogViewModel>();
+                    
                 });
 
                 containerRegistry.RegisterInstance(config.CreateMapper());
