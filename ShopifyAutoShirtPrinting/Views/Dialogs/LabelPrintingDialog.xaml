@@ -14,8 +14,11 @@
             <Setter Property="dialogs:Dialog.WindowStartupLocation" 
                     Value="CenterScreen" />
             <Setter Property="ResizeMode" 
-                    Value="NoResize"/>
-            <Setter Property="ShowInTaskbar" Value="False"/>
+                    Value="CanResizeWithGrip"/>
+            <Setter Property="Height" 
+                    Value="900"/>
+            <Setter Property="ShowInTaskbar" 
+                    Value="False"/>
         </Style>
     </dialogs:Dialog.WindowStyle>
 
@@ -27,7 +30,7 @@
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition />
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <TextBlock FontSize="30"  
@@ -56,11 +59,11 @@
         </Grid>
         <DataGrid ItemsSource="{Binding LineItems}" 
                   Grid.Row="2"
-                    IsReadOnly="True"
-                    CanUserAddRows="False"
-                    ScrollViewer.VerticalScrollBarVisibility="Visible"
-                    ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                    AutoGenerateColumns="False">
+                  IsReadOnly="True"
+                  CanUserAddRows="False"
+                  ScrollViewer.VerticalScrollBarVisibility="Visible"
+                  ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                  AutoGenerateColumns="False">
 
             <DataGrid.Columns>
                 <DataGridTextColumn Header="SKU" Binding="{Binding Sku}"/>
@@ -75,41 +78,93 @@
                    Grid.Row="4"
                    FontStyle="Italic"/>
 
-        <GroupBox Header="Shipping" Grid.Row="5">
-
-            <Grid>
+        <GroupBox Header="Shipping" 
+                  Grid.Row="5">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Orientation="Vertical" Grid.Column="0">
+                <StackPanel Orientation="Vertical" Grid.Column="0" Margin="4,4,4,4">
 
-                    <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
                         <Label Content="First Name"/>
                         <TextBox Text="{Binding ShippingFirstName}"/>
                     </StackPanel>
 
-                    <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
                         <Label Content="Last Name"/>
                         <TextBox Text="{Binding ShippingLastName}"/>
                     </StackPanel>
 
-
-                    <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
                         <Label Content="Address Line 1"/>
                         <TextBox Text="{Binding ShippingAddress1}"
                                  MinLines="2"/>
                     </StackPanel>
 
-                    <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
                         <Label Content="Address Line 2"/>
                         <TextBox Text="{Binding ShippingAddress2}"
                                  MinLines="2"/>
                     </StackPanel>
+
+                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                        <Label Content="Phone"/>
+                        <TextBox Text="{Binding ShippingPhone}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                        <Label Content="City"/>
+                        <TextBox Text="{Binding ShippingCity}"/>
+                    </StackPanel>
+
+                </StackPanel>
+
+                <StackPanel Orientation="Vertical"
+                            Grid.Column="1" Margin="4,4,4,4">
+
+                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                        <Label Content="Zip"/>
+                        <TextBox Text="{Binding ShippingZip}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                        <Label Content="Province"/>
+                        <TextBox Text="{Binding ShippingProvince}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                        <Label Content="Country"/>
+                        <TextBox Text="{Binding ShippingCountry}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                        <Label Content="Company"/>
+                        <TextBox Text="{Binding ShippingCompany}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                        <Label Content="Country Code"/>
+                        <TextBox Text="{Binding Province Code}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                        <Label Content="Country Code"/>
+                        <TextBox Text="{Binding ShippingProvinceCode}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                        <Label Content="Full Name"/>
+                        <TextBox Text="{Binding ShippingFullName}"/>
+                    </StackPanel>
                 </StackPanel>
             </Grid>
+            </ScrollViewer>
         </GroupBox>
+        
         <StackPanel Orientation="Horizontal" 
                     HorizontalAlignment="Center" 
                     Grid.Row="6">
