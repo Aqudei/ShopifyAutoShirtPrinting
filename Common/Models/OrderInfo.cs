@@ -126,8 +126,5 @@ namespace Common.Models
             get => _shippingFullName;
             set => _shippingFullName = value;
         }
-
-
-
     }
 }

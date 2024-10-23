@@ -26,6 +26,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Threading;
@@ -622,7 +623,6 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         });
     }
 
-
     private async void OrderProcessingViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         switch (e.PropertyName)
@@ -817,7 +817,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     {
         try
         {
-            await _myPrintService.PrintItem(lineItemVm);
+            // await _myPrintService.PrintItem(lineItemVm);
+
             var processingItemResult = await _apiClient.ProcessItemAsync(lineItemVm.Id);
 
             await ActivateLineItemInView(_mapper.Map<LineItemViewModel>(processingItemResult.LineItem));
@@ -857,7 +858,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                                     if (processingItemResult.LineItem.BinNumber.HasValue)
                                         await _binService.EmptyBinAsync(processingItemResult.LineItem.BinNumber.Value);
 
-                                    Task.Run(async () =>
+                                    new Thread(async () =>
                                     {
                                         var shipStationResult = await _browserService.NavigateToOrderAsync(lineItemVm.OrderNumber);
                                         if (!shipStationResult)
@@ -866,7 +867,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                                             await _dialogCoordinator.ShowMessageAsync(this, "Order Not Found!", $"Cannot find Order #{lineItemVm.OrderNumber} in ShipStation!\nYou may need to refresh/reload your store in Shipstaion.");
 
                                         }
-                                    });
+                                    }).Start();
 
                                     WindowHelper.FocusChrome();
                                 }
@@ -886,7 +887,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                         var dlgParams = new DialogParameters
                                         {
                                             { "Id", lineItemVm.Id },
-                                            { "Message", "Added item to exisiting bin:" },
+                                            { "Message", "Added item to existing bin:" },
                                             { "Title", "BIN NUMBER ASSIGNED" }
                                         };
                         _dialogService.ShowDialog("AfterScanDialog", dlgParams, result => { });

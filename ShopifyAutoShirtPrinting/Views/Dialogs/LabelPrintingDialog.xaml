@@ -169,12 +169,13 @@
                     HorizontalAlignment="Center" 
                     Grid.Row="6">
             <Button Command="{Binding DialogCommand}" 
-                        CommandParameter="YES"
-                        Width="100" Content="Yes" Margin="10" />
+                    CommandParameter="YES"
+                    Width="150" 
+                    Content="Yes (ShipStation)" Margin="10" />
 
-            <Button Width="158" 
+            <Button Width="150" 
                     Command="{Binding DialogCommand}"    
-                    Margin="10" Content="YES - (AusPost Direct)" 
+                    Margin="10" Content="YES (AusPost Direct)" 
                     CommandParameter="AUSPOST"/>
 
             <Button Width="100" 
