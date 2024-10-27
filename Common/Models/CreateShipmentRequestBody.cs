@@ -7,52 +7,10 @@ using System.Threading.Tasks;
 
 namespace Common.Models
 {
-    public class Shipment
+    public class CreateShipmentRequestBody
     {
-        [JsonPropertyName("id")]
-        public int Id { get; set; }
-
-        [JsonPropertyName("Manifested")]
-        public bool Manifested { get; set; }
-
-        [JsonPropertyName("HasLabel")]
-        public bool HasLabel { get; set; }
-
-        [JsonPropertyName("ShipmentId")]
-        public string ShipmentId { get; set; }
-
         [JsonPropertyName("OrderNumber")]
         public string OrderNumber { get; set; }
-
-        [JsonPropertyName("ShippingAddress1")]
-        public string ShippingAddress1 { get; set; }
-
-        [JsonPropertyName("ShippingAddress2")]
-        public string ShippingAddress2 { get; set; }
-
-        [JsonPropertyName("ShipmentReference")]
-        public string ShipmentReference { get; set; }
-
-        [JsonPropertyName("SenderReferences")]
-        public string SenderReferences { get; set; }
-
-        [JsonPropertyName("ShipmentCreationDate")]
-        public DateTime? ShipmentCreationDate { get; set; }
-
-        [JsonPropertyName("ShipmentModifiedDate")]
-        public DateTime? ShipmentModifiedDate { get; set; }
-
-        [JsonPropertyName("Label")]
-        public Uri Label { get; set; }
-
-        [JsonPropertyName("Items")]
-        public IEnumerable<ShipmentItem> ShipmentItems { get; set; }
-
-        
-        public string ManifestFileName => $"shipment-manifest-{ShipmentOrder}.pdf";
-
-        [JsonPropertyName("ShipmentOrder")]
-        public ShipmentOrder ShipmentOrder { get; set; }
 
         [JsonPropertyName("PostageProductId")]
         public string PostageProductId { get; set; }
@@ -74,6 +32,22 @@ namespace Common.Models
         {
             get => _shippingLastName;
             set => _shippingLastName = value;
+        }
+
+        private string _shippingAddress1;
+        [JsonPropertyName("ShippingAddress1")]
+        public string ShippingAddress1
+        {
+            get => _shippingAddress1;
+            set => _shippingAddress1 = value;
+        }
+
+        private string _shippingAddress2;
+        [JsonPropertyName("ShippingAddress2")]
+        public string ShippingAddress2
+        {
+            get => _shippingAddress2;
+            set => _shippingAddress2 = value;
         }
 
         private string _shippingPhone;
@@ -147,5 +121,9 @@ namespace Common.Models
             get => _shippingFullName;
             set => _shippingFullName = value;
         }
+
+        [JsonPropertyName("Shipping")]
+        public string Shipping { get; set; }
     }
+
 }

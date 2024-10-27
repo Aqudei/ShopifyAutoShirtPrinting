@@ -124,10 +124,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private DelegateCommand<string> _printCommand;
 
-    public DelegateCommand<string> PrintCommand
-    {
-        get { return _printCommand ??= new DelegateCommand<string>(HandlePrintCommand, arg => SelectedLineItem != null).ObservesProperty(() => SelectedLineItem); }
-    }
+    public DelegateCommand<string> PrintCommand => _printCommand ??= new DelegateCommand<string>(HandlePrintCommand, arg => SelectedLineItem != null)
+        .ObservesProperty(() => SelectedLineItem);
 
     private async void HandlePrintCommand(string arg)
     {
@@ -846,7 +844,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                             {
                                 if (result.Parameters.TryGetValue<bool>("auspost", out var isAusPost) && isAusPost)
                                 {
-                                    var shipment = result.Parameters.GetValue<Shipment>("shipment");
+                                    var shipment = result.Parameters.GetValue<CreateShipmentRequestBody>("shipment");
                                     await _apiClient.CreateShipmentAsync(shipment);
                                 }
                                 else

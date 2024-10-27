@@ -34,7 +34,9 @@ namespace Common.Models
 
         [JsonPropertyName("OriginalBinNumber")]
         public int OriginalBinNumber { get; set; }
-
+        
+        [JsonPropertyName("Shipping")]
+        public string Shipping { get; set; }
 
         private string _shippingFirstName;
         public string ShippingFirstName

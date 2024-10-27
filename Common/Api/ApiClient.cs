@@ -592,14 +592,17 @@ namespace Common.Api
 
 
 
-        public async Task<Shipment> CreateShipmentAsync(Shipment shipment)
+        public async Task<Shipment> CreateShipmentAsync(CreateShipmentRequestBody shipment)
         {
-            var request = new RestRequest($"/shipping/shipments/")
+            var request = new RestRequest($"/shipping/CreateShipment/")
                 .AddBody(shipment);
 
             var response = await _client.ExecutePostAsync<Shipment>(request);
             if (response.StatusCode != HttpStatusCode.Created)
+            {
+                Logger.Error(response.Content ?? response.ErrorMessage);
                 return null;
+            }
 
             return response.Data;
         }

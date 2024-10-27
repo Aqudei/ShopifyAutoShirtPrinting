@@ -7,6 +7,14 @@ using System.Threading.Tasks;
 
 namespace Common.Models
 {
+    public class PostageShipping
+    {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        public string Shipping { get; set; }
+    }
+
     public class PostageProduct
     {
         [JsonPropertyName("id")]
@@ -17,10 +25,8 @@ namespace Common.Models
 
         [JsonPropertyName("postage_product_id")]
         public string PostageProductId { get; set; }
-        
-        [JsonPropertyName("shipping_option")]
-        public string ShippingOption { get; set; }
 
+        public IEnumerable<PostageShipping> PostageShippings { get; set; } = new List<PostageShipping>();
 
     }
 }

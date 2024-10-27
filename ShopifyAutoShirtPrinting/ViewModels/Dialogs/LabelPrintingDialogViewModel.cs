@@ -125,6 +125,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             set { SetProperty(ref _postageProductId, value); }
         }
 
+        public string Shipping { get; set; }
+
         public decimal TotalWeight
         {
             get { return _totalWeight; }
@@ -144,9 +146,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             }
             else if (cmd.ToUpper() == "AUSPOST")
             {
-                var shipment = _mapper.Map<Shipment>(this);
+                var shipment = _mapper.Map<CreateShipmentRequestBody>(this);
                 shipment.PostageProductId = SelectedPostage.PostageProductId;
-
                 var dlgParams = new DialogParameters
                 {
                     { "auspost", true },
@@ -227,7 +228,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
                     Postages.AddRange(postages);
 
                     TotalWeight = lineItems.Sum(l => l.Grams);
-                    SelectedPostage = Postages.FirstOrDefault(p => p.ShippingOption?.ToLower() == shippingLine.ToLower());
+                    SelectedPostage = Postages.FirstOrDefault(p => p.PostageShippings.Select(pp=>pp.Shipping?.ToLower()).Contains(shippingLine.ToLower()));
                 });
             }
         }

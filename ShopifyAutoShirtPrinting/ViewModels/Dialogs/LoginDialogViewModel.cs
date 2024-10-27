@@ -68,7 +68,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             public int Id { get; set; }
             public string Name { get; set; }
             public string Url { get; set; }
-
         }
 
         private readonly IMapper _mapper;
@@ -148,6 +147,46 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             get { return _message; }
             set { SetProperty(ref _message, value); }
         }
+
+        private DelegateCommand _deleteServerCommand;
+        private string _selectedServer;
+
+        public DelegateCommand DeleteServerCommand
+        {
+            get
+            {
+                return _deleteServerCommand ??= new DelegateCommand(OnDeleteServer, () => SelectedServer != null)
+                    .ObservesProperty(() => SelectedServer);
+            }
+        }
+
+        private void OnDeleteServer()
+        {
+            Server server = null;
+            using (var db = new LiteDatabase(_dbPath))
+            {
+                var servers = db.GetCollection<Server>().FindAll().ToList();
+                if (!string.IsNullOrWhiteSpace(SelectedServer))
+                {
+                    server = servers.FirstOrDefault(s => s.Url == SelectedServer);
+                }
+                else
+                {
+                    server = servers.FirstOrDefault(s => s.Url == "" || s.Url == null);
+                }
+
+                if (server != null)
+                {
+                    db.GetCollection<Server>().Delete(server.Id);
+                    var toRemove = Servers.FirstOrDefault(ss => server.Url == server.Url);
+                    if (toRemove != null)
+                    {
+                        Servers.Remove(toRemove);
+                    }
+                }
+            }
+        }
+
         private void LoadServers()
         {
             using (var db = new LiteDatabase(_dbPath))
@@ -170,7 +209,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             }
         }
 
-        public string SelectedServer { get; set; }
+        public string SelectedServer { get => _selectedServer; set => SetProperty(ref _selectedServer, value); }
 
         public SecureString Password { get; set; }
         public string UserName { get => _userName; set => SetProperty(ref _userName, value); }
