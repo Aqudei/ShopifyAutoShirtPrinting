@@ -590,29 +590,29 @@ namespace Common.Api
             return new Variant[] { null };
         }
 
-        public async Task<IEnumerable<Shipment>> FetchShipmentsAsync(int offset)
+
+
+        public async Task<Shipment> CreateShipmentAsync(Shipment shipment)
         {
-            var request = new RestRequest("/api/Shipments/")
-                .AddParameter("limit", 100)
-                .AddParameter("offset", offset);
+            var request = new RestRequest($"/shipping/shipments/")
+                .AddBody(shipment);
 
-            var response = await _client.ExecuteGetAsync<PaginatedResult<Shipment>>(request);
-            if (response.StatusCode == HttpStatusCode.OK) { return response.Data.Results; }
+            var response = await _client.ExecutePostAsync<Shipment>(request);
+            if (response.StatusCode != HttpStatusCode.Created)
+                return null;
 
-            return new Shipment[] { null };
-
+            return response.Data;
         }
 
-        public async Task CreateShipmentAsync(string orderNumber)
+        public async Task<IEnumerable<PostageProduct>> ListPostageProductsAsync()
         {
-            var request = new RestRequest($"/api/ShipItem/{orderNumber}/");
+            var request = new RestRequest($"/shipping/postages");
 
-            var response = await _client.ExecutePostAsync(request);
-            if (response.StatusCode == HttpStatusCode.OK)
-                return;
+            var response = await _client.ExecuteGetAsync<IEnumerable<PostageProduct>>(request);
+            if (response.StatusCode != HttpStatusCode.OK)
+                return null;
 
-            throw new Exception(response.ErrorMessage ?? response.Content);
-
+            return response.Data;
         }
 
         public async Task ResetBackPrintsAsync()
@@ -626,7 +626,6 @@ namespace Common.Api
             throw new Exception(response.ErrorMessage ?? response.Content);
 
         }
-
         public async Task SetBackPrintAsync(string sku)
         {
             var request = new RestRequest($"/api/tools/Variants/set_backprint/")
@@ -639,9 +638,24 @@ namespace Common.Api
             throw new Exception(response.ErrorMessage ?? response.Content);
         }
 
+        #region ShippingEndpoints
+
+        public async Task<IEnumerable<Shipment>> FetchShipmentsAsync(int offset)
+        {
+            var request = new RestRequest("/shipping/shipments/")
+                .AddParameter("limit", 100)
+                .AddParameter("offset", offset);
+
+            var response = await _client.ExecuteGetAsync<PaginatedResult<Shipment>>(request);
+            if (response.StatusCode == HttpStatusCode.OK) { return response.Data.Results; }
+
+            return new Shipment[] { null };
+
+        }
+
         public async Task ManifestShipmentsAsync()
         {
-            var request = new RestRequest($"/api/OrderShipments/");
+            var request = new RestRequest($"/shipping/OrderShipments/");
 
             var response = await _client.ExecutePostAsync(request);
             if (response.StatusCode == HttpStatusCode.OK)
@@ -650,6 +664,6 @@ namespace Common.Api
             throw new Exception(response.ErrorMessage ?? response.Content);
         }
 
-
+        #endregion
     }
 }

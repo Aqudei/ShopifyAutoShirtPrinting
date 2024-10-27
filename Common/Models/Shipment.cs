@@ -36,5 +36,11 @@ namespace Common.Models
         [JsonPropertyName("shipment_order")]
 
         public ShipmentOrder ShipmentOrder { get; set; }
+        
+        [JsonPropertyName("product_id")]
+        public string PostageProductId { get; set; }
+
+        [JsonPropertyName("total_weight")]
+        public decimal TotalWeight { get; set; }
     }
 }

@@ -64,6 +64,17 @@ namespace Common.Models
         [JsonPropertyName("ForPickup")]
         public bool ForPickup { get; set; }
 
+        [JsonPropertyName("Grams")]
+        public decimal Grams { get; set; }
+
+        [JsonPropertyName("Length")]
+        public decimal Length { get; set; }
+        [JsonPropertyName("Width")]
+
+        public decimal Width { get; set; }
+        [JsonPropertyName("Height")]
+        public decimal Height{ get; set; }
+
         public override string ToString()
         {
             return $"#{OrderNumber} - {Sku} - {VariantTitle} - {Name}";

@@ -108,11 +108,29 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         }
 
         private string _shippingFullName;
+        private PostageProduct _selectedPostageProduct;
+
         public string ShippingFullName
         {
             get => _shippingFullName;
             set => SetProperty(ref _shippingFullName, value);
         }
+
+        private decimal _totalWeight;
+        private string _postageProductId;
+
+        public string PostageProductId
+        {
+            get { return _postageProductId; }
+            set { SetProperty(ref _postageProductId, value); }
+        }
+
+        public decimal TotalWeight
+        {
+            get { return _totalWeight; }
+            set { SetProperty(ref _totalWeight, value); }
+        }
+
         public ObservableCollection<MyLineItem> LineItems { get; set; } = new();
         public string Notes { get => _notes; set => SetProperty(ref _notes, value); }
 
@@ -126,10 +144,15 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             }
             else if (cmd.ToUpper() == "AUSPOST")
             {
+                var shipment = _mapper.Map<Shipment>(this);
+                shipment.PostageProductId = SelectedPostage.PostageProductId;
+
                 var dlgParams = new DialogParameters
                 {
-                    { "auspost", true }
+                    { "auspost", true },
+                    { "shipment", shipment}
                 };
+
 
                 RequestClose?.Invoke(new DialogResult(ButtonResult.Yes, dlgParams));
             }
@@ -170,14 +193,22 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             }
         }
 
+        public PostageProduct SelectedPostage { get => _selectedPostageProduct; set => SetProperty(ref _selectedPostageProduct, value); }
+        public ObservableCollection<PostageProduct> Postages { get; set; } = new();
+
         private async Task LoadData()
         {
             var prams = new Dictionary<string, string>() { { "OrderNumber", $"{OrderNumber}" } };
             var lineItems = await _apiClient.ListItemsAsync(prams);
             var orderInfo = await _apiClient.GetOrderInfoBy(new Dictionary<string, string> { { "OrderNumber", OrderNumber } });
+            var postages = await _apiClient.ListPostageProductsAsync();
+
 
             if (lineItems != null && lineItems.Any())
             {
+                var lineItems0 = lineItems.FirstOrDefault();
+                var shippingLine = lineItems0.Shipping;
+
                 var customerName = lineItems.Where(l => !string.IsNullOrWhiteSpace(l.Customer)).FirstOrDefault()?.Customer;
                 var customerEmail = lineItems.Where(l => !string.IsNullOrWhiteSpace(l.CustomerEmail)).FirstOrDefault()?.CustomerEmail;
 
@@ -191,6 +222,12 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
                     Notes = lineItems.FirstOrDefault()?.Notes;
                     CustomerName = customerName;
                     CustomerEmail = customerEmail;
+
+
+                    Postages.AddRange(postages);
+
+                    TotalWeight = lineItems.Sum(l => l.Grams);
+                    SelectedPostage = Postages.FirstOrDefault(p => p.ShippingOption?.ToLower() == shippingLine.ToLower());
                 });
             }
         }

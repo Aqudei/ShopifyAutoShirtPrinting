@@ -844,9 +844,10 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                         {
                             if (result.Result == ButtonResult.Yes)
                             {
-                                if (result.Parameters.TryGetValue<bool>("auspost", out var isAusPost))
+                                if (result.Parameters.TryGetValue<bool>("auspost", out var isAusPost) && isAusPost)
                                 {
-                                    await _apiClient.CreateShipmentAsync(lineItemVm.OrderNumber);
+                                    var shipment = result.Parameters.GetValue<Shipment>("shipment");
+                                    await _apiClient.CreateShipmentAsync(shipment);
                                 }
                                 else
                                 {

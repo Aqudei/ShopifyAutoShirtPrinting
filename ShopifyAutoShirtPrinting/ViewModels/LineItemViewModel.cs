@@ -116,6 +116,12 @@ namespace Common.Models
         public string Shipping { get; set; }
         public bool ForPickup { get; set; }
 
+        public decimal Grams { get; set; }
+
+        public decimal Length { get; set; }
+
+        public decimal Width { get; set; }
+        public decimal Height { get; set; }
 
     }
 }
