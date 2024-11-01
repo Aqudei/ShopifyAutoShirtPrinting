@@ -26,7 +26,8 @@ namespace Common.Models
         [JsonPropertyName("postage_product_id")]
         public string PostageProductId { get; set; }
 
-        public IEnumerable<PostageShipping> PostageShippings { get; set; } = new List<PostageShipping>();
+        [JsonPropertyName("PostageShippings")]
+        public IEnumerable<PostageShipping> PostageShippings { get; set; }
 
     }
 }

@@ -725,7 +725,7 @@ public class ArchivedViewModel : PageBase, INavigationAware
             else
             {
                 var prams2 = new Dictionary<string, string> { { "OrderNumber", $"{lineItem.OrderNumber}" } };
-                var orderInfo = _apiClient.GetOrderInfoBy(prams2);
+                var orderInfo = _apiClient.GetOrderOrderByAsync(prams2);
 
                 if (relatedLineItems.Where(l => l.BinNumber > 0 && l.OrderId == lineItem.OrderId).Sum(x => x.PrintedQuantity) > 1)
                 {

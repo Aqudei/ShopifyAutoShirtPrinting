@@ -170,7 +170,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
             try
             {
-                await Task.Run(_apiClient.ManifestShipmentsAsync);
+                await Task.Run(_apiClient.CreateManifestAsync);
             }
             catch (Exception e)
             {

@@ -90,6 +90,7 @@
     <Compile Include="Api\ApiClient.cs" />
     <Compile Include="Models\Bin.cs" />
     <Compile Include="Models\EntityBase.cs" />
+    <Compile Include="Models\PackagingType.cs" />
     <Compile Include="Models\PostageProduct.cs" />
     <Compile Include="Models\SessionVariables.cs" />
     <Compile Include="Models\IdArray.cs" />

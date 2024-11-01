@@ -223,7 +223,7 @@ namespace Common.Api
             throw new Exception(response.Content ?? response.ErrorMessage);
         }
 
-        public async Task<OrderInfo> GetOrderInfoBy(Dictionary<string, string> parameters)
+        public async Task<OrderInfo> GetOrderOrderByAsync(Dictionary<string, string> parameters)
         {
             if (parameters != null && parameters.Count > 0)
             {
@@ -656,15 +656,49 @@ namespace Common.Api
 
         }
 
-        public async Task ManifestShipmentsAsync()
+        public async Task CreateManifestAsync()
         {
-            var request = new RestRequest($"/shipping/OrderShipments/");
+            var request = new RestRequest($"/shipping/CreateManifest/");
 
             var response = await _client.ExecutePostAsync(request);
             if (response.StatusCode == HttpStatusCode.OK)
                 return;
 
             throw new Exception(response.ErrorMessage ?? response.Content);
+        }
+
+
+        public async Task<IEnumerable<PackagingType>> ListPackagingTypesAsync()
+        {
+            var request = new RestRequest($"/shipping/packages");
+
+            var response = await _client.ExecuteGetAsync<IEnumerable<PackagingType>>(request);
+            if (response.StatusCode != HttpStatusCode.OK)
+                return new List<PackagingType>();
+
+            return response.Data;
+        }
+
+        public async Task<Shipment> GetShipmentByAsync(Dictionary<string, string> getParameters)
+        {
+            if (getParameters != null && getParameters.Count > 0)
+            {
+                var request = new RestRequest("/shipping/shipments");
+                foreach (var kvp in getParameters)
+                {
+                    request = request.AddParameter(kvp.Key, kvp.Value);
+                }
+                var response = await _client.ExecuteGetAsync<IEnumerable<Shipment>>(request);
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    return response.Data.First();
+                }
+
+                throw new Exception(response.Content ?? response.ErrorMessage);
+
+            }
+
+            throw new ArgumentNullException(nameof(getParameters));
         }
 
         #endregion

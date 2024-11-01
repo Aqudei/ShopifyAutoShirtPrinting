@@ -118,6 +118,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
         private decimal _totalWeight;
         private string _postageProductId;
+        private string _shipping;
+        private PackagingType _selectedPackagingType;
 
         public string PostageProductId
         {
@@ -125,7 +127,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             set { SetProperty(ref _postageProductId, value); }
         }
 
-        public string Shipping { get; set; }
+        public string Shipping { get => _shipping; set => SetProperty(ref _shipping, value); }
 
         public decimal TotalWeight
         {
@@ -135,7 +137,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
         public ObservableCollection<MyLineItem> LineItems { get; set; } = new();
         public string Notes { get => _notes; set => SetProperty(ref _notes, value); }
-
+        public ObservableCollection<PackagingType> PackagingTypes { get; set; } = new();
+        public PackagingType SelectedPackagingType { get => _selectedPackagingType; set => SetProperty(ref _selectedPackagingType, value); }
         public DelegateCommand<string> DialogCommand => _dialogCommand ??= new DelegateCommand<string>(OnCommand);
 
         private void OnCommand(string cmd)
@@ -199,11 +202,11 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
         private async Task LoadData()
         {
-            var prams = new Dictionary<string, string>() { { "OrderNumber", $"{OrderNumber}" } };
-            var lineItems = await _apiClient.ListItemsAsync(prams);
-            var orderInfo = await _apiClient.GetOrderInfoBy(new Dictionary<string, string> { { "OrderNumber", OrderNumber } });
+            var orderNumberParams = new Dictionary<string, string>() { { "OrderNumber", $"{OrderNumber}" } };
+            var lineItems = await _apiClient.ListItemsAsync(orderNumberParams);
+            var shipment = await _apiClient.GetShipmentByAsync(orderNumberParams);
             var postages = await _apiClient.ListPostageProductsAsync();
-
+            var packaging = await _apiClient.ListPackagingTypesAsync();
 
             if (lineItems != null && lineItems.Any())
             {
@@ -216,7 +219,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
                 await _dispatcher.InvokeAsync(() =>
                 {
 
-                    _mapper.Map(orderInfo, this);
+                    _mapper.Map(shipment, this);
 
                     LineItems.AddRange(lineItems);
                     BinNumber = lineItems.FirstOrDefault()?.BinNumber;
@@ -226,9 +229,11 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
 
                     Postages.AddRange(postages);
+                    PackagingTypes.AddRange(packaging);
 
                     TotalWeight = lineItems.Sum(l => l.Grams);
-                    SelectedPostage = Postages.FirstOrDefault(p => p.PostageShippings.Select(pp=>pp.Shipping?.ToLower()).Contains(shippingLine.ToLower()));
+                    SelectedPostage = Postages.FirstOrDefault(p => p.PostageShippings.Select(pp => pp.Shipping?.ToLower()).Contains(shippingLine.ToLower()));
+                    SelectedPackagingType = PackagingTypes.FirstOrDefault();
                 });
             }
         }

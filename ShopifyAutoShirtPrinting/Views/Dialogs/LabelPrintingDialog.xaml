@@ -7,7 +7,7 @@
              xmlns:dialogs="http://prismlibrary.com/"
              Margin="30"
              mc:Ignorable="d" 
-             d:DesignHeight="713.102" d:DesignWidth="884.543">
+             d:DesignHeight="1457.92" d:DesignWidth="1197.612">
 
     <dialogs:Dialog.WindowStyle>
         <Style TargetType="Window">
@@ -82,95 +82,102 @@
                   Grid.Row="5">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
 
-                <StackPanel Orientation="Vertical" Grid.Column="0" Margin="4,4,4,4">
-                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
-                        <Label Content="Postage Type"/>
+                    <StackPanel Orientation="Vertical" Grid.Column="0" Margin="4,4,4,4">
+                        <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                            <Label Content="Postage Type"/>
                             <ComboBox ItemsSource="{Binding Postages}"
                                       SelectedItem="{Binding SelectedPostage}"
                                       DisplayMemberPath="PostageType"/>
-                    </StackPanel>
-                    
-                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
-                        <Label Content="First Name"/>
-                        <TextBox Text="{Binding ShippingFirstName}"/>
-                    </StackPanel>
+                        </StackPanel>
 
-                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
-                        <Label Content="Last Name"/>
-                        <TextBox Text="{Binding ShippingLastName}"/>
-                    </StackPanel>
+                        <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                            <Label Content="First Name"/>
+                            <TextBox Text="{Binding ShippingFirstName}"/>
+                        </StackPanel>
 
-                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
-                        <Label Content="Address Line 1"/>
-                        <TextBox Text="{Binding ShippingAddress1}"
+                        <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                            <Label Content="Last Name"/>
+                            <TextBox Text="{Binding ShippingLastName}"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                            <Label Content="Address Line 1"/>
+                            <TextBox Text="{Binding ShippingAddress1}"
                                  MinLines="2"/>
-                    </StackPanel>
+                        </StackPanel>
 
-                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
-                        <Label Content="Address Line 2"/>
-                        <TextBox Text="{Binding ShippingAddress2}"
+                        <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                            <Label Content="Address Line 2"/>
+                            <TextBox Text="{Binding ShippingAddress2}"
                                  MinLines="2"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                            <Label Content="Phone"/>
+                            <TextBox Text="{Binding ShippingPhone}"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                            <Label Content="City"/>
+                            <TextBox Text="{Binding ShippingCity}"/>
+                        </StackPanel>
+
                     </StackPanel>
 
-                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
-                        <Label Content="Phone"/>
-                        <TextBox Text="{Binding ShippingPhone}"/>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
-                        <Label Content="City"/>
-                        <TextBox Text="{Binding ShippingCity}"/>
-                    </StackPanel>
-
-                </StackPanel>
-
-                <StackPanel Orientation="Vertical"
+                    <StackPanel Orientation="Vertical"
                             Grid.Column="1" Margin="4,4,4,4">
 
-                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
-                        <Label Content="Zip"/>
-                        <TextBox Text="{Binding ShippingZip}"/>
-                    </StackPanel>
+                        <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                            <Label Content="Packaging Type"/>
+                            <ComboBox ItemsSource="{Binding PackagingTypes}"
+                                      SelectedItem="{Binding SelectedPackagingType}"
+                                      DisplayMemberPath="Name"/>
+                        </StackPanel>
 
-                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
-                        <Label Content="Province"/>
-                        <TextBox Text="{Binding ShippingProvince}"/>
-                    </StackPanel>
+                        <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                            <Label Content="Zip"/>
+                            <TextBox Text="{Binding ShippingZip}"/>
+                        </StackPanel>
 
-                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
-                        <Label Content="Country"/>
-                        <TextBox Text="{Binding ShippingCountry}"/>
-                    </StackPanel>
+                        <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                            <Label Content="Province"/>
+                            <TextBox Text="{Binding ShippingProvince}"/>
+                        </StackPanel>
 
-                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
-                        <Label Content="Company"/>
-                        <TextBox Text="{Binding ShippingCompany}"/>
-                    </StackPanel>
+                        <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                            <Label Content="Country"/>
+                            <TextBox Text="{Binding ShippingCountry}"/>
+                        </StackPanel>
 
-                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
-                        <Label Content="Total Weight (g)"/>
-                        <TextBox Text="{Binding TotalWeight}"/>
-                    </StackPanel>
+                        <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                            <Label Content="Company"/>
+                            <TextBox Text="{Binding ShippingCompany}"/>
+                        </StackPanel>
 
-                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
-                        <Label Content="Country Code"/>
-                        <TextBox Text="{Binding ShippingProvinceCode}"/>
-                    </StackPanel>
+                        <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                            <Label Content="Total Weight (g)"/>
+                            <TextBox Text="{Binding TotalWeight}"/>
+                        </StackPanel>
 
-                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
-                        <Label Content="Full Name"/>
-                        <TextBox Text="{Binding ShippingFullName}"/>
+                        <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                            <Label Content="Country Code"/>
+                            <TextBox Text="{Binding ShippingProvinceCode}"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                            <Label Content="Full Name"/>
+                            <TextBox Text="{Binding ShippingFullName}"/>
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
-            </Grid>
+                </Grid>
             </ScrollViewer>
         </GroupBox>
-        
+
         <StackPanel Orientation="Horizontal" 
                     HorizontalAlignment="Center" 
                     Grid.Row="6">
