@@ -643,11 +643,18 @@ namespace Common.Api
 
         #region ShippingEndpoints
 
-        public async Task<IEnumerable<Shipment>> FetchShipmentsAsync(int offset)
+        public async Task<IEnumerable<Shipment>> FetchShipmentsByAsync(int offset, Dictionary<string, string> getParameters = null)
         {
             var request = new RestRequest("/shipping/shipments/")
-                .AddParameter("limit", 100)
-                .AddParameter("offset", offset);
+                .AddQueryParameter("limit", 100);
+
+            if (getParameters != null && getParameters.Count > 0)
+            {
+                foreach (var param in getParameters)
+                {
+                    request.AddQueryParameter(param.Key, param.Value);
+                }
+            }
 
             var response = await _client.ExecuteGetAsync<PaginatedResult<Shipment>>(request);
             if (response.StatusCode == HttpStatusCode.OK) { return response.Data.Results; }
@@ -658,7 +665,7 @@ namespace Common.Api
 
         public async Task CreateManifestAsync()
         {
-            var request = new RestRequest($"/shipping/CreateManifest/");
+            var request = new RestRequest("/shipping/CreateManifest/");
 
             var response = await _client.ExecutePostAsync(request);
             if (response.StatusCode == HttpStatusCode.OK)
@@ -683,10 +690,10 @@ namespace Common.Api
         {
             if (getParameters != null && getParameters.Count > 0)
             {
-                var request = new RestRequest("/shipping/shipments");
+                var request = new RestRequest("/shipping/shipments/");
                 foreach (var kvp in getParameters)
                 {
-                    request = request.AddParameter(kvp.Key, kvp.Value);
+                    request = request.AddQueryParameter(kvp.Key, kvp.Value);
                 }
                 var response = await _client.ExecuteGetAsync<IEnumerable<Shipment>>(request);
                 if (response.StatusCode == HttpStatusCode.OK)

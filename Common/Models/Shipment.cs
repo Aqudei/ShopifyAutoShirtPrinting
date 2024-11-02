@@ -147,5 +147,11 @@ namespace Common.Models
             get => _shippingFullName;
             set => _shippingFullName = value;
         }
+
+        [JsonPropertyName("Shipping")]
+        public string Shipping { get; set; }
+
+        [JsonPropertyName("PackageType")]
+        public string PackageType { get; set; }
     }
 }

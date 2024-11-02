@@ -120,6 +120,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         private string _postageProductId;
         private string _shipping;
         private PackagingType _selectedPackagingType;
+        private string _packageType;
 
         public string PostageProductId
         {
@@ -196,7 +197,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
                 Task.Run(LoadData);
             }
         }
-
+        public string PackageType { get => _packageType; set => SetProperty(ref _packageType, value); }
         public PostageProduct SelectedPostage { get => _selectedPostageProduct; set => SetProperty(ref _selectedPostageProduct, value); }
         public ObservableCollection<PostageProduct> Postages { get; set; } = new();
 
@@ -233,7 +234,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
                     TotalWeight = lineItems.Sum(l => l.Grams);
                     SelectedPostage = Postages.FirstOrDefault(p => p.PostageShippings.Select(pp => pp.Shipping?.ToLower()).Contains(shippingLine.ToLower()));
-                    SelectedPackagingType = PackagingTypes.FirstOrDefault();
+                    SelectedPackagingType = PackagingTypes.FirstOrDefault(pk => pk.Code == PackageType);
                 });
             }
         }

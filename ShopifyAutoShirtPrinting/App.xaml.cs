@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Common.Api;
 using Common.Models;
-using DotNetEnv;
 using MahApps.Metro.Controls.Dialogs;
 using NLog;
 using Prism.DryIoc;
@@ -43,8 +42,6 @@ namespace ShopifyEasyShirtPrinting
         {
             try
             {
-                // Process.Start("explorer.exe", $"\"{dataPath}\"");
-                Env.Load();
 
                 containerRegistry.RegisterInstance(_sessionVariables);
                 // containerRegistry.RegisterDialog<PrintQrView, PrintQrViewModel>();
@@ -63,20 +60,6 @@ namespace ShopifyEasyShirtPrinting
                 var databaseName = Settings.Default.DatabaseName;
                 var databaseUser = Settings.Default.DatabaseUser;
                 var databasePass = Settings.Default.DatabasePass;
-
-                var connectionString = "";
-
-                if (System.Environment.MachineName.Contains("LAPTOP-DB8A9BOL"))
-                {
-                    connectionString = $"Server=localhost;Port=5432;Database=thelonelykids;User Id=postgres;Password=Espelimbergo;";
-                    _sessionVariables.IsOnLocalMachine = true;
-                }
-                else
-                    connectionString = $"Server={databaseHost};Port={databasePort};Database={databaseName};User Id={databaseUser};Password={databasePass};";
-
-                // Database.SetInitializer(new MigrateDatabaseToLatestVersion<LonelyKidsContext, Migrations.Configuration>(useSuppliedContext: true));
-                // containerRegistry.RegisterInstance(new LonelyKidsContext(connectionString));
-                // containerRegistry.RegisterInstance(new DbService(connectionString));
 
                 containerRegistry.RegisterInstance(DialogCoordinator.Instance);
 

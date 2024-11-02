@@ -6,6 +6,7 @@ using NLog;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Regions;
+using ShopifyEasyShirtPrinting.Services.AusPost;
 using ShopifyEasyShirtPrinting.Services.ShipStation;
 using System;
 using System.Collections.Generic;
@@ -93,47 +94,42 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             if (string.IsNullOrWhiteSpace(SearchText))
             {
                 _searchParameters.Clear();
-                _searchParameters["page"] = "1";
+                _searchParameters["offset"] = "0";
             }
             else
             {
-                _searchParameters["orderNumber"] = SearchText;
-                _searchParameters["page"] = "1";
+                _searchParameters["OrderNumber"] = SearchText;
+                _searchParameters["offset"] = "0";
             }
 
+            await Task.Run(() => FetchItems());
+
+        }
+
+        private async void FetchItems(int offset = 0)
+        {
             var progress = await _dialogCoordinator.ShowProgressAsync(this, "Loading", "Fetching Shipments...");
-            progress.SetIndeterminate();
 
             try
             {
-                await Task.Run(() => FetchItems());
+                progress.SetIndeterminate();
+
+                var shipments = await _apiClient.FetchShipmentsByAsync(offset, _searchParameters);
+
+                _dispatcher.Invoke(ShippedItems.Clear);
+                foreach (var shipment in shipments)
+                {
+                    _dispatcher.Invoke(() => ShippedItems.Add(shipment));
+                }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Logger.Error(e);
+                Logger.Error(ex);
             }
             finally
             {
                 await progress.CloseAsync();
             }
-        }
-
-        private async void FetchItems(int offset = 0)
-        {
-            var progress = await _dialogCoordinator.ShowProgressAsync(this, "Loading",
-                $"Fetching shipped items from ShipStation at Page #{offset + 1}");
-            progress.SetIndeterminate();
-
-
-            var shipments = await _apiClient.FetchShipmentsAsync(offset);
-
-            _dispatcher.Invoke(ShippedItems.Clear);
-            foreach (var shipment in shipments)
-            {
-                _dispatcher.Invoke(() => ShippedItems.Add(shipment));
-            }
-
-            await progress.CloseAsync();
         }
 
         public void Loaded()
@@ -189,8 +185,22 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             get { return _viewLabelCommand ??= new DelegateCommand<Shipment>(OnViewLabel); }
         }
 
+
+        private async void DownloadLabel(Shipment shipment, string labelPath)
+        {
+            using var client = new WebClient();
+
+
+            await client.DownloadFileTaskAsync(shipment.Label, labelPath);
+            if (File.Exists(labelPath))
+            {
+                Process.Start(labelPath);
+            }
+        }
         private async void OnViewLabel(Shipment shipment)
         {
+
+            ProgressDialogController progress = null;
             try
             {
                 if (shipment.Label == null)
@@ -206,17 +216,20 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 }
                 else
                 {
-                    using var client = new WebClient();
-                    await client.DownloadFileTaskAsync(shipment.Label, labelPath);
-                    if (File.Exists(labelPath))
-                    {
-                        Process.Start(labelPath);
-                    }
+                    progress = await _dialogCoordinator.ShowProgressAsync(this, "Label", "Downloading Label...");
+                    progress.SetIndeterminate();
+
+                    await Task.Run(() => DownloadLabel(shipment, labelPath));
                 }
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
+            }
+            finally
+            {
+                if (progress != null)
+                    await progress.CloseAsync();
             }
         }
 
@@ -230,9 +243,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         private async void OnViewManifest(Shipment shipment)
         {
-            var progress = await _dialogCoordinator.ShowProgressAsync(this, "Opening", $"Opening order summary...");
-            progress.SetIndeterminate();
 
+            ProgressDialogController progress = null;
             try
             {
                 var manifestPdfPath = Path.Combine(_sessionVariables.PdfsPath, shipment.ManifestFileName);
@@ -242,6 +254,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 }
                 else
                 {
+                    progress = await _dialogCoordinator.ShowProgressAsync(this, "Opening", $"Opening order summary...");
+                    progress.SetIndeterminate();
                     using var client = new WebClient();
                     await client.DownloadFileTaskAsync(new Uri(shipment.ShipmentOrder.OrderSummary), manifestPdfPath);
                     if (File.Exists(manifestPdfPath))
@@ -256,7 +270,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             }
             finally
             {
-                await progress.CloseAsync();
+                if (progress != null)
+                    await progress.CloseAsync();
             }
         }
     }
