@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Common.Api;
+using Common.BGTasker;
 using Common.Models;
 using MahApps.Metro.Controls.Dialogs;
 using NLog;
@@ -7,6 +8,7 @@ using Prism.DryIoc;
 using Prism.Events;
 using Prism.Ioc;
 using Prism.Regions;
+using ShopifyEasyShirtPrinting.BGTasker;
 using ShopifyEasyShirtPrinting.Messaging;
 using ShopifyEasyShirtPrinting.Properties;
 using ShopifyEasyShirtPrinting.Services;
@@ -17,6 +19,7 @@ using ShopifyEasyShirtPrinting.Views;
 using ShopifyEasyShirtPrinting.Views.Dialogs;
 using ShopifyEasyShirtPrinting.Views.Tools;
 using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Windows;
 
@@ -95,7 +98,7 @@ namespace ShopifyEasyShirtPrinting
                     cfg.CreateMap<Shipment, LabelPrintingDialogViewModel>();
 
                     cfg.CreateMap<LabelPrintingDialogViewModel, CreateShipmentRequestBody>();
-                    
+
                 });
 
                 containerRegistry.RegisterInstance(config.CreateMapper());
@@ -106,7 +109,7 @@ namespace ShopifyEasyShirtPrinting
 
                 containerRegistry.RegisterSingleton<IEventAggregator, EventAggregator>();
 
-               
+
 
 
                 regionManager.RegisterViewWithRegion<SkuTool>("ToolsRegion");

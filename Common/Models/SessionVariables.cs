@@ -1,9 +1,13 @@
-﻿using System.Text.Json.Serialization;
+﻿using Common.BGTasker;
+using System.Collections.Concurrent;
+using System.Text.Json.Serialization;
 
 namespace Common.Models
 {
     public class SessionVariables
     {
+        private ConcurrentQueue<IBGTask> _taskQueue = new System.Collections.Concurrent.ConcurrentQueue<IBGTask>();
+
         public string DataPath { get; set; }
         public string DbName { get; set; }
         public string ShopUrl { get; set; }
@@ -26,5 +30,15 @@ namespace Common.Models
 
         public string ShipStationUsername { get; set; }
         public string ShipStationPassword { get; set; }
+        public ConcurrentQueue<IBGTask> TaskQueue
+        {
+            get
+            {
+                if (_taskQueue == null)
+                    _taskQueue = new ConcurrentQueue<IBGTask>();
+
+                return _taskQueue;
+            }
+        }
     }
 }

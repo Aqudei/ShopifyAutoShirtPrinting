@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Common.Api;
+using Common.BGTasker;
 using Common.Models;
 using ImTools;
 using MahApps.Metro.Controls.Dialogs;
@@ -8,6 +9,7 @@ using Prism.Commands;
 using Prism.Events;
 using Prism.Regions;
 using Prism.Services.Dialogs;
+using ShopifyEasyShirtPrinting.BGTasker;
 using ShopifyEasyShirtPrinting.Extensions;
 using ShopifyEasyShirtPrinting.Helpers;
 using ShopifyEasyShirtPrinting.Messaging;
@@ -15,6 +17,7 @@ using ShopifyEasyShirtPrinting.Models;
 using ShopifyEasyShirtPrinting.Services;
 using ShopifyEasyShirtPrinting.Services.ShipStation;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -63,7 +66,6 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     private DelegateCommand _openQrScannerCommand;
     private string _searchText;
     private string _detectedQr;
-
 
     public string[] ScanModes => new string[]
     {
@@ -845,7 +847,11 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                                 if (result.Parameters.TryGetValue<bool>("auspost", out var isAusPost) && isAusPost)
                                 {
                                     var shipment = result.Parameters.GetValue<CreateShipmentRequestBody>("shipment");
-                                    await _apiClient.CreateShipmentAsync(shipment);
+                                    var updatedShipment = await _apiClient.CreateShipmentAsync(shipment);
+                                    if (updatedShipment != null)
+                                    {
+                                        _globalVariables.TaskQueue.Enqueue(new LabelPrintTask(_apiClient, _globalVariables, updatedShipment));
+                                    }
                                 }
                                 else
                                 {
@@ -914,6 +920,11 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             Logger.Error(exception);
             await _dialogCoordinator.ShowMessageAsync(this, "Error", $"{exception.Message}\n\n{exception.StackTrace}");
         }
+    }
+
+    private void PrintLabelTask(Shipment updatedShipment)
+    {
+        throw new NotImplementedException();
     }
 
     private async Task ActivateLineItemInView(LineItemViewModel orderItemResult)

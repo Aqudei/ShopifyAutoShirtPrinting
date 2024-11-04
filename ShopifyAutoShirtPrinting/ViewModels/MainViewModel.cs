@@ -1,15 +1,18 @@
-﻿using MahApps.Metro.Controls;
+﻿using Common.Models;
+using MahApps.Metro.Controls;
 using MahApps.Metro.IconPacks;
 using ShopifyEasyShirtPrinting.Views;
 using ShopifyEasyShirtPrinting.Views.Tools;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace ShopifyEasyShirtPrinting.ViewModels
 {
     public class MainViewModel : PageBase
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+        private readonly SessionVariables _globalVariables;
 
         public override string Title
         {
@@ -27,7 +30,9 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         public ObservableCollection<MenuItem> Menu { get; set; } = new();
         public ObservableCollection<MenuItem> OptionsMenu { get; set; } = new();
 
-        public MainViewModel()
+        private BackgroundWorker _backGroundTaskRunner = new BackgroundWorker();
+
+        public MainViewModel(SessionVariables globalVariables)
         {
             Menu.Add(new MenuItem
             {
@@ -105,6 +110,21 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                     Kind = PackIconFontAwesomeKind.ToolboxSolid
                 }
             });
+
+            _globalVariables = globalVariables;
+
+            _backGroundTaskRunner.DoWork += _backGroundTaskRunner_DoWork;
+            _backGroundTaskRunner.WorkerReportsProgress = true;
+            _backGroundTaskRunner.RunWorkerAsync();
+
+        }
+
+        private void _backGroundTaskRunner_DoWork(object sender, DoWorkEventArgs e)
+        {
+            if (_globalVariables.TaskQueue.TryDequeue(out var task))
+            {
+                task.Execute();
+            }
         }
     }
 
