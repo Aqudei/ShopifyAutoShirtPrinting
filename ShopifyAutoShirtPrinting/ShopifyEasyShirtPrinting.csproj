@@ -519,7 +519,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BGTasker\ManifestPrintTask.cs" />
     <Compile Include="BGTasker\LabelPrintTask.cs" />
+    <Compile Include="BGTasker\PrintTaskBase.cs" />
     <Compile Include="Converters\GenericBooleanConverter.cs" />
     <Compile Include="Helpers\DirectoryHelper.cs" />
     <Compile Include="Models\ImageItem.cs" />

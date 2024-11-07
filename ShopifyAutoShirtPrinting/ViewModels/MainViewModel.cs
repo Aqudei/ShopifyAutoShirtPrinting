@@ -123,7 +123,14 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         {
             if (_globalVariables.TaskQueue.TryDequeue(out var task))
             {
-                task.Execute();
+                try
+                {
+                    task.Execute();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex);
+                }
             }
         }
     }

@@ -21,11 +21,12 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly IMapper _mapper;
 
-        public ObservableCollection<string> QrPrinters { get; set; } = new();
-        public ObservableCollection<string> LabelPrinters { get; set; } = new();
+        public ObservableCollection<string> Printers { get; set; } = new();
+        
         public string DownloadedImagesPath { get => _downloadedImagesPath; set => SetProperty(ref _downloadedImagesPath, value); }
         public string QrPrinter { get => qrPrinter; set => SetProperty(ref qrPrinter, value); }
-        public string LabelPrinter { get => labelPrinter; set => SetProperty(ref labelPrinter, value); }
+        public string ManifestPrinter { get => _manifestPrinter; set => SetProperty(ref _manifestPrinter, value); }
+        public string LabelPrinter { get => _labelPrinter; set => SetProperty(ref _labelPrinter, value); }
         public string HotFoldersConfig { get => hotFoldersConfig; set => SetProperty(ref hotFoldersConfig, value); }
 
         private string _printFilesFolder;
@@ -130,12 +131,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
             foreach (string printerName in PrinterSettings.InstalledPrinters)
             {
-                QrPrinters.Add(printerName);
-            }
-
-            foreach (string printerName in PrinterSettings.InstalledPrinters)
-            {
-                LabelPrinters.Add(printerName);
+                Printers.Add(printerName);
             }
 
             _mapper.Map(Settings.Default, this);
@@ -173,7 +169,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         private double paperHeight;
         private int fontSize;
         private string qrPrinter;
-        private string labelPrinter;
+        private string _labelPrinter;
         private string hotFoldersConfig;
         private bool useBrowser;
         private DelegateCommand<string> _addTagCommand;
@@ -197,6 +193,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         private DelegateCommand _browsePrintFilesLocationCommand;
         private string _downloadedImagesPath;
+        private string _manifestPrinter;
 
         public DelegateCommand BrowsePrintFilesLocationCommand => _browsePrintFilesLocationCommand ??= new DelegateCommand(HandleBrowsePrintFiles);
 

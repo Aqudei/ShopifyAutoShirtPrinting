@@ -10,7 +10,6 @@ namespace Common.Models
     public class ShipmentOrder
     {
         [JsonPropertyName("order_ref")]
-
         public string OrderRef { get; set; }
         
         [JsonPropertyName("summary")]

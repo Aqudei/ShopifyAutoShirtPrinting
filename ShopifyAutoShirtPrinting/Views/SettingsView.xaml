@@ -17,15 +17,22 @@
             <StackPanel Orientation="Horizontal">
                 <Label Margin="2,2,2,2" Width="120">Label Printer</Label>
                 <ComboBox x:Name="comboBox" Margin="2,2,2,2" Width="400" 
-                          ItemsSource="{Binding LabelPrinters}"
+                          ItemsSource="{Binding Printers}"
                           SelectedItem="{Binding LabelPrinter}"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal">
                 <Label Margin="2,2,2,2" Width="120">QR Tag Printer</Label>
                 <ComboBox x:Name="comboBox1" Margin="2,2,2,2" Width="400"
-                          ItemsSource="{Binding QrPrinters}"
+                          ItemsSource="{Binding Printers}"
                           SelectedItem="{Binding QrPrinter}"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal">
+                <Label Margin="2,2,2,2" Width="120">ManifestPrinter</Label>
+                <ComboBox Margin="2,2,2,2" Width="400"
+                ItemsSource="{Binding Printers}"
+                SelectedItem="{Binding ManifestPrinter}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <Label Margin="2" Width="120">Paper Width</Label>

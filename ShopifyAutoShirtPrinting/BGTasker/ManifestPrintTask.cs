@@ -13,19 +13,20 @@ using System.Threading.Tasks;
 
 namespace ShopifyEasyShirtPrinting.BGTasker
 {
-    public class LabelPrintTask : PrintTaskBase, IBGTask
+    public class ManifestPrintTask : PrintTaskBase, IBGTask
     {
         private readonly ApiClient _apiClient;
         private readonly SessionVariables _sessionVariables;
         private readonly Shipment _shipment;
 
-        public LabelPrintTask(ApiClient apiClient, SessionVariables sessionVariables, Shipment shipment)
+        public ManifestPrintTask(ApiClient apiClient, SessionVariables sessionVariables, Shipment shipment)
         {
             _sessionVariables = sessionVariables;
             _apiClient = apiClient;
             _shipment = shipment;
         }
 
+       
         public static void PrintPdf(string pdfPath, string printerName = null)
         {
             // Open the PDF document
@@ -49,19 +50,19 @@ namespace ShopifyEasyShirtPrinting.BGTasker
         {
             while (true)
             {
-                var shipment = await _apiClient.GetShipmentByAsync(new Dictionary<string, string> { { "OrderNumber", _shipment.OrderNumber } });
+                var shipment = await _apiClient.GetShipmentByAsync (new Dictionary<string, string> { { "OrderNumber", _shipment.OrderNumber } });
                 if (shipment == null)
                     break;
 
+                var orderSummary = shipment?.ShipmentOrder?.OrderSummary;
 
-                if (shipment.HasLabel && shipment.Label != null)
+                if (!string.IsNullOrWhiteSpace(orderSummary))
                 {
-                    var nameOnly = Path.GetFileName(shipment.Label.ToString());
-                    var labelPath = Path.Combine(_sessionVariables.PdfsPath, nameOnly);
-                    var destination = await DownloadRemoteFileToLocalAsync(shipment.Label, labelPath);
+                    var labelPath = Path.Combine(_sessionVariables.PdfsPath, shipment.ManifestFileName);
+                    var destination = await DownloadRemoteFileToLocalAsync(orderSummary, labelPath);
                     if (!string.IsNullOrWhiteSpace(destination) && File.Exists(destination))
                     {
-                        PrintPdf(destination, ShopifyEasyShirtPrinting.Properties.Settings.Default.LabelPrinter);
+                        PrintPdf(destination, ShopifyEasyShirtPrinting.Properties.Settings.Default.ManifestPrinter);
                     }
                     break;
                 }

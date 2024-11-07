@@ -686,6 +686,29 @@ namespace Common.Api
             return response.Data;
         }
 
+
+        public async Task<Shipment> GetShipmentOrderByAsync(Dictionary<string, string> getParameters)
+        {
+            if (getParameters != null && getParameters.Count > 0)
+            {
+                var request = new RestRequest("/shipping/shipments/");
+                foreach (var kvp in getParameters)
+                {
+                    request = request.AddQueryParameter(kvp.Key, kvp.Value);
+                }
+                var response = await _client.ExecuteGetAsync<IEnumerable<Shipment>>(request);
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    return response.Data.First();
+                }
+
+                throw new Exception(response.Content ?? response.ErrorMessage);
+
+            }
+
+            throw new ArgumentNullException(nameof(getParameters));
+        }
+
         public async Task<Shipment> GetShipmentByAsync(Dictionary<string, string> getParameters)
         {
             if (getParameters != null && getParameters.Count > 0)
