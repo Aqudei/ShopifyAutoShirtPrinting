@@ -663,15 +663,16 @@ namespace Common.Api
 
         }
 
-        public async Task CreateManifestAsync()
+        public async Task<ShipmentOrder> CreateManifestAsync()
         {
             var request = new RestRequest("/shipping/CreateManifest/");
 
-            var response = await _client.ExecutePostAsync(request);
-            if (response.StatusCode == HttpStatusCode.OK)
-                return;
+            var response = await _client.ExecutePostAsync<ShipmentOrder>(request);
+            if (response.StatusCode != HttpStatusCode.OK)
+                return null;
 
-            throw new Exception(response.ErrorMessage ?? response.Content);
+
+            return response.Data;
         }
 
 
@@ -686,27 +687,16 @@ namespace Common.Api
             return response.Data;
         }
 
-
-        public async Task<Shipment> GetShipmentOrderByAsync(Dictionary<string, string> getParameters)
+        public async Task<ShipmentOrder> GetShipmentOrderByIdAsync(int shipmentOrderId)
         {
-            if (getParameters != null && getParameters.Count > 0)
+            var request = new RestRequest($"/shipping/GetShipmentOrder/{shipmentOrderId}/");
+            var response = await _client.ExecuteGetAsync<ShipmentOrder>(request);
+            if (response.StatusCode == HttpStatusCode.OK)
             {
-                var request = new RestRequest("/shipping/shipments/");
-                foreach (var kvp in getParameters)
-                {
-                    request = request.AddQueryParameter(kvp.Key, kvp.Value);
-                }
-                var response = await _client.ExecuteGetAsync<IEnumerable<Shipment>>(request);
-                if (response.StatusCode == HttpStatusCode.OK)
-                {
-                    return response.Data.First();
-                }
-
-                throw new Exception(response.Content ?? response.ErrorMessage);
-
+                return response.Data;
             }
-
-            throw new ArgumentNullException(nameof(getParameters));
+            
+            return null;
         }
 
         public async Task<Shipment> GetShipmentByAsync(Dictionary<string, string> getParameters)

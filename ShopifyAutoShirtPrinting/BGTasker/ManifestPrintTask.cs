@@ -17,16 +17,17 @@ namespace ShopifyEasyShirtPrinting.BGTasker
     {
         private readonly ApiClient _apiClient;
         private readonly SessionVariables _sessionVariables;
-        private readonly Shipment _shipment;
 
-        public ManifestPrintTask(ApiClient apiClient, SessionVariables sessionVariables, Shipment shipment)
+        private ShipmentOrder _shipmentOrder;
+
+        public ManifestPrintTask(ApiClient apiClient, SessionVariables sessionVariables, ShipmentOrder shipmentOrder)
         {
             _sessionVariables = sessionVariables;
             _apiClient = apiClient;
-            _shipment = shipment;
+            _shipmentOrder = shipmentOrder;
         }
 
-       
+
         public static void PrintPdf(string pdfPath, string printerName = null)
         {
             // Open the PDF document
@@ -46,28 +47,28 @@ namespace ShopifyEasyShirtPrinting.BGTasker
                 }
             }
         }
-        public async void Execute()
+        public override async void Execute()
         {
-            while (true)
+            while (ContinueRunning)
             {
-                var shipment = await _apiClient.GetShipmentByAsync (new Dictionary<string, string> { { "OrderNumber", _shipment.OrderNumber } });
-                if (shipment == null)
-                    break;
-
-                var orderSummary = shipment?.ShipmentOrder?.OrderSummary;
+                var orderSummary = _shipmentOrder?.OrderSummary;
 
                 if (!string.IsNullOrWhiteSpace(orderSummary))
                 {
-                    var labelPath = Path.Combine(_sessionVariables.PdfsPath, shipment.ManifestFileName);
+                    var labelPath = Path.Combine(_sessionVariables.PdfsPath, _shipmentOrder.ManifestFileName);
                     var destination = await DownloadRemoteFileToLocalAsync(orderSummary, labelPath);
                     if (!string.IsNullOrWhiteSpace(destination) && File.Exists(destination))
                     {
                         PrintPdf(destination, ShopifyEasyShirtPrinting.Properties.Settings.Default.ManifestPrinter);
                     }
+
+                    ContinueRunning = false;
                     break;
                 }
                 else
-                    await Task.Delay(4000);
+                {
+                    _shipmentOrder = await _apiClient.GetShipmentOrderByIdAsync(_shipmentOrder.Id);
+                }
             }
         }
     }

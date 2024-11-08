@@ -851,8 +851,6 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                                     if (updatedShipment != null)
                                     {
                                         _globalVariables.TaskQueue.Enqueue(new LabelPrintTask(_apiClient, _globalVariables, updatedShipment));
-                                        _globalVariables.TaskQueue.Enqueue(new ManifestPrintTask(_apiClient, _globalVariables, updatedShipment));
-
                                     }
                                 }
                                 else

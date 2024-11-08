@@ -45,9 +45,9 @@ namespace ShopifyEasyShirtPrinting.BGTasker
                 }
             }
         }
-        public async void Execute()
+        public override async void Execute()
         {
-            while (true)
+            while (ContinueRunning)
             {
                 var shipment = await _apiClient.GetShipmentByAsync(new Dictionary<string, string> { { "OrderNumber", _shipment.OrderNumber } });
                 if (shipment == null)
@@ -63,11 +63,15 @@ namespace ShopifyEasyShirtPrinting.BGTasker
                     {
                         PrintPdf(destination, ShopifyEasyShirtPrinting.Properties.Settings.Default.LabelPrinter);
                     }
+
+                    ContinueRunning = false;
                     break;
                 }
                 else
                     await Task.Delay(4000);
             }
+
+            Status = "";
         }
     }
 }

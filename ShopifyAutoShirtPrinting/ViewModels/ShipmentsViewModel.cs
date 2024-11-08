@@ -6,6 +6,7 @@ using NLog;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Regions;
+using ShopifyEasyShirtPrinting.BGTasker;
 using ShopifyEasyShirtPrinting.Services.AusPost;
 using ShopifyEasyShirtPrinting.Services.ShipStation;
 using System;
@@ -166,7 +167,11 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
             try
             {
-                await Task.Run(_apiClient.CreateManifestAsync);
+                var shipmentOrder = await _apiClient.CreateManifestAsync();
+                if (shipmentOrder != null)
+                {
+                    _sessionVariables.TaskQueue.Enqueue(new ManifestPrintTask(_apiClient, _sessionVariables, shipmentOrder));
+                }
             }
             catch (Exception e)
             {
@@ -247,7 +252,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             ProgressDialogController progress = null;
             try
             {
-                var manifestPdfPath = Path.Combine(_sessionVariables.PdfsPath, shipment.ManifestFileName);
+                var manifestPdfPath = Path.Combine(_sessionVariables.PdfsPath, shipment?.ShipmentOrder?.ManifestFileName);
                 if (File.Exists(manifestPdfPath))
                 {
                     Process.Start(manifestPdfPath);

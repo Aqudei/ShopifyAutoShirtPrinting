@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ShopifyEasyShirtPrinting.BGTasker
 {
-    public abstract class PrintTaskBase
+    public abstract class PrintTaskBase : BGTaskBase
     {
         protected async Task<string> DownloadRemoteFileToLocalAsync(string source, string destination)
         {

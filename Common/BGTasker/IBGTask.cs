@@ -9,5 +9,8 @@ namespace Common.BGTasker
     public interface IBGTask
     {
         void Execute();
+        void Stop();
+        string Name { get; }
+        string Status { get; set; }
     }
 }

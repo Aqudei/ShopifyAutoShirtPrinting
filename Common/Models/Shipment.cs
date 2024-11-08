@@ -48,8 +48,7 @@ namespace Common.Models
         [JsonPropertyName("Items")]
         public IEnumerable<ShipmentItem> ShipmentItems { get; set; }
 
-        
-        public string ManifestFileName => $"shipment-manifest-{ShipmentOrder}.pdf";
+        public string ManifestFileName => $"shipment-manifest-{ShipmentOrder.OrderRef}.pdf";
 
         [JsonPropertyName("ShipmentOrder")]
         public ShipmentOrder ShipmentOrder { get; set; }

@@ -6,6 +6,7 @@ using ShopifyEasyShirtPrinting.Views.Tools;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Threading;
 
 namespace ShopifyEasyShirtPrinting.ViewModels
 {
@@ -111,6 +112,18 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 }
             });
 
+
+            OptionsMenu.Add(new MenuItem
+            {
+                Label = "Tasks",
+                NavigationPath = "TasksView",
+                NavigationType = typeof(TasksView),
+                Icon = new PackIconFontAwesome
+                {
+                    Kind = PackIconFontAwesomeKind.TasksSolid
+                }
+            });
+
             _globalVariables = globalVariables;
 
             _backGroundTaskRunner.DoWork += _backGroundTaskRunner_DoWork;
@@ -121,16 +134,21 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         private void _backGroundTaskRunner_DoWork(object sender, DoWorkEventArgs e)
         {
-            if (_globalVariables.TaskQueue.TryDequeue(out var task))
+            while (true)
             {
-                try
+                if (_globalVariables.TaskQueue.TryDequeue(out var task))
                 {
-                    task.Execute();
+                    try
+                    {
+                        task.Execute();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(ex);
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex);
-                }
+
+                Thread.Sleep(100);
             }
         }
     }

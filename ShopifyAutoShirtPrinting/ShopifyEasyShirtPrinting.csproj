@@ -32,7 +32,7 @@
     <ProductName>ShopifyEasyShirtPrinting</ProductName>
     <PublisherName>Aqudei</PublisherName>
     <SuiteName>Tools</SuiteName>
-    <ApplicationRevision>3</ApplicationRevision>
+    <ApplicationRevision>4</ApplicationRevision>
     <ApplicationVersion>17.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -519,6 +519,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BGTasker\BGTaskBase.cs" />
     <Compile Include="BGTasker\ManifestPrintTask.cs" />
     <Compile Include="BGTasker\LabelPrintTask.cs" />
     <Compile Include="BGTasker\PrintTaskBase.cs" />
@@ -530,6 +531,7 @@
     <Compile Include="ViewModels\ArchivedViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\LoginDialogViewModel.cs" />
     <Compile Include="ViewModels\ProductsViewModel.cs" />
+    <Compile Include="ViewModels\TasksViewModel.cs" />
     <Compile Include="ViewModels\Tools\SizingToolViewModel.cs" />
     <Compile Include="Views\Dialogs\EditTextDialog.xaml.cs">
       <DependentUpon>EditTextDialog.xaml</DependentUpon>
@@ -542,6 +544,9 @@
     </Compile>
     <Compile Include="Views\Products.xaml.cs">
       <DependentUpon>Products.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TasksView.xaml.cs">
+      <DependentUpon>TasksView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Tooling.xaml.cs">
       <DependentUpon>Tooling.xaml</DependentUpon>
@@ -726,6 +731,10 @@
     <Compile Include="Views\SettingsView.xaml.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>
     </Compile>
+    <Page Include="Views\TasksView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Tooling.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
