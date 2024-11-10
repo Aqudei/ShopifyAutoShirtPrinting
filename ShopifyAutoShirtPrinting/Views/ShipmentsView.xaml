@@ -40,6 +40,14 @@
                 <DataGridTextColumn Header="Manifested" Binding="{Binding Manifested}"/>
                 <DataGridTextColumn Header="Shipment Id" Binding="{Binding ShipmentId}"/>
                 <DataGridTextColumn Header="Order Number" Binding="{Binding OrderNumber}"/>
+                <DataGridTextColumn Header="Shipping FullName" Binding="{Binding ShippingFullName}"/>
+                <DataGridTextColumn Header="Package Type" Binding="{Binding PackageType}"/>
+                <DataGridTextColumn Header="Shipping" Binding="{Binding Shipping}"/>
+                <DataGridTextColumn Header="Total Weight" Binding="{Binding TotalWeight}"/>
+                <DataGridTextColumn Header="Postage Product" Binding="{Binding PostageProductId}"/>
+                <DataGridTextColumn Header="Create At" Binding="{Binding CreateAt}"/>
+                <DataGridTextColumn Header="Modified At" Binding="{Binding ModifiedAt}"/>
+                <DataGridTextColumn Header="Archived" Binding="{Binding Archived}"/>
                 <DataGridTemplateColumn>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>

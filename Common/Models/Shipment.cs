@@ -151,6 +151,16 @@ namespace Common.Models
         public string Shipping { get; set; }
 
         [JsonPropertyName("PackageType")]
+
         public string PackageType { get; set; }
+
+        [JsonPropertyName("CreatedAt")]
+        public DateTime? CreatedAt { get; set; }
+
+        [JsonPropertyName("ModifiedAt")]
+        public DateTime? ModifiedAt { get; set; }
+
+        [JsonPropertyName("Archived")]
+        public bool Archived { get; set; }
     }
 }

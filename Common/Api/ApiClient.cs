@@ -646,7 +646,7 @@ namespace Common.Api
         public async Task<IEnumerable<Shipment>> FetchShipmentsByAsync(int offset, Dictionary<string, string> getParameters = null)
         {
             var request = new RestRequest("/shipping/shipments/")
-                .AddQueryParameter("limit", 100);
+                .AddQueryParameter("limit", 500);
 
             if (getParameters != null && getParameters.Count > 0)
             {
