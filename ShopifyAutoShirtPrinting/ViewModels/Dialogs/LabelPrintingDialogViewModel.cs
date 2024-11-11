@@ -4,14 +4,16 @@ using Common.Models;
 using Prism.Commands;
 using Prism.Services.Dialogs;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 {
-    internal class LabelPrintingDialogViewModel : PageBase, IDialogAware
+    internal class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataErrorInfo
     {
         public string Message { get => _message; set => SetProperty(ref _message, value); }
         private DelegateCommand<string> _dialogCommand;
@@ -37,18 +39,67 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             set => SetProperty(ref _shippingLastName, value);
         }
 
+
+
+        protected virtual void OnErrorsChanged(string propertyName)
+        {
+            ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+        }
+
+        private void ValidateProperty(string propertyName, object value)
+        {
+            // Clear previous errors for this property
+            if (_errors.ContainsKey(propertyName))
+            {
+                _errors.Remove(propertyName);
+                OnErrorsChanged(propertyName);
+            }
+
+            // Apply validation rules
+            var errors = new List<string>();
+
+            switch (propertyName)
+            {
+                case nameof(ShippingAddress1):
+                case nameof(ShippingAddress2):
+                    if (!string.IsNullOrWhiteSpace(value?.ToString()) && value?.ToString()?.Length > 40)
+                    {
+                        errors.Add("Address length cannot exceed 40 characters.");
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            // Add errors to dictionary and raise event
+            if (errors.Count > 0)
+            {
+                _errors[propertyName] = errors;
+                OnErrorsChanged(propertyName);
+            }
+        }
+
+
         private string _shippingAddress1;
         public string ShippingAddress1
         {
             get => _shippingAddress1;
-            set => SetProperty(ref _shippingAddress1, value);
+            set
+            {
+                SetProperty(ref _shippingAddress1, value);
+                ValidateProperty(nameof(ShippingAddress1), _shippingAddress1);
+            }
         }
 
         private string _shippingAddress2;
         public string ShippingAddress2
         {
             get => _shippingAddress2;
-            set => SetProperty(ref _shippingAddress2, value);
+            set
+            {
+                SetProperty(ref _shippingAddress2, value);
+                ValidateProperty(nameof(ShippingAddress2), _shippingAddress2);
+            }
         }
 
         private string _shippingPhone;
@@ -159,7 +210,12 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
                 };
 
 
-                RequestClose?.Invoke(new DialogResult(ButtonResult.Yes, dlgParams));
+                ValidateProperty(nameof(ShippingAddress1), _shippingAddress1);
+                ValidateProperty(nameof(ShippingAddress2), _shippingAddress2);
+
+                if (!HasErrors)
+                    RequestClose?.Invoke(new DialogResult(ButtonResult.Yes, dlgParams));
+                
             }
             else
             {
@@ -239,6 +295,13 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             }
         }
 
+        public IEnumerable GetErrors(string propertyName)
+        {
+            if (_errors.ContainsKey(propertyName))
+                return _errors[propertyName];
+            return null;
+        }
+
         public string CustomerName
         {
             get => _customerName;
@@ -266,7 +329,11 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
 
         public override string Title => "Print Shipment Label";
+        private readonly Dictionary<string, List<string>> _errors = new();
+
+        public bool HasErrors => _errors.Count > 0;
 
         public event Action<IDialogResult> RequestClose;
+        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
     }
 }

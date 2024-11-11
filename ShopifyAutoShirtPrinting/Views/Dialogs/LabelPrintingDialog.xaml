@@ -107,13 +107,14 @@
 
                         <StackPanel Orientation="Vertical" Margin="0,5,0,5">
                             <Label Content="Address Line 1"/>
-                            <TextBox Text="{Binding ShippingAddress1}"
+                            <TextBox Text="{Binding ShippingAddress1, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
+                                     
                                  MinLines="2"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Vertical" Margin="0,5,0,5">
                             <Label Content="Address Line 2"/>
-                            <TextBox Text="{Binding ShippingAddress2}"
+                            <TextBox Text="{Binding ShippingAddress2, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
                                  MinLines="2"/>
                         </StackPanel>
 

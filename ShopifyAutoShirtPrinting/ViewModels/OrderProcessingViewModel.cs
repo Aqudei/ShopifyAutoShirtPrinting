@@ -1,15 +1,14 @@
 ﻿using AutoMapper;
 using Common.Api;
-using Common.BGTasker;
 using Common.Models;
 using ImTools;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using NLog;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Regions;
 using Prism.Services.Dialogs;
-using ShopifyEasyShirtPrinting.BGTasker;
 using ShopifyEasyShirtPrinting.Extensions;
 using ShopifyEasyShirtPrinting.Helpers;
 using ShopifyEasyShirtPrinting.Messaging;
@@ -17,7 +16,6 @@ using ShopifyEasyShirtPrinting.Models;
 using ShopifyEasyShirtPrinting.Services;
 using ShopifyEasyShirtPrinting.Services.ShipStation;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -26,7 +24,6 @@ using System.Drawing;
 using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -846,12 +843,9 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                             {
                                 if (result.Parameters.TryGetValue<bool>("auspost", out var isAusPost) && isAusPost)
                                 {
-                                    var shipment = result.Parameters.GetValue<CreateShipmentRequestBody>("shipment");
-                                    var updatedShipment = await _apiClient.CreateShipmentAsync(shipment);
-                                    if (updatedShipment != null)
-                                    {
-                                        _globalVariables.TaskQueue.Enqueue(new LabelPrintTask(_apiClient, _globalVariables, updatedShipment));
-                                    }
+                                    var createShipmentBody = result.Parameters.GetValue<CreateShipmentRequestBody>("shipment");
+
+                                    await HandleAusPostLabelPrinting(createShipmentBody);
                                 }
                                 else
                                 {
@@ -919,6 +913,58 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         {
             Logger.Error(exception);
             await _dialogCoordinator.ShowMessageAsync(this, "Error", $"{exception.Message}\n\n{exception.StackTrace}");
+        }
+    }
+    
+    private async Task HandleAusPostLabelPrinting(CreateShipmentRequestBody createShipmentBody)
+    {
+        var progress = await _dialogCoordinator.ShowProgressAsync(this, "Printing Label", "Generating Shipping Labels...");
+
+        try
+        {
+            progress.SetIndeterminate();
+            progress.SetCancelable(true);
+
+
+            var shipmentInfo = await _apiClient.CreateShipmentAsync(createShipmentBody);
+            if (shipmentInfo == null)
+            {
+                return;
+            }
+
+            var timeStart = DateTime.Now;
+            var delta = DateTime.Now - timeStart;
+
+            while (delta <= TimeSpan.FromSeconds(60) && !progress.IsCanceled)
+            {
+                if (shipmentInfo.HasLabel && shipmentInfo.Label != null)
+                {
+                    progress.SetMessage($"Printing label to {Properties.Settings.Default.LabelPrinter}");
+                    var nameOnly = Path.GetFileName(shipmentInfo.Label.ToString());
+                    var labelPath = Path.Combine(_globalVariables.PdfsPath, nameOnly);
+                    var destination = await PrintHelpers.DownloadRemoteFileToLocalAsync(shipmentInfo.Label, labelPath);
+                    if (!string.IsNullOrWhiteSpace(destination) && File.Exists(destination))
+                    {
+                       PrintHelpers.PrintPdf(destination, Properties.Settings.Default.LabelPrinter);
+                    }
+
+                    break;
+                }
+                else
+                {
+                    delta = DateTime.Now - timeStart;
+                    shipmentInfo = await _apiClient.GetShipmentByAsync(new Dictionary<string, string> { { "OrderNumber", createShipmentBody.OrderNumber } });
+                    await Task.Delay(1000);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.Error(ex);
+        }
+        finally
+        {
+            await progress.CloseAsync();
         }
     }
 
@@ -1085,7 +1131,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             if (string.IsNullOrWhiteSpace(lineItem.ProductImage))
                 return null;
 
-            return await DownloadImageAsync(lineItem.ProductImage, imagePath);
+            return await PrintHelpers.DownloadRemoteFileToLocalAsync(lineItem.ProductImage, imagePath);
         }
         catch (Exception e)
         {
@@ -1093,14 +1139,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             return null;
         }
     }
-
-    private async Task<string> DownloadImageAsync(string imageSource, string imagePath)
-    {
-        using var client = new WebClient();
-        await client.DownloadFileTaskAsync(new Uri(imageSource), imagePath);
-        return imagePath;
-    }
-
+   
     private async Task FetchArchivedLineItemsAsync()
     {
         var waitDialog = await _dialogCoordinator.ShowProgressAsync(this, "Please wait", "Fetching archived orders...");

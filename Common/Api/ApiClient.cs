@@ -652,7 +652,7 @@ namespace Common.Api
             {
                 foreach (var param in getParameters)
                 {
-                    request.AddQueryParameter(param.Key, param.Value);
+                    request.AddQueryParameter(param.Key, param.Value.ToString());
                 }
             }
 

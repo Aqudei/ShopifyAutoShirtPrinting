@@ -32,7 +32,7 @@
     <ProductName>ShopifyEasyShirtPrinting</ProductName>
     <PublisherName>Aqudei</PublisherName>
     <SuiteName>Tools</SuiteName>
-    <ApplicationRevision>5</ApplicationRevision>
+    <ApplicationRevision>6</ApplicationRevision>
     <ApplicationVersion>17.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -519,12 +519,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="BGTasker\BGTaskBase.cs" />
-    <Compile Include="BGTasker\ManifestPrintTask.cs" />
-    <Compile Include="BGTasker\LabelPrintTask.cs" />
-    <Compile Include="BGTasker\PrintTaskBase.cs" />
     <Compile Include="Converters\GenericBooleanConverter.cs" />
     <Compile Include="Helpers\DirectoryHelper.cs" />
+    <Compile Include="Helpers\PrintHelpers.cs" />
     <Compile Include="Models\ImageItem.cs" />
     <Compile Include="ViewModels\Dialogs\EditTextDialogViewModel.cs" />
     <Compile Include="ViewModels\LineItemViewModel.cs" />

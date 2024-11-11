@@ -1,23 +1,20 @@
 ﻿using Common.Api;
 using Common.Models;
 using MahApps.Metro.Controls.Dialogs;
-using Microsoft.Extensions.Logging;
 using NLog;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Regions;
-using ShopifyEasyShirtPrinting.BGTasker;
-using ShopifyEasyShirtPrinting.Services.AusPost;
-using ShopifyEasyShirtPrinting.Services.ShipStation;
+using ShopifyEasyShirtPrinting.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
 
 namespace ShopifyEasyShirtPrinting.ViewModels
 {
@@ -64,7 +61,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             }
         }
 
-        public ShipmentsViewModel(IDialogCoordinator dialogCoordinator, IEventAggregator eventAggregator, ApiClient apiClient, SessionVariables sessionVariables)
+        public ShipmentsViewModel(IDialogCoordinator dialogCoordinator, IEventAggregator eventAggregator, ApiClient apiClient,
+            SessionVariables sessionVariables)
         {
             _dialogCoordinator = dialogCoordinator;
             _eventAggregator = eventAggregator;
@@ -107,6 +105,49 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         }
 
+        public int TotalPending
+        {
+            get => _totalPending; set
+            {
+                SetProperty(ref _totalPending, value);
+                RaisePropertyChanged(nameof(TotalPendingText));
+            }
+        }
+        public string TotalPendingText => $"CREATE MANIFEST FOR ({TotalPending}) PENDING SHIPMENT/S";
+        private async void FetchPendingShipments()
+        {
+            var progress = await _dialogCoordinator.ShowProgressAsync(this, "Loading", "Fetching Pending Shipments...");
+            progress.SetIndeterminate();
+            try
+            {
+                var searchParams = new Dictionary<string, string> {
+                    { "HasLabel", "1" },
+                    { "Manifested", "0" },
+                };
+
+                var shipments = await _apiClient.FetchShipmentsByAsync(0, searchParams);
+
+                _dispatcher.Invoke(() =>
+                {
+                    TotalPending = shipments.Count();
+                });
+
+                _dispatcher.Invoke(ShippedItems.Clear);
+                foreach (var shipment in shipments)
+                {
+                    _dispatcher.Invoke(() => ShippedItems.Add(shipment));
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+            }
+            finally
+            {
+                await progress.CloseAsync();
+            }
+        }
+
         private async void FetchItems(int offset = 0)
         {
             var progress = await _dialogCoordinator.ShowProgressAsync(this, "Loading", "Fetching Shipments...");
@@ -141,7 +182,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         public async void OnNavigatedTo(NavigationContext navigationContext)
         {
-            await Task.Run(() => FetchItems());
+            await Task.Run(FetchPendingShipments);
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)
@@ -164,13 +205,36 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             var progress = await _dialogCoordinator.ShowProgressAsync(this, "Loading",
                 $"Finalizing shipping orders. Generating manifest...");
             progress.SetIndeterminate();
+            progress.SetCancelable(true);
 
             try
             {
                 var shipmentOrder = await _apiClient.CreateManifestAsync();
                 if (shipmentOrder != null)
                 {
-                    _sessionVariables.TaskQueue.Enqueue(new ManifestPrintTask(_apiClient, _sessionVariables, shipmentOrder));
+                    var timeStart = DateTime.Now;
+                    var delta = DateTime.Now - timeStart;
+
+                    while (delta <= TimeSpan.FromSeconds(120) && !progress.IsCanceled)
+                    {
+                        var orderSummary = shipmentOrder?.OrderSummary;
+
+                        if (!string.IsNullOrWhiteSpace(orderSummary))
+                        {
+                            var labelPath = Path.Combine(_sessionVariables.PdfsPath, shipmentOrder.ManifestFileName);
+                            var destination = await PrintHelpers.DownloadRemoteFileToLocalAsync(orderSummary, labelPath);
+                            if (!string.IsNullOrWhiteSpace(destination) && File.Exists(destination))
+                            {
+                                PrintHelpers.PrintPdf(destination, Properties.Settings.Default.ManifestPrinter);
+                            }
+                            break;
+                        }
+                        else
+                        {
+                            delta = DateTime.Now - timeStart;
+                            shipmentOrder = await _apiClient.GetShipmentOrderByIdAsync(shipmentOrder.Id);
+                        }
+                    }
                 }
             }
             catch (Exception e)
@@ -239,6 +303,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         }
 
         private DelegateCommand<Shipment> _viewManifestCommand;
+        private int _totalPending = 0;
 
         public DelegateCommand<Shipment> ViewManifestCommand
         {
