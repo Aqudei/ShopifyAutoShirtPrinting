@@ -162,5 +162,8 @@ namespace Common.Models
 
         [JsonPropertyName("Archived")]
         public bool Archived { get; set; }
+
+        [JsonPropertyName("Debug")]
+        public string Debug { get; set; }
     }
 }

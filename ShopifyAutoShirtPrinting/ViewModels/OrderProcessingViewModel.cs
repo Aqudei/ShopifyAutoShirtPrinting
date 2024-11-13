@@ -937,6 +937,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
             while (delta <= TimeSpan.FromSeconds(60) && !progress.IsCanceled)
             {
+                
                 if (shipmentInfo.HasLabel && shipmentInfo.Label != null)
                 {
                     progress.SetMessage($"Printing label to {Properties.Settings.Default.LabelPrinter}");

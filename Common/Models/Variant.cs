@@ -13,7 +13,6 @@ namespace Common.Models
         public string Sku { get; set; }
         [JsonPropertyName("title")]
         public string Title { get; set; }
-
         [JsonPropertyName("product")]
         public Product Product { get; set; }
         [JsonPropertyName("id")]

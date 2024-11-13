@@ -671,10 +671,8 @@ namespace Common.Api
             if (response.StatusCode != HttpStatusCode.OK)
                 return null;
 
-
             return response.Data;
         }
-
 
         public async Task<IEnumerable<PackagingType>> ListPackagingTypesAsync()
         {
