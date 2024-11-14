@@ -8,6 +8,9 @@
              Margin="30"
              mc:Ignorable="d" 
              d:DesignHeight="1457.92" d:DesignWidth="1197.612">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
 
     <dialogs:Dialog.WindowStyle>
         <Style TargetType="Window">
@@ -31,6 +34,8 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <TextBlock FontSize="30"  
@@ -179,9 +184,30 @@
             </ScrollViewer>
         </GroupBox>
 
+        <ItemsControl Grid.Row="6"
+                      ItemsSource="{Binding ShipmentErrors}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderBrush="Red" 
+                            BorderThickness="0.4" 
+                            Padding="5" 
+                            Margin="3">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Field}" />
+                            <TextBlock Text=" - "/>
+                            <TextBlock Text="{Binding Message}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <ProgressBar Grid.Row="7"
+                     IsIndeterminate="True"
+                     Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         <StackPanel Orientation="Horizontal" 
                     HorizontalAlignment="Center" 
-                    Grid.Row="6">
+                    Grid.Row="8">
             <Button Command="{Binding DialogCommand}" 
                     CommandParameter="YES"
                     Width="150" 

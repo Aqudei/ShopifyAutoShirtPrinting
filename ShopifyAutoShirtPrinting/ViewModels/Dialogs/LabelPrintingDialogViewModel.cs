@@ -3,18 +3,22 @@ using Common.Api;
 using Common.Models;
 using Prism.Commands;
 using Prism.Services.Dialogs;
+using ShopifyEasyShirtPrinting.Helpers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 {
-    internal class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataErrorInfo
+    public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataErrorInfo
     {
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+
         public string Message { get => _message; set => SetProperty(ref _message, value); }
         private DelegateCommand<string> _dialogCommand;
         private int? _binNumber;
@@ -25,6 +29,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         private string _notes;
         private readonly ApiClient _apiClient;
         private readonly IMapper _mapper;
+        private readonly SessionVariables _globalVariables;
         private string _shippingFirstName;
         public string ShippingFirstName
         {
@@ -172,6 +177,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         private string _shipping;
         private PackagingType _selectedPackagingType;
         private string _packageType;
+        private bool _isBusy;
 
         public string PostageProductId
         {
@@ -193,7 +199,76 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         public PackagingType SelectedPackagingType { get => _selectedPackagingType; set => SetProperty(ref _selectedPackagingType, value); }
         public DelegateCommand<string> DialogCommand => _dialogCommand ??= new DelegateCommand<string>(OnCommand);
 
-        private void OnCommand(string cmd)
+        public bool IsBusy { get => _isBusy; set => SetProperty(ref _isBusy, value); }
+
+        private async Task<bool> HandleAusPostLabelPrinting(CreateShipmentRequestBody createShipmentBody)
+        {
+            await _dispatcher.BeginInvoke(ShipmentErrors.Clear);
+
+            try
+            {
+                await _dispatcher.BeginInvoke(() => IsBusy = true);
+
+                var shipmentInfo = await _apiClient.CreateShipmentAsync(createShipmentBody);
+                if (shipmentInfo == null)
+                {
+                    return false;
+                }
+
+                var timeStart = DateTime.Now;
+                var delta = DateTime.Now - timeStart;
+
+
+                while (delta <= TimeSpan.FromSeconds(30))
+                {
+
+                    if (shipmentInfo.HasLabel && shipmentInfo.Label != null)
+                    {
+                        var nameOnly = Path.GetFileName(shipmentInfo.Label.ToString());
+                        var labelPath = Path.Combine(_globalVariables.PdfsPath, nameOnly);
+                        var destination = await PrintHelpers.DownloadRemoteFileToLocalAsync(shipmentInfo.Label, labelPath);
+                        if (!string.IsNullOrWhiteSpace(destination) && File.Exists(destination))
+                        {
+                            PrintHelpers.PrintPdf(destination, Properties.Settings.Default.LabelPrinter);
+                        }
+
+                        return false;
+                    }
+                    else if (shipmentInfo.DebugInfo != null)
+                    {
+                        foreach (var error in shipmentInfo.DebugInfo.Errors)
+                        {
+                            await _dispatcher.BeginInvoke(() => ShipmentErrors.Add(error));
+                        }
+                        foreach (var warning in shipmentInfo.DebugInfo.Warnings)
+                        {
+                            await _dispatcher.BeginInvoke(() => ShipmentErrors.Add(warning));
+                        }
+
+                        return true;
+                    }
+                    else
+                    {
+                        delta = DateTime.Now - timeStart;
+                        shipmentInfo = await _apiClient.GetShipmentByAsync(new Dictionary<string, string> { { "OrderNumber", createShipmentBody.OrderNumber } });
+                        await Task.Delay(1000);
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                return true;
+            }
+            finally
+            {
+                await _dispatcher.BeginInvoke(() => IsBusy = false);
+            }
+        }
+
+        private async void OnCommand(string cmd)
         {
             if (cmd.ToUpper() == "YES")
             {
@@ -203,19 +278,20 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             {
                 var shipment = _mapper.Map<CreateShipmentRequestBody>(this);
                 shipment.PostageProductId = SelectedPostage.PostageProductId;
-                var dlgParams = new DialogParameters
-                {
-                    { "auspost", true },
-                    { "shipment", shipment}
-                };
 
 
                 ValidateProperty(nameof(ShippingAddress1), _shippingAddress1);
                 ValidateProperty(nameof(ShippingAddress2), _shippingAddress2);
 
                 if (!HasErrors)
+                    return;
+
+                var retry = await Task.Run(() => HandleAusPostLabelPrinting(shipment));
+                if (!retry)
+                {
+                    var dlgParams = new DialogParameters { { "auspost", true } };
                     RequestClose?.Invoke(new DialogResult(ButtonResult.Yes, dlgParams));
-                
+                }
             }
             else
             {
@@ -233,8 +309,9 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
         }
 
-        public LabelPrintingDialogViewModel(ApiClient apiClient, IMapper mapper)
+        public LabelPrintingDialogViewModel(ApiClient apiClient, IMapper mapper, SessionVariables globalVariables)
         {
+            _globalVariables = globalVariables;
             _apiClient = apiClient;
             _mapper = mapper;
         }
@@ -332,6 +409,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         private readonly Dictionary<string, List<string>> _errors = new();
 
         public bool HasErrors => _errors.Count > 0;
+
+        public ObservableCollection<FieldDetail> ShipmentErrors { get; set; } = new();
 
         public event Action<IDialogResult> RequestClose;
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;

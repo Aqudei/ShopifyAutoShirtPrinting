@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace Common.Models
 {
-    public class ErrorDetail
+    public class FieldDetail
     {
         [JsonPropertyName("code")]
         public string Code { get; set; }
-        
+
         [JsonPropertyName("name")]
         public string Name { get; set; }
-        
+
         [JsonPropertyName("field")]
         public string Field { get; set; }
 
@@ -22,10 +22,14 @@ namespace Common.Models
         public string Message { get; set; }
     }
 
-    public class ShipmentErrorResponse
+    public class DebugInfo
     {
         [JsonPropertyName("errors")]
 
-        public IEnumerable<ErrorDetail> Errors { get; set; }
+        public IEnumerable<FieldDetail> Errors { get; set; } = new List<FieldDetail>();
+
+        [JsonPropertyName("warnings")]
+
+        public IEnumerable<FieldDetail> Warnings { get; set; } = new List<FieldDetail>();
     }
 }

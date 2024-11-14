@@ -843,9 +843,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                             {
                                 if (result.Parameters.TryGetValue<bool>("auspost", out var isAusPost) && isAusPost)
                                 {
-                                    var createShipmentBody = result.Parameters.GetValue<CreateShipmentRequestBody>("shipment");
-
-                                    await HandleAusPostLabelPrinting(createShipmentBody);
+                     
                                 }
                                 else
                                 {
@@ -916,62 +914,9 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
     }
     
-    private async Task HandleAusPostLabelPrinting(CreateShipmentRequestBody createShipmentBody)
-    {
-        var progress = await _dialogCoordinator.ShowProgressAsync(this, "Printing Label", "Generating Shipping Labels...");
-
-        try
-        {
-            progress.SetIndeterminate();
-            progress.SetCancelable(true);
-
-
-            var shipmentInfo = await _apiClient.CreateShipmentAsync(createShipmentBody);
-            if (shipmentInfo == null)
-            {
-                return;
-            }
-
-            var timeStart = DateTime.Now;
-            var delta = DateTime.Now - timeStart;
-
-            while (delta <= TimeSpan.FromSeconds(60) && !progress.IsCanceled)
-            {
-                
-                if (shipmentInfo.HasLabel && shipmentInfo.Label != null)
-                {
-                    progress.SetMessage($"Printing label to {Properties.Settings.Default.LabelPrinter}");
-                    var nameOnly = Path.GetFileName(shipmentInfo.Label.ToString());
-                    var labelPath = Path.Combine(_globalVariables.PdfsPath, nameOnly);
-                    var destination = await PrintHelpers.DownloadRemoteFileToLocalAsync(shipmentInfo.Label, labelPath);
-                    if (!string.IsNullOrWhiteSpace(destination) && File.Exists(destination))
-                    {
-                       PrintHelpers.PrintPdf(destination, Properties.Settings.Default.LabelPrinter);
-                    }
-
-                    break;
-                }
-                else
-                {
-                    delta = DateTime.Now - timeStart;
-                    shipmentInfo = await _apiClient.GetShipmentByAsync(new Dictionary<string, string> { { "OrderNumber", createShipmentBody.OrderNumber } });
-                    await Task.Delay(1000);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.Error(ex);
-        }
-        finally
-        {
-            await progress.CloseAsync();
-        }
-    }
 
     private void PrintLabelTask(Shipment updatedShipment)
     {
-        throw new NotImplementedException();
     }
 
     private async Task ActivateLineItemInView(LineItemViewModel orderItemResult)
