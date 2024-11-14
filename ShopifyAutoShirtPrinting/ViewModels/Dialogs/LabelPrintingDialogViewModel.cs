@@ -234,6 +234,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
                         return false;
                     }
+
                     else if (shipmentInfo.DebugInfo != null)
                     {
                         foreach (var error in shipmentInfo.DebugInfo.Errors)
