@@ -1,4 +1,5 @@
-﻿using Common.Api;
+﻿using AutoMapper;
+using Common.Api;
 using Common.Models;
 using MahApps.Metro.Controls.Dialogs;
 using NLog;
@@ -6,6 +7,8 @@ using Prism.Commands;
 using Prism.Events;
 using Prism.Regions;
 using ShopifyEasyShirtPrinting.Helpers;
+using ShopifyEasyShirtPrinting.Messaging;
+using ShopifyEasyShirtPrinting.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -26,9 +29,11 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         private readonly IEventAggregator _eventAggregator;
         private readonly ApiClient _apiClient;
         private readonly SessionVariables _sessionVariables;
+        private readonly IMapper _mapper;
+        private readonly MessageBus _messageBus;
         private DelegateCommand<string> _changePageCommand;
         private string _selectedPage;
-        public ObservableCollection<Shipment> ShippedItems { get; set; } = new();
+        public ObservableCollection<Models.Shipment> ShippedItems { get; set; } = new();
         public ObservableCollection<string> Pages { get; set; } = new();
 
 
@@ -61,15 +66,33 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             }
         }
 
-        public ShipmentsViewModel(IDialogCoordinator dialogCoordinator, IEventAggregator eventAggregator, ApiClient apiClient,
-            SessionVariables sessionVariables)
+        public ShipmentsViewModel(IDialogCoordinator dialogCoordinator, IEventAggregator eventAggregator,
+            ApiClient apiClient, SessionVariables sessionVariables, IMapper mapper, MessageBus messageBus)
         {
             _dialogCoordinator = dialogCoordinator;
             _eventAggregator = eventAggregator;
             _apiClient = apiClient;
             _sessionVariables = sessionVariables;
+            _mapper = mapper;
+            _messageBus = messageBus;
             _dispatcher = Application.Current.Dispatcher;
 
+        }
+
+        private void _messageBus_ShipmentsUpdated(object sender, int[] shipmentIds)
+        {
+            Task.Run(async () =>
+            {
+                var shipments = await _apiClient.GetShipmentsByIdsAsync(shipmentIds);
+                foreach (var shipment in shipments)
+                {
+                    var uiShipment = ShippedItems.FirstOrDefault(s => s.Id == shipment.Id);
+                    if (uiShipment != null)
+                    {
+                        await _dispatcher.BeginInvoke(() => _mapper.Map(shipment, uiShipment));
+                    }
+                }
+            });
         }
 
         private string _searchText;
@@ -121,8 +144,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             try
             {
                 var searchParams = new Dictionary<string, string> {
-                    { "HasLabel", "1" },
-                    { "Manifested", "0" },
+                    { "HasLabel", "true" },
+                    { "Manifested", "false" },
                 };
 
                 var shipments = await _apiClient.FetchShipmentsByAsync(0, searchParams);
@@ -135,7 +158,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 _dispatcher.Invoke(ShippedItems.Clear);
                 foreach (var shipment in shipments)
                 {
-                    _dispatcher.Invoke(() => ShippedItems.Add(shipment));
+                    _dispatcher.Invoke(() => ShippedItems.Add(_mapper.Map<Models.Shipment>(shipment)));
                 }
             }
             catch (Exception ex)
@@ -161,7 +184,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 _dispatcher.Invoke(ShippedItems.Clear);
                 foreach (var shipment in shipments)
                 {
-                    _dispatcher.Invoke(() => ShippedItems.Add(shipment));
+                    _dispatcher.Invoke(() => ShippedItems.Add(_mapper.Map<Models.Shipment>(shipment)));
                 }
             }
             catch (Exception ex)
@@ -183,6 +206,9 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         public async void OnNavigatedTo(NavigationContext navigationContext)
         {
             await Task.Run(FetchPendingShipments);
+
+            _messageBus.ShipmentsUpdated += _messageBus_ShipmentsUpdated;
+
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)
@@ -191,7 +217,9 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         }
 
         public void OnNavigatedFrom(NavigationContext navigationContext)
-        { }
+        {
+            _messageBus.ShipmentsUpdated -= _messageBus_ShipmentsUpdated;
+        }
 
         private DelegateCommand _manifestPendingCommand;
 
@@ -247,15 +275,59 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             }
         }
 
-        private DelegateCommand<Shipment> _viewLabelCommand;
 
-        public DelegateCommand<Shipment> ViewLabelCommand
+        private DelegateCommand<Models.Shipment> _voidLabelCommand;
+
+        public DelegateCommand<Models.Shipment> VoidLabelCommand
         {
-            get { return _viewLabelCommand ??= new DelegateCommand<Shipment>(OnViewLabel); }
+            get { return _voidLabelCommand ??= new DelegateCommand<Models.Shipment>(OnVoidLabel); }
+        }
+
+        private async void OnVoidLabel(Models.Shipment shipment)
+        {
+            ProgressDialogController progress = null;
+
+            try
+            {
+                var confirm = await _dialogCoordinator.ShowMessageAsync(this, "Void Label",
+                    $"Are you sure you want to void label of shipment for Order #{shipment.OrderNumber}?",
+                    MessageDialogStyle.AffirmativeAndNegative);
+
+                if (confirm == MessageDialogResult.Affirmative)
+                {
+                    progress = await _dialogCoordinator.ShowProgressAsync(this, "Void Label", "Voiding Labels... Please wait.");
+                    progress.SetIndeterminate();
+
+                    var updatedShipment = await _apiClient.VoidLabelForShipmentAsync(shipment.Id);
+                    _mapper.Map(updatedShipment, shipment);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e);
+            }
+            finally
+            {
+                if (progress != null)
+                {
+                    await progress.CloseAsync();
+                }
+            }
+        }
+
+        private DelegateCommand<Models.Shipment> _viewLabelCommand;
+
+        public DelegateCommand<Models.Shipment> ViewLabelCommand
+        {
+            get
+            {
+                return _viewLabelCommand ??= new DelegateCommand<Models.Shipment>(OnViewLabel);
+            }
         }
 
 
-        private async void DownloadLabel(Shipment shipment, string labelPath)
+
+        private async void DownloadLabel(Models.Shipment shipment, string labelPath)
         {
             using var client = new WebClient();
 
@@ -266,14 +338,16 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 Process.Start(labelPath);
             }
         }
-        private async void OnViewLabel(Shipment shipment)
+        private async void OnViewLabel(Models.Shipment shipment)
         {
 
             ProgressDialogController progress = null;
             try
             {
-                if (shipment.Label == null)
+                if (shipment.Label == null || !shipment.HasLabel)
                 {
+                    await _dialogCoordinator.ShowMessageAsync(this, "View Label Error",
+                        "This shipment has no label.");
                     return;
                 }
 
@@ -302,21 +376,29 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             }
         }
 
-        private DelegateCommand<Shipment> _viewManifestCommand;
+        private DelegateCommand<Models.Shipment> _viewManifestCommand;
         private int _totalPending = 0;
 
-        public DelegateCommand<Shipment> ViewManifestCommand
+        public DelegateCommand<Models.Shipment> ViewManifestCommand
         {
-            get { return _viewManifestCommand ??= new DelegateCommand<Shipment>(OnViewManifest); }
+            get { return _viewManifestCommand ??= new DelegateCommand<Models.Shipment>(OnViewManifest); }
         }
 
 
-        private async void OnViewManifest(Shipment shipment)
+        private async void OnViewManifest(Models.Shipment shipment)
         {
 
             ProgressDialogController progress = null;
             try
             {
+                var orderSummary = shipment?.ShipmentOrder?.OrderSummary;
+                if (string.IsNullOrWhiteSpace(orderSummary))
+                {
+                    await _dialogCoordinator.ShowMessageAsync(this, "View Manifest Error",
+                        "This shipment has not been manifested yet.");
+                    return;
+                }
+
                 var manifestPdfPath = Path.Combine(_sessionVariables.PdfsPath, shipment?.ShipmentOrder?.ManifestFileName);
                 if (File.Exists(manifestPdfPath))
                 {
@@ -327,7 +409,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                     progress = await _dialogCoordinator.ShowProgressAsync(this, "Opening", $"Opening order summary...");
                     progress.SetIndeterminate();
                     using var client = new WebClient();
-                    await client.DownloadFileTaskAsync(new Uri(shipment.ShipmentOrder.OrderSummary), manifestPdfPath);
+                    await client.DownloadFileTaskAsync(new Uri(orderSummary), manifestPdfPath);
                     if (File.Exists(manifestPdfPath))
                     {
                         Process.Start(manifestPdfPath);

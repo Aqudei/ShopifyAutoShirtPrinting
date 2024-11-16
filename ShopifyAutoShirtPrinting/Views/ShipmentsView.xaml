@@ -31,6 +31,7 @@
             </StackPanel>
         </Grid>
         <DataGrid Grid.Row="1" 
+                  FontSize="14"
                   ItemsSource="{Binding ShippedItems}"
                   x:Name="ShipmentsDataGrid"
                   CanUserAddRows="False"
@@ -38,9 +39,36 @@
                   AutoGenerateColumns="False"
                   AutoGeneratingColumn="ArchivesDataGrid_AutoGeneratingColumn">
             <DataGrid.Columns>
+                
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical">
+                                <Button Command="{Binding DataContext.ViewManifestCommand, ElementName=ShipmentsDataGrid}"
+                        CommandParameter="{Binding}"
+                        IsEnabled="{Binding Manifested}"
+                        Content="View Manifest"
+                        Margin="4"/>
 
+                                <Button Command="{Binding DataContext.ViewLabelCommand, ElementName=ShipmentsDataGrid}"
+                        CommandParameter="{Binding}"
+                        IsEnabled="{Binding HasLabel}"
+                        Content="View Label"
+                        Margin="4"/>
+
+                                <Button Command="{Binding DataContext.VoidLabelCommand, ElementName=ShipmentsDataGrid}"
+                        CommandParameter="{Binding}"
+                        Content="Void Label"
+                        IsEnabled="{Binding HasLabel}"
+                        Margin="4"/>
+                            </StackPanel>
+
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
                 <DataGridTextColumn Header="Manifested" Binding="{Binding Manifested}"/>
-                <DataGridTextColumn Header="Shipment Id" Binding="{Binding ShipmentId}"/>
+                <!--<DataGridTextColumn Header="Shipment Id" Binding="{Binding ShipmentId}"/>-->
                 <DataGridTextColumn Header="Order Number" Binding="{Binding OrderNumber}"/>
                 <DataGridTextColumn Header="Shipping FullName" Binding="{Binding ShippingFullName}"/>
                 <DataGridTextColumn Header="Package Type" Binding="{Binding PackageType}"/>
@@ -49,22 +77,8 @@
                 <DataGridTextColumn Header="Postage Product" Binding="{Binding PostageProductId}"/>
                 <DataGridTextColumn Header="Create At" Binding="{Binding CreateAt}"/>
                 <DataGridTextColumn Header="Modified At" Binding="{Binding ModifiedAt}"/>
-                <DataGridTextColumn Header="Archived" Binding="{Binding Archived}"/>
-                <DataGridTemplateColumn>
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <Button Command="{Binding DataContext.ViewManifestCommand, ElementName=ShipmentsDataGrid}"
-                                        CommandParameter="{Binding}"
-                                        Content="View Manifest"/>
-                                <Button Command="{Binding DataContext.ViewLabelCommand, ElementName=ShipmentsDataGrid}"
-                                        CommandParameter="{Binding}"
-                                        Content="View Label"/>
-                            </StackPanel>
-                            
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                
+                
 
             </DataGrid.Columns>
         </DataGrid>

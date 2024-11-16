@@ -8,6 +8,7 @@ using Prism.Events;
 using Prism.Ioc;
 using Prism.Regions;
 using ShopifyEasyShirtPrinting.Messaging;
+using ShopifyEasyShirtPrinting.Models;
 using ShopifyEasyShirtPrinting.Properties;
 using ShopifyEasyShirtPrinting.Services;
 using ShopifyEasyShirtPrinting.Services.ShipStation;
@@ -93,9 +94,10 @@ namespace ShopifyEasyShirtPrinting
 
                     cfg.CreateMap<LoginDialogViewModel.SessionInfo, SessionVariables>();
                     cfg.CreateMap<LoginDialogViewModel.LoginResultBody, SessionVariables>();
-                    cfg.CreateMap<Shipment, LabelPrintingDialogViewModel>();
+                    cfg.CreateMap<Common.Models.Shipment, LabelPrintingDialogViewModel>();
 
                     cfg.CreateMap<LabelPrintingDialogViewModel, CreateShipmentRequestBody>();
+                    cfg.CreateMap<Common.Models.Shipment, Models.Shipment>().ReverseMap();
 
                 });
 

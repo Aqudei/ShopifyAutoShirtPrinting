@@ -32,7 +32,7 @@
     <ProductName>ShopifyEasyShirtPrinting</ProductName>
     <PublisherName>Aqudei</PublisherName>
     <SuiteName>Tools</SuiteName>
-    <ApplicationRevision>7</ApplicationRevision>
+    <ApplicationRevision>8</ApplicationRevision>
     <ApplicationVersion>17.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -524,6 +524,7 @@
     <Compile Include="Helpers\DirectoryHelper.cs" />
     <Compile Include="Helpers\PrintHelpers.cs" />
     <Compile Include="Models\ImageItem.cs" />
+    <Compile Include="Models\Shipment.cs" />
     <Compile Include="ViewModels\Dialogs\EditTextDialogViewModel.cs" />
     <Compile Include="ViewModels\LineItemViewModel.cs" />
     <Compile Include="ViewModels\ArchivedViewModel.cs" />

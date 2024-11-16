@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
@@ -693,8 +694,22 @@ namespace Common.Api
             {
                 return response.Data;
             }
-            
+
             return null;
+        }
+
+        public async Task<IEnumerable<Shipment>> GetShipmentsByIdsAsync(int[] shipmentDbIds)
+        {
+            var request = new RestRequest($"/shipping/shipments/")
+                .AddQueryParameter("ids", string.Join(",", shipmentDbIds));
+
+            var response = await _client.ExecuteGetAsync<IEnumerable<Shipment>>(request);
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return response.Data;
+            }
+
+            throw new Exception(response.Content ?? response.ErrorMessage);
         }
 
         public async Task<Shipment> GetShipmentByAsync(Dictionary<string, string> getParameters)
@@ -719,6 +734,18 @@ namespace Common.Api
             throw new ArgumentNullException(nameof(getParameters));
         }
 
+        public async Task<Shipment> VoidLabelForShipmentAsync(int shipmentId)
+        {
+            var request = new RestRequest($"/shipping/shipments/{shipmentId}/void_label/");
+
+            var response = await _client.ExecutePostAsync<Shipment>(request);
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                throw new Exception(response.Content);
+            }
+
+            return response.Data;
+        }
         #endregion
     }
 }

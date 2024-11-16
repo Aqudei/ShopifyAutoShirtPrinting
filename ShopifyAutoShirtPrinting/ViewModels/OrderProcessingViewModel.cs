@@ -843,7 +843,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                             {
                                 if (result.Parameters.TryGetValue<bool>("auspost", out var isAusPost) && isAusPost)
                                 {
-                     
+
                                 }
                                 else
                                 {
@@ -912,11 +912,6 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             Logger.Error(exception);
             await _dialogCoordinator.ShowMessageAsync(this, "Error", $"{exception.Message}\n\n{exception.StackTrace}");
         }
-    }
-    
-
-    private void PrintLabelTask(Shipment updatedShipment)
-    {
     }
 
     private async Task ActivateLineItemInView(LineItemViewModel orderItemResult)
@@ -1085,7 +1080,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             return null;
         }
     }
-   
+
     private async Task FetchArchivedLineItemsAsync()
     {
         var waitDialog = await _dialogCoordinator.ShowProgressAsync(this, "Please wait", "Fetching archived orders...");
