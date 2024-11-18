@@ -284,7 +284,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
                 ValidateProperty(nameof(ShippingAddress1), _shippingAddress1);
                 ValidateProperty(nameof(ShippingAddress2), _shippingAddress2);
 
-                if (!HasErrors)
+                if (HasErrors)
                     return;
 
                 var retry = await Task.Run(() => HandleAusPostLabelPrinting(shipment));
