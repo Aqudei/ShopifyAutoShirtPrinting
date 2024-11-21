@@ -208,7 +208,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             try
             {
                 await _dispatcher.BeginInvoke(() => IsBusy = true);
-
                 var shipmentInfo = await _apiClient.CreateShipmentAsync(createShipmentBody);
                 if (shipmentInfo == null)
                 {
@@ -219,13 +218,21 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
                 var delta = DateTime.Now - timeStart;
 
 
-                while (delta <= TimeSpan.FromSeconds(15))
+                while (delta <= TimeSpan.FromSeconds(20))
                 {
                     if (shipmentInfo.HasLabel && shipmentInfo.Label != null)
                     {
+                        var labelUrl = shipmentInfo.Label;
+
+                        if (!shipmentInfo.Label.IsAbsoluteUri)
+                        {
+                            var hostUrl = new Uri(_globalVariables.ServerUrl, UriKind.Absolute);
+                            labelUrl = new Uri(hostUrl, shipmentInfo.Label);
+                        }
+
                         var nameOnly = Path.GetFileName(shipmentInfo.Label.ToString());
                         var labelPath = Path.Combine(_globalVariables.PdfsPath, nameOnly);
-                        var destination = await PrintHelpers.DownloadRemoteFileToLocalAsync(shipmentInfo.Label, labelPath);
+                        var destination = await PrintHelpers.DownloadRemoteFileToLocalAsync(labelUrl, labelPath);
                         if (!string.IsNullOrWhiteSpace(destination) && File.Exists(destination))
                         {
                             PrintHelpers.PrintPdf(destination, Properties.Settings.Default.LabelPrinter);
