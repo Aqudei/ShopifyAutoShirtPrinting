@@ -219,9 +219,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
                 var delta = DateTime.Now - timeStart;
 
 
-                while (delta <= TimeSpan.FromSeconds(30))
+                while (delta <= TimeSpan.FromSeconds(15))
                 {
-
                     if (shipmentInfo.HasLabel && shipmentInfo.Label != null)
                     {
                         var nameOnly = Path.GetFileName(shipmentInfo.Label.ToString());
@@ -234,25 +233,27 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
                         return false;
                     }
-
-                    else if (shipmentInfo.DebugInfo != null)
-                    {
-                        foreach (var error in shipmentInfo.DebugInfo.Errors)
-                        {
-                            await _dispatcher.BeginInvoke(() => ShipmentErrors.Add(error));
-                        }
-                        foreach (var warning in shipmentInfo.DebugInfo.Warnings)
-                        {
-                            await _dispatcher.BeginInvoke(() => ShipmentErrors.Add(warning));
-                        }
-
-                        return true;
-                    }
                     else
                     {
-                        delta = DateTime.Now - timeStart;
-                        shipmentInfo = await _apiClient.GetShipmentByAsync(new Dictionary<string, string> { { "OrderNumber", createShipmentBody.OrderNumber } });
-                        await Task.Delay(1000);
+                        if (shipmentInfo.DebugInfo != null)
+                        {
+                            foreach (var error in shipmentInfo.DebugInfo.Errors)
+                            {
+                                await _dispatcher.BeginInvoke(() => ShipmentErrors.Add(error));
+                            }
+                            foreach (var warning in shipmentInfo.DebugInfo.Warnings)
+                            {
+                                await _dispatcher.BeginInvoke(() => ShipmentErrors.Add(warning));
+                            }
+
+                            return shipmentInfo.DebugInfo.Errors != null && shipmentInfo.DebugInfo.Errors.Any();
+                        }
+                        else
+                        {
+                            delta = DateTime.Now - timeStart;
+                            shipmentInfo = await _apiClient.GetShipmentByAsync(new Dictionary<string, string> { { "OrderNumber", createShipmentBody.OrderNumber } });
+                            await Task.Delay(1000);
+                        }
                     }
                 }
 
