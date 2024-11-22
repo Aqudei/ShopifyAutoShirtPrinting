@@ -525,6 +525,7 @@
     <Compile Include="Helpers\PrintHelpers.cs" />
     <Compile Include="Models\ImageItem.cs" />
     <Compile Include="Models\Shipment.cs" />
+    <Compile Include="ViewModels\ArchivedShipmentsViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\EditTextDialogViewModel.cs" />
     <Compile Include="ViewModels\LineItemViewModel.cs" />
     <Compile Include="ViewModels\ArchivedViewModel.cs" />
@@ -532,6 +533,9 @@
     <Compile Include="ViewModels\ProductsViewModel.cs" />
     <Compile Include="ViewModels\TasksViewModel.cs" />
     <Compile Include="ViewModels\Tools\SizingToolViewModel.cs" />
+    <Compile Include="Views\ArchivedShipmentsView.xaml.cs">
+      <DependentUpon>ArchivedShipmentsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Dialogs\EditTextDialog.xaml.cs">
       <DependentUpon>EditTextDialog.xaml</DependentUpon>
     </Compile>
@@ -556,6 +560,10 @@
     <Compile Include="Views\Tools\SkuTool.xaml.cs">
       <DependentUpon>SkuTool.xaml</DependentUpon>
     </Compile>
+    <Page Include="Views\ArchivedShipmentsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Bins.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

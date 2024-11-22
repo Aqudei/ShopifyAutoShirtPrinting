@@ -76,7 +76,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             _mapper = mapper;
             _messageBus = messageBus;
             _dispatcher = Application.Current.Dispatcher;
-
         }
 
         private void _messageBus_ShipmentsUpdated(object sender, int[] shipmentIds)
@@ -148,7 +147,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                     { "Manifested", "false" },
                 };
 
-                var shipments = await _apiClient.FetchShipmentsByAsync(0, searchParams);
+                var shipments = await _apiClient.FetchShipmentsByAsync(getParameters: searchParams);
 
                 _dispatcher.Invoke(() =>
                 {
@@ -179,7 +178,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             {
                 progress.SetIndeterminate();
 
-                var shipments = await _apiClient.FetchShipmentsByAsync(offset, _searchParameters);
+                var shipments = await _apiClient.FetchShipmentsByAsync(offset, getParameters: _searchParameters);
 
                 _dispatcher.Invoke(ShippedItems.Clear);
                 foreach (var shipment in shipments)
@@ -324,20 +323,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 return _viewLabelCommand ??= new DelegateCommand<Models.Shipment>(OnViewLabel);
             }
         }
-
-
-
-        private async void DownloadLabel(Models.Shipment shipment, string labelPath)
-        {
-            using var client = new WebClient();
-
-
-            await client.DownloadFileTaskAsync(shipment.Label, labelPath);
-            if (File.Exists(labelPath))
-            {
-                Process.Start(labelPath);
-            }
-        }
         private async void OnViewLabel(Models.Shipment shipment)
         {
 
@@ -376,8 +361,23 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             }
         }
 
-        private DelegateCommand<Models.Shipment> _viewManifestCommand;
+
+        private async void DownloadLabel(Models.Shipment shipment, string labelPath)
+        {
+            using var client = new WebClient();
+
+
+            await client.DownloadFileTaskAsync(shipment.Label, labelPath);
+            if (File.Exists(labelPath))
+            {
+                Process.Start(labelPath);
+            }
+        }
+        
+
         private int _totalPending = 0;
+
+        private DelegateCommand<Models.Shipment> _viewManifestCommand;
 
         public DelegateCommand<Models.Shipment> ViewManifestCommand
         {

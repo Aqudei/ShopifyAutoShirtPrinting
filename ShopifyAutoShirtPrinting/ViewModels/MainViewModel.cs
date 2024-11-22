@@ -101,6 +101,17 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 }
             });
 
+            Menu.Add(new MenuItem
+            {
+                Label = "Archived Shipments",
+                NavigationPath = "ArchivedShipmentsView",
+                NavigationType = typeof(ArchivedShipmentsView),
+                Icon = new PackIconMaterial
+                {
+                    Kind = PackIconMaterialKind.ShippingPallet
+                }
+            });
+
             OptionsMenu.Add(new MenuItem
             {
                 Label = "Settings",

@@ -644,10 +644,10 @@ namespace Common.Api
 
         #region ShippingEndpoints
 
-        public async Task<IEnumerable<Shipment>> FetchShipmentsByAsync(int offset, Dictionary<string, string> getParameters = null)
+        public async Task<IEnumerable<Shipment>> FetchShipmentsByAsync(int offset=0, int limit = 500, Dictionary<string, string> getParameters = null)
         {
             var request = new RestRequest("/shipping/shipments/")
-                .AddQueryParameter("limit", 500);
+                .AddQueryParameter("limit", limit);
 
             if (getParameters != null && getParameters.Count > 0)
             {
