@@ -259,7 +259,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
                         {
                             delta = DateTime.Now - timeStart;
                             shipmentInfo = await _apiClient.GetShipmentByAsync(new Dictionary<string, string> { { "OrderNumber", createShipmentBody.OrderNumber } });
-                            await Task.Delay(2000);
+                            await Task.Delay(3000);
                         }
                     }
                 }
