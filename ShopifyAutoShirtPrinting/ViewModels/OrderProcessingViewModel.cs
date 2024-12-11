@@ -751,18 +751,18 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     {
         try
         {
+            await _dispatcher.InvokeAsync(Logs.Clear);
+
             if (SelectedLineItem == null)
             {
                 await _dispatcher.InvokeAsync(() =>
                 {
                     CurrentImage = null;
                     Notes = "";
-                    Logs.Clear();
                 });
 
                 return;
             }
-
 
             await _dispatcher.InvokeAsync(() => IsFilterEnabled = false);
 
@@ -771,12 +771,12 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             var selectedLineItemOrderId = selectedLineItem.OrderId;
             var selectedLineItemVariantId = selectedLineItem.VariantId;
 
+
             await _dispatcher.InvokeAsync(() =>
-            {
-                Notes = selectedLineItemNotes;
-                CurrentImage = null;
-                Logs.Clear();
-            });
+                        {
+                            Notes = selectedLineItemNotes;
+                            CurrentImage = null;
+                        });
 
             var logs = await _apiClient.ListLogsAsync(selectedLineItemId);
 
