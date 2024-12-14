@@ -208,6 +208,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             try
             {
                 await _dispatcher.BeginInvoke(() => IsBusy = true);
+
                 var shipmentInfo = await _apiClient.CreateShipmentAsync(createShipmentBody);
                 if (shipmentInfo == null)
                 {
@@ -215,24 +216,19 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
                 }
 
                 var timeStart = DateTime.Now;
-                var delta = DateTime.Now - timeStart;
+                var timeout = TimeSpan.FromSeconds(20);
 
-
-                while (delta <= TimeSpan.FromSeconds(20))
+                while (DateTime.Now - timeStart <= timeout)
                 {
                     if (shipmentInfo.HasLabel && shipmentInfo.Label != null)
                     {
-                        var labelUrl = shipmentInfo.Label;
+                        var labelUrl = shipmentInfo.Label.IsAbsoluteUri
+                            ? shipmentInfo.Label
+                            : new Uri(new Uri(_globalVariables.ServerUrl, UriKind.Absolute), shipmentInfo.Label);
 
-                        if (!shipmentInfo.Label.IsAbsoluteUri)
-                        {
-                            var hostUrl = new Uri(_globalVariables.ServerUrl, UriKind.Absolute);
-                            labelUrl = new Uri(hostUrl, shipmentInfo.Label);
-                        }
-
-                        var nameOnly = Path.GetFileName(shipmentInfo.Label.ToString());
-                        var labelPath = Path.Combine(_globalVariables.PdfsPath, nameOnly);
+                        var labelPath = Path.Combine(_globalVariables.PdfsPath, Path.GetFileName(labelUrl.ToString()));
                         var destination = await PrintHelpers.DownloadRemoteFileToLocalAsync(labelUrl, labelPath);
+
                         if (!string.IsNullOrWhiteSpace(destination) && File.Exists(destination))
                         {
                             PrintHelpers.PrintPdf(destination, Properties.Settings.Default.LabelPrinter);
@@ -240,28 +236,26 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
                         return false;
                     }
-                    else
-                    {
-                        if (shipmentInfo.DebugInfo != null)
-                        {
-                            foreach (var error in shipmentInfo.DebugInfo.Errors)
-                            {
-                                await _dispatcher.BeginInvoke(() => ShipmentErrors.Add(error));
-                            }
-                            foreach (var warning in shipmentInfo.DebugInfo.Warnings)
-                            {
-                                await _dispatcher.BeginInvoke(() => ShipmentErrors.Add(warning));
-                            }
 
-                            return shipmentInfo.DebugInfo.Errors != null && shipmentInfo.DebugInfo.Errors.Any();
-                        }
-                        else
+                    if (shipmentInfo.DebugInfo?.Errors?.Any() == true)
+                    {
+                        foreach (var error in shipmentInfo.DebugInfo.Errors)
                         {
-                            delta = DateTime.Now - timeStart;
-                            shipmentInfo = await _apiClient.GetShipmentByAsync(new Dictionary<string, string> { { "OrderNumber", createShipmentBody.OrderNumber } });
-                            await Task.Delay(3000);
+                            await _dispatcher.BeginInvoke(() => ShipmentErrors.Add(error));
+                        }
+                        return true;
+                    }
+
+                    if (shipmentInfo.DebugInfo?.Warnings?.Any() == true)
+                    {
+                        foreach (var warning in shipmentInfo.DebugInfo.Warnings)
+                        {
+                            await _dispatcher.BeginInvoke(() => ShipmentErrors.Add(warning));
                         }
                     }
+
+                    await Task.Delay(3000);
+                    shipmentInfo = await _apiClient.GetShipmentByAsync(new Dictionary<string, string> { { "OrderNumber", createShipmentBody.OrderNumber } });
                 }
 
                 return true;
@@ -276,6 +270,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
                 await _dispatcher.BeginInvoke(() => IsBusy = false);
             }
         }
+
 
         private async void OnCommand(string cmd)
         {

@@ -227,6 +227,18 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             get { return _manifestPendingCommand ??= new DelegateCommand(OnManifestShipments); }
         }
 
+        private DelegateCommand _refreshCommand;
+
+        public DelegateCommand RefreshCommand
+        {
+            get { return _refreshCommand ??= new DelegateCommand(DoRefresh); }
+        }
+
+        private async void DoRefresh()
+        {
+            await Task.Run(FetchPendingShipments);
+        }
+
         private async void OnManifestShipments()
         {
             var progress = await _dialogCoordinator.ShowProgressAsync(this, "Loading",

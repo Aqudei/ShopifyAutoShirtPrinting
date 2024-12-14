@@ -24,6 +24,7 @@
 
             <TextBox Grid.Column="0" Text="{Binding SearchText}"/>
             <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button Content="Refresh" Command="{Binding RefreshCommand}" />
                 <Button Content="Search" Command="{Binding SearchCommand}" />
                 <Button Command="{Binding ManifestPendingCommand}" >
                     <Label Content="{Binding TotalPendingText}"/>
