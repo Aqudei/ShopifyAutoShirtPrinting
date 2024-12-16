@@ -168,7 +168,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             if (!result)
             {
                 WindowHelper.FocusSelf();
-                await _dialogCoordinator.ShowMessageAsync(this, "Order Not Found!", $"Cannot find Order #{item.OrderNumber} in ShipStation!\nYou may need to refresh/reload your store in Shipstaion.");
+                await _dialogCoordinator.ShowMessageAsync(this, "Order Not Found!",
+                    $"Cannot find Order #{item.OrderNumber} in ShipStation!\nYou may need to refresh/reload your store in Shipstaion.");
             }
 
         });
@@ -282,7 +283,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private async void RefreshData()
     {
-        await FetchActiveLineItemsAsync();
+        await Task.Run(FetchActiveLineItemsAsync);
     }
 
     private async void OnSaveQrTag()
@@ -410,16 +411,12 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         _messageBus.ItemsArchived += _messageBus_ItemsArchived;
 
         LineItemsView.CollectionChanged += LineItemsView_CollectionChanged;
-
-        Task.Run(FetchActiveLineItemsAsync);
-
-        FocusSelf();
     }
 
     private void FocusSelf()
     {
         var dt = new DispatcherTimer(DispatcherPriority.Normal);
-        dt.Interval = TimeSpan.FromSeconds(1);
+        dt.Interval = TimeSpan.FromSeconds(2);
         dt.Tick += (s, e) =>
         {
             WindowHelper.FocusSelf();
@@ -1274,6 +1271,10 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     public void OnNavigatedTo(NavigationContext navigationContext)
     {
         Debug.WriteLine(navigationContext.Parameters);
+
+        Task.Run(FetchActiveLineItemsAsync);
+
+        Task.Run(FocusSelf);
     }
 
     public bool IsNavigationTarget(NavigationContext navigationContext)
