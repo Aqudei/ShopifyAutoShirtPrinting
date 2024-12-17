@@ -26,6 +26,7 @@ namespace ShopifyEasyShirtPrinting.Messaging
         public event EventHandler<int[]> ItemsAdded;
         public event EventHandler<int[]> ItemsArchived;
         public event EventHandler<int[]> ShipmentsUpdated;
+        public event EventHandler<int[]> ShipmentsVoided;
 
         public event EventHandler DatabaseReset;
 
@@ -98,6 +99,12 @@ namespace ShopifyEasyShirtPrinting.Messaging
                         {
                             var shipmentIds = JsonConvert.DeserializeObject<int[]>(message);
                             ShipmentsUpdated?.Invoke(this, shipmentIds);
+                            break;
+                        }
+                    case "shipments.voided":
+                        {
+                            var shipmentIds = JsonConvert.DeserializeObject<int[]>(message);
+                            ShipmentsVoided?.Invoke(this, shipmentIds);
                             break;
                         }
                     default:

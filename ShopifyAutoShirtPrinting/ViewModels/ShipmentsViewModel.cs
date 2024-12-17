@@ -207,7 +207,22 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             await Task.Run(FetchPendingShipments);
 
             _messageBus.ShipmentsUpdated += _messageBus_ShipmentsUpdated;
+            _messageBus.ShipmentsVoided += _messageBus_ShipmentsVoided;
+        }
 
+        private void _messageBus_ShipmentsVoided(object sender, int[] shipmentsIds)
+        {
+            Task.Run(async () =>
+            {
+                foreach (var shipmentId in shipmentsIds)
+                {
+                    var uiShipment = ShippedItems.FirstOrDefault(s => s.Id == shipmentId);
+                    if (uiShipment != null)
+                    {
+                        await _dispatcher.BeginInvoke(() => ShippedItems.Remove(uiShipment));
+                    }
+                }
+            });
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)
@@ -218,6 +233,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         public void OnNavigatedFrom(NavigationContext navigationContext)
         {
             _messageBus.ShipmentsUpdated -= _messageBus_ShipmentsUpdated;
+            _messageBus.ShipmentsVoided -= _messageBus_ShipmentsVoided;
+
         }
 
         private DelegateCommand _manifestPendingCommand;
@@ -385,7 +402,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 Process.Start(labelPath);
             }
         }
-        
+
 
         private int _totalPending = 0;
 
