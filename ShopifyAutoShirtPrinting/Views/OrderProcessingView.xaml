@@ -232,7 +232,7 @@
                       ScrollViewer.HorizontalScrollBarVisibility="Visible"
                       FrozenColumnCount="1"
                       IsSynchronizedWithCurrentItem="True"
-                      SelectedItem="{Binding SelectedLineItem}"
+                      SelectedItem="{Binding SelectedLineItem, Mode=OneWayToSource}"
                       IsReadOnly="True"
                       Margin="5"
                       x:Name="OrdersDataGrid"
@@ -329,9 +329,9 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    
+
                     <DataGridTextColumn Header="SKU" Binding="{Binding Sku}"/>
-                    
+
                     <DataGridTextColumn Header="Status" Binding="{Binding Status}"/>
                     <DataGridTextColumn Header="Shipping" Binding="{Binding Shipping}"/>
                     <DataGridTextColumn Header="Bin" Binding="{Binding BinNumber}"/>
@@ -448,7 +448,7 @@
                                Width="25"/>
                     </Button.Content>
                 </Button>
-                
+
                 <!--<mah:ToggleSwitch Grid.Row="1" 
                                   Grid.ColumnSpan="2"
                                   HorizontalAlignment="Right"

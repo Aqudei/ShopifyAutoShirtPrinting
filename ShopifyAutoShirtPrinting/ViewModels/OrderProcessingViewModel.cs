@@ -279,6 +279,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     private async void RefreshData()
     {
         await Task.Run(FetchActiveLineItemsAsync);
+        await ClearUIItemInfo();
     }
 
     private async void OnSaveQrTag()
@@ -485,7 +486,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 if (lineItem == null)
                 {
                     item.PropertyChanged += LineItem_PropertyChanged;
-                    await _dispatcher.BeginInvoke(() => _lineItems.Add(item));
+                    await _dispatcher.InvokeAsync(() => _lineItems.Add(item));
                 }
             }
             catch (Exception e)
@@ -494,12 +495,12 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             }
         }
 
-        BeginUpdateDisplay();
+        await UpdateDisplayAsync();
     }
 
-    private void BeginUpdateDisplay()
+    private async Task UpdateDisplayAsync()
     {
-        _dispatcher.BeginInvoke(() =>
+        await _dispatcher.InvokeAsync(() =>
         {
             UpdateCounts();
             UpdateMasterCheckBoxState();
@@ -535,7 +536,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             }
         }
 
-        BeginUpdateDisplay();
+        UpdateDisplayAsync();
     }
 
     private DelegateCommand _browseQrCommand;
@@ -597,7 +598,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             return (s as LineItemViewModel)?.Status == statusTag;
         };
 
-        BeginUpdateDisplay();
+        await UpdateDisplayAsync();
     }
 
     public DelegateCommand ApplyNotesCommand
@@ -765,15 +766,9 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     {
         try
         {
-            await _dispatcher.InvokeAsync(Logs.Clear);
-
             if (theSelectedLineItem == null)
             {
-                await _dispatcher.InvokeAsync(() =>
-                {
-                    CurrentImage = null;
-                    Notes = "";
-                });
+                await ClearUIItemInfo();
 
                 return;
             }
@@ -796,7 +791,11 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
             if (logs != null && logs.Any())
             {
-                await _dispatcher.InvokeAsync(() => Logs.AddRange(logs));
+                await _dispatcher.InvokeAsync(() =>
+                {
+                    Logs.Clear();
+                    Logs.AddRange(logs);
+                });
             }
 
             var imagePath = await FetchProductImageAsync(theSelectedLineItem);
@@ -810,6 +809,16 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         {
             await _dispatcher.InvokeAsync(() => IsFilterEnabled = true);
         }
+    }
+
+    private async Task ClearUIItemInfo()
+    {
+        await _dispatcher.InvokeAsync(() =>
+        {
+            Notes = string.Empty;
+            CurrentImage = null;
+            Logs.Clear();
+        });
     }
 
     private async Task ShowScanInfoAsync(LineItemViewModel lineItem)
@@ -1114,7 +1123,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             foreach (var lineItem in lineItems.Select(_mapper.Map<LineItemViewModel>))
             {
                 lineItem.PropertyChanged += LineItem_PropertyChanged;
-                await _dispatcher.BeginInvoke(() => _lineItems.Add(lineItem));
+                await _dispatcher.InvokeAsync(() => _lineItems.Add(lineItem));
             }
 
             UpdateCounts();
@@ -1132,14 +1141,13 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private async Task ClearUILineItems()
     {
-        for (int i = _lineItems.Count - 1; i >= 0; i--)
+        foreach (var item in _lineItems)
         {
-            var item = _lineItems[i];
             item.PropertyChanged -= LineItem_PropertyChanged;
-
-            await _dispatcher.BeginInvoke(() => _lineItems.Remove(item));
         }
 
+        await _dispatcher.InvokeAsync(_lineItems.Clear);
+        
         GC.Collect();
     }
 
@@ -1165,7 +1173,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 await _dispatcher.BeginInvoke(() => _lineItems.Add(lineItem));
             }
 
-            BeginUpdateDisplay();
+            await UpdateDisplayAsync();
         }
         catch (Exception e)
         {
@@ -1177,12 +1185,12 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
     }
 
-    private void LineItem_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private async void LineItem_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         LineItemViewModel myLineItem;
         if (e.PropertyName == nameof(myLineItem.IsSelected))
         {
-            BeginUpdateDisplay();
+            await UpdateDisplayAsync();
         }
     }
 
@@ -1220,6 +1228,11 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     }
 
     private async void OnPrintQrTags()
+    {
+        await PrintQrTagsAsync();
+    }
+
+    private async Task PrintQrTagsAsync()
     {
         if (!_lineItems.Any(l => l.IsSelected))
         {
