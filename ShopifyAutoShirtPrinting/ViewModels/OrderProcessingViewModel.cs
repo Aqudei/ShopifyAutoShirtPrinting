@@ -260,19 +260,14 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     public int TotalDisplayed
     {
-        get
-        {
-            return LineItemsView.Cast<LineItemViewModel>().Count();
-        }
+        get => _totalDisplayed; set => SetProperty(ref _totalDisplayed, value);
     }
 
     public int TotalItems
     {
-        get
-        {
-            return LineItemsView.SourceCollection.Cast<LineItemViewModel>().Count();
-        }
+        get => _totalItems; set => SetProperty(ref _totalItems, value);
     }
+
     public int TotalSelected
     {
         get
@@ -410,7 +405,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         _messageBus.ItemsAdded += _messageBus_ItemsAdded;
         _messageBus.ItemsArchived += _messageBus_ItemsArchived;
 
-        LineItemsView.CollectionChanged += LineItemsView_CollectionChanged;
+        //LineItemsView.CollectionChanged += LineItemsView_CollectionChanged;
     }
 
     private void FocusSelf()
@@ -446,17 +441,18 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
     }
 
-    private void LineItemsView_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    private void UpdateCounts()
     {
-        UpdateMasterCheckBoxState();
-        RaisePropertyChanged(nameof(TotalDisplayed));
-        RaisePropertyChanged(nameof(TotalItems));
+        TotalDisplayed = LineItemsView.Cast<LineItemViewModel>().Count();
+        TotalItems = LineItemsView.SourceCollection.Cast<LineItemViewModel>().Count();
+        RaisePropertyChanged(nameof(TotalSelected));
     }
 
     private void UpdateMasterCheckBoxState()
     {
         var allSelected = LineItemsView.Cast<LineItemViewModel>().All(x => x.IsSelected);
         var noneSelected = LineItemsView.Cast<LineItemViewModel>().All(x => !x.IsSelected);
+
         if (allSelected)
         {
             MasterCheckBoxState = true;
@@ -471,9 +467,15 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
     }
 
-    private async void _messageBus_ItemsAdded(object sender, int[] ids)
+    private void _messageBus_ItemsAdded(object sender, int[] ids)
+    {
+        Task.Run(() => ItemsAdded(ids));
+    }
+
+    private async Task ItemsAdded(int[] ids)
     {
         Debug.WriteLine($"@_messageBus_ItemsAdded() -> {ids}");
+
         var items = await _apiClient.ListLineItemsByIdAsync(ids);
         foreach (var item in items.Select(_mapper.Map<LineItemViewModel>))
         {
@@ -482,11 +484,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 var lineItem = _lineItems.FirstOrDefault(x => x.Id == item.Id);
                 if (lineItem == null)
                 {
-                    await _dispatcher.InvokeAsync(() =>
-                    {
-                        item.PropertyChanged += LineItem_PropertyChanged;
-                        _lineItems.Add(item);
-                    });
+                    item.PropertyChanged += LineItem_PropertyChanged;
+                    await _dispatcher.BeginInvoke(() => _lineItems.Add(item));
                 }
             }
             catch (Exception e)
@@ -494,9 +493,25 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 Logger.Error(e);
             }
         }
+
+        BeginUpdateDisplay();
     }
 
-    private async void _messageBus_ItemsUpdated(object sender, int[] ids)
+    private void BeginUpdateDisplay()
+    {
+        _dispatcher.BeginInvoke(() =>
+        {
+            UpdateCounts();
+            UpdateMasterCheckBoxState();
+        });
+    }
+
+    private void _messageBus_ItemsUpdated(object sender, int[] ids)
+    {
+        Task.Run(() => ItemsUpdated(ids));
+    }
+
+    private async Task ItemsUpdated(int[] ids)
     {
         Debug.WriteLine($"@_messageBus_ItemsUpdated() -> {ids}");
 
@@ -519,9 +534,9 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 Logger.Error(e);
             }
         }
+
+        BeginUpdateDisplay();
     }
-
-
 
     private DelegateCommand _browseQrCommand;
 
@@ -581,6 +596,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         {
             return (s as LineItemViewModel)?.Status == statusTag;
         };
+
+        BeginUpdateDisplay();
     }
 
     public DelegateCommand ApplyNotesCommand
@@ -744,13 +761,13 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     public bool IsFilterEnabled { get => _isFilterEnabled; set => SetProperty(ref _isFilterEnabled, value); }
 
-    private async Task UpdateUIForLineItem(LineItemViewModel selectedLineItem)
+    private async Task UpdateUIForLineItem(LineItemViewModel theSelectedLineItem)
     {
         try
         {
             await _dispatcher.InvokeAsync(Logs.Clear);
 
-            if (SelectedLineItem == null)
+            if (theSelectedLineItem == null)
             {
                 await _dispatcher.InvokeAsync(() =>
                 {
@@ -763,10 +780,10 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
             await _dispatcher.InvokeAsync(() => IsFilterEnabled = false);
 
-            var selectedLineItemId = selectedLineItem.Id;
-            var selectedLineItemNotes = selectedLineItem.Notes;
-            var selectedLineItemOrderId = selectedLineItem.OrderId;
-            var selectedLineItemVariantId = selectedLineItem.VariantId;
+            var selectedLineItemId = theSelectedLineItem.Id;
+            var selectedLineItemNotes = theSelectedLineItem.Notes;
+            var selectedLineItemOrderId = theSelectedLineItem.OrderId;
+            var selectedLineItemVariantId = theSelectedLineItem.VariantId;
 
 
             await _dispatcher.InvokeAsync(() =>
@@ -782,7 +799,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 await _dispatcher.InvokeAsync(() => Logs.AddRange(logs));
             }
 
-            var imagePath = await FetchProductImageAsync(SelectedLineItem);
+            var imagePath = await FetchProductImageAsync(theSelectedLineItem);
             CurrentImage = imagePath;
         }
         catch (Exception ex)
@@ -1097,13 +1114,11 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             foreach (var lineItem in lineItems.Select(_mapper.Map<LineItemViewModel>))
             {
                 lineItem.PropertyChanged += LineItem_PropertyChanged;
-                await _dispatcher.InvokeAsync(() =>
-                {
-                    _lineItems.Add(lineItem);
-                });
+                await _dispatcher.BeginInvoke(() => _lineItems.Add(lineItem));
             }
 
-            await _dispatcher.InvokeAsync(() => RaisePropertyChanged(nameof(TotalItems)));
+            UpdateCounts();
+            UpdateMasterCheckBoxState();
         }
         catch (Exception e)
         {
@@ -1121,8 +1136,11 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         {
             var item = _lineItems[i];
             item.PropertyChanged -= LineItem_PropertyChanged;
-            await _dispatcher.InvokeAsync(() => _lineItems.Remove(item));
+
+            await _dispatcher.BeginInvoke(() => _lineItems.Remove(item));
         }
+
+        GC.Collect();
     }
 
     private async Task FetchActiveLineItemsAsync()
@@ -1132,11 +1150,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
         try
         {
-            // Update UI
             await ClearUILineItems();
-
-
-            // waitDialog.SetMessage($"Fetching orders @ offset: {offset}...");
 
             var lineItems = await _apiClient.ListItemsAsync();
 
@@ -1147,14 +1161,11 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
             foreach (var lineItem in lineItems.Select(_mapper.Map<LineItemViewModel>))
             {
-                await _dispatcher.InvokeAsync(() =>
-                {
-                    lineItem.PropertyChanged += LineItem_PropertyChanged;
-                    _lineItems.Add(lineItem);
-                });
+                lineItem.PropertyChanged += LineItem_PropertyChanged;
+                await _dispatcher.BeginInvoke(() => _lineItems.Add(lineItem));
             }
 
-            await _dispatcher.InvokeAsync(() => RaisePropertyChanged(nameof(TotalItems)));
+            BeginUpdateDisplay();
         }
         catch (Exception e)
         {
@@ -1171,8 +1182,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         LineItemViewModel myLineItem;
         if (e.PropertyName == nameof(myLineItem.IsSelected))
         {
-            RaisePropertyChanged(nameof(TotalSelected));
-            UpdateMasterCheckBoxState();
+            BeginUpdateDisplay();
         }
     }
 
@@ -1183,6 +1193,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     private bool? _masterCheckBoxState;
     private string LastTagFilter;
     private bool _isFilterEnabled = true;
+    private int _totalDisplayed;
+    private int _totalItems;
 
     public DelegateCommand OpenQrScannerCommand
     {
@@ -1285,6 +1297,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     public void OnNavigatedFrom(NavigationContext navigationContext)
     {
         Debug.WriteLine(navigationContext.Parameters);
+
+
     }
 }
 
