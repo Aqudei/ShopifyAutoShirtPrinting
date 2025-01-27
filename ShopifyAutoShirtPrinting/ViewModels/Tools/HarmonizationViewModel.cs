@@ -2,6 +2,7 @@
 using Common.Api;
 using Common.Models.Harmonisation;
 using ImTools;
+using NLog;
 using OfficeOpenXml;
 using Prism.Commands;
 using Prism.Services.Dialogs;
@@ -68,17 +69,50 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
             });
         }
 
+        private DelegateCommand _DeleteSelectedCommand;
+
+        public DelegateCommand DeleteSelectedCommand
+        {
+            get { return _DeleteSelectedCommand ??= new DelegateCommand(OnDeleteSelected); }
+        }
+
+        private async void OnDeleteSelected()
+        {
+            try
+            {
+                var selected = HarmonizationItems.Where(s => s.IsSelected).ToArray();
+                foreach (var item in selected)
+                {
+                    await _api.DeleteHsnAsync(_mapper.Map<Common.Models.Harmonisation.HSN>(item));
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+
         public DelegateCommand SyncCommand
         {
             get { return _syncCommand ??= new DelegateCommand(OnSync); }
+        }
+
+        private DelegateCommand _RefreshCommand;
+
+        public DelegateCommand RefreshCommand
+        {
+            get { return _RefreshCommand ??= new DelegateCommand(OnRefresh); }
+        }
+
+        private void OnRefresh()
+        {
+            Task.Run(FetchItems);
         }
 
         private async void OnSync()
         {
             await Task.Run(FetchItems);
             await Task.Run(PushItems);
-
-
         }
 
         private async void PushItems()

@@ -104,6 +104,8 @@ namespace ShopifyEasyShirtPrinting
 
                     cfg.CreateMap<LabelPrintingDialogViewModel, CreateShipmentRequestBody>();
                     cfg.CreateMap<Common.Models.Shipment, Models.Shipment>().ReverseMap();
+                    cfg.CreateMap<Common.Models.Harmonisation.HSN, Models.Harmonisation.HSN>().ReverseMap();
+
 
                 });
 

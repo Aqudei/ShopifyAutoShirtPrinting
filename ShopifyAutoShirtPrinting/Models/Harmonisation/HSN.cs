@@ -10,16 +10,16 @@ namespace ShopifyEasyShirtPrinting.Models.Harmonisation
 {
     public class HSN : BindableBase
     {
-        private string code;
-        private string description;
-        private bool selected;
+        private string _code;
+        private string _description;
+        private bool _isSelected;
 
-        public bool Selected { get => selected; set => SetProperty(ref selected, value); }
+        public bool IsSelected { get => _isSelected; set => SetProperty(ref _isSelected, value); }
         [JsonPropertyName("id")]
         public int Id { get; set; }
         [JsonPropertyName("code")]
-        public string Code { get => code; set => SetProperty(ref code, value); }
+        public string Code { get => _code; set => SetProperty(ref _code, value); }
         [JsonPropertyName("description")]
-        public string Description { get => description; set => SetProperty(ref description, value); }
+        public string Description { get => _description; set => SetProperty(ref _description, value); }
     }
 }

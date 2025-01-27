@@ -772,17 +772,17 @@ namespace Common.Api
 
         public async Task SaveHSNAsync(HSN hsn)
         {
-            var request = new RestRequest($"/shipping/harmonizations/")
-              .AddBody(hsn);
-
             RestResponse<HSN> response;
-
             if (hsn.Id <= 0)
             {
-                response = await _client.ExecutePostAsync<HSN>(request);
+                var request = new RestRequest($"/shipping/harmonizations/")
+                              .AddJsonBody(hsn);
+                 response = await _client.ExecutePostAsync<HSN>(request);
             }
             else
             {
+                var request = new RestRequest($"/shipping/harmonizations/{hsn.Id}/")
+                              .AddJsonBody(hsn);
                 response = await _client.ExecutePutAsync<HSN>(request);
             }
 
@@ -797,6 +797,12 @@ namespace Common.Api
             var response = await _client.ExecutePostAsync(request);
             if (response.StatusCode != HttpStatusCode.OK) { throw new Exception(response.Content); }
 
+        }
+
+        public async Task DeleteHsnAsync(HSN item)
+        {
+            var request = new RestRequest($"/shipping/harmonizations/{item.Id}/");
+            var response = await _client.ExecuteDeleteAsync(request);
         }
 
 

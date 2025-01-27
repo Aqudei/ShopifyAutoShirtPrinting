@@ -26,17 +26,21 @@
                     Margin="2"
                     Width="150"
                     Command="{Binding DeleteSelectedCommand}"/>
+            <Button Content="Refresh"
+                    Width="150"
+                    Margin="2"
+                    Command="{Binding RefreshCommand}"/>
         </StackPanel>
         <DataGrid Grid.Row="1"
                   Margin="2"
                   IsReadOnly="True"
-                  ItemsSource="{Binding HarmonisationItems}"
+                  ItemsSource="{Binding HarmonizationItems}"
                   AutoGenerateColumns="False">
             <DataGrid.Columns>
                 <DataGridTemplateColumn>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <CheckBox IsChecked="{Binding Selected}"/>
+                            <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>    
                 </DataGridTemplateColumn>
