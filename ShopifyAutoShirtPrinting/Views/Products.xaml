@@ -1,0 +1,67 @@
+﻿<UserControl x:Class="ShopifyEasyShirtPrinting.Views.Products"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ShopifyEasyShirtPrinting.Views"
+             xmlns:converters="clr-namespace:ShopifyEasyShirtPrinting.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:GenericBooleanConverter x:Key="GenericBooleanConverter"/>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal">
+                <Button Width="100" Margin="2" 
+                        Command="{Binding NavCommand}"
+                        CommandParameter="previous" 
+                        Content="Previous"/>
+                <Button Width="100" Margin="2"
+                        Command="{Binding NavCommand}"
+                        CommandParameter="next"
+                        Content="Next"/>
+            </StackPanel>
+            <DataGrid ItemsSource="{Binding Products}"
+                SelectedItem="{Binding SelectedProduct}"
+                      AutoGenerateColumns="False"
+                IsReadOnly="True"
+                      Grid.Row="1">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Id" Width="*" Binding="{Binding Id}"/>
+                    <DataGridTextColumn Header="Handle" Width="2*" Binding="{Binding Handle}"/>
+                    <DataGridTextColumn Header="Shopify Id" Width="*" Binding="{Binding ShopifyId}"/>
+                    <DataGridTextColumn Header="Product Type" Width="*" Binding="{Binding ProductType}"/>
+                    <DataGridTextColumn 
+                        Header="Title" 
+                        Width="2*" 
+                        Binding="{Binding Title}"/>
+                 </DataGrid.Columns>
+                
+            </DataGrid>
+        </Grid>
+        <DataGrid ItemsSource="{Binding Variants}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  Grid.Row="1">
+            <DataGrid.Columns>
+                <DataGridTextColumn Width="*" Header="Sku" Binding="{Binding Sku}"/>
+                <DataGridTextColumn Width="2*" Header="Title" Binding="{Binding Title}"/>
+                <DataGridTextColumn Width="*" Header="Option 1" Binding="{Binding Option1}"/>
+                <DataGridTextColumn Width="*" Header="Option 2" Binding="{Binding Option2}"/>
+                <DataGridTextColumn Width="*" Header="Option 3" Binding="{Binding Option3}"/>
+                <DataGridTextColumn Header="Has Back Print" Width="*"                 
+                                    Binding="{Binding HasBackPrint, ConverterParameter=Yes;No, Converter={StaticResource GenericBooleanConverter}}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        
+    </Grid>
+</UserControl>

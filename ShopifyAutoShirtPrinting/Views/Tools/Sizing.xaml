@@ -1,0 +1,49 @@
+﻿<UserControl x:Class="ShopifyEasyShirtPrinting.Views.Tools.SizingTool"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             mah:DialogParticipation.Register="{Binding}"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ShopifyEasyShirtPrinting.Views.Tools"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" >
+            <Button Width="120" Command="{Binding ImportFilesCommand}" Margin="4">Import Files</Button>
+            <Button Width="120" Command="{Binding StartProcessingCommand}" Margin="4">Start Processing</Button>
+            <Button Width="120" Command="{Binding ClearItemsCommand}" Margin="4">Clear All</Button>
+        </StackPanel>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+
+            <DataGrid 
+                IsReadOnly="True"
+                CanUserAddRows="False"
+                CanUserDeleteRows="False"
+                ItemsSource="{Binding Items}" Margin="0,0,0,-27"/>
+            <StackPanel Orientation="Vertical" Grid.Column="1">
+                <Label Margin="5,8,5,2">Destination</Label>
+                <TextBox Text="{Binding DestinationFolder}" Margin="5,0,5,0"/>
+                <Button Content="Browse"
+                        Command="{Binding BrowseFolderCommand}"
+                        CommandParameter="destination" Margin="5,5,5,0"/>
+                <Label Margin="5,8,5,2">Background Color</Label>
+                <mah:ColorPicker SelectedColor="{Binding BackgroundColor}" Margin="5,0,5,0"/>
+
+                <Label Margin="5,8,5,2" Content="Canvas Width (in Pixels):"/>
+                <TextBox Text="{Binding CanvasWidth}" Margin="5,0,5,0"/>
+
+                <Label Margin="5,8,5,2" Content="Canvas Height (in Pixels):"/>
+                <TextBox Text="{Binding CanvasHeight}" Margin="5,0,5,0"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

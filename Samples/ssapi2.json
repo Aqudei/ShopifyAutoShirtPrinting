@@ -1,0 +1,571 @@
+{
+    "currentPageFulfillmentPlanIds": [
+        "276024163"
+    ],
+    "salesOrders": [
+        {
+            "fulfillmentPlanIds": [
+                "276024163"
+            ],
+            "salesOrderId": "c4556bfb-d00f-5293-9cb5-14b887a63f92",
+            "orderNumber": "23410",
+            "createdDateTime": "2023-08-25T02:38:37.187Z",
+            "modifiedDateTime": "2023-08-25T02:38:43.673Z",
+            "orderDateTime": "2023-08-25T00:34:43Z",
+            "paidDateTime": "2023-08-25T00:34:43Z",
+            "shipByDateTime": null,
+            "holdUntilDateTime": null,
+            "assignedToUser": "",
+            "assignedToUserId": "",
+            "requestedService": "Standard",
+            "isGift": false,
+            "isCanceled": false,
+            "derivedStatus": "AWS",
+            "items": [
+                {
+                    "salesOrderItemId": "b373af0b-a69f-5797-9c21-86243f857dcd",
+                    "productId": null,
+                    "sku": null,
+                    "name": "Self Love Sloth Tote - Pink / Carrie Tote",
+                    "originalQuantity": 1.0,
+                    "quantity": 1.0,
+                    "productThumbnailUrl": null,
+                    "unitPrice": {
+                        "value": 20.00,
+                        "code": "AUD"
+                    },
+                    "totalPrice": {
+                        "value": 20.00,
+                        "code": "AUD"
+                    },
+                    "isGift": false,
+                    "attributes": []
+                },
+                {
+                    "salesOrderItemId": "fed69842-9301-50c1-b41d-c212d959b646",
+                    "productId": null,
+                    "sku": "TEE-SECONDRODEO-WHT-REG-XL-LT",
+                    "name": "Second Rodeo Tee - White / Regular / XL",
+                    "originalQuantity": 1.0,
+                    "quantity": 1.0,
+                    "productThumbnailUrl": null,
+                    "unitPrice": {
+                        "value": 45.00,
+                        "code": "AUD"
+                    },
+                    "totalPrice": {
+                        "value": 45.00,
+                        "code": "AUD"
+                    },
+                    "isGift": false,
+                    "attributes": []
+                }
+            ],
+            "store": {
+                "storeGuid": "ba700fa5-299c-4aad-9e02-58e1774c66b9",
+                "marketplaceId": "14",
+                "marketplaceCode": "shopify",
+                "externalUrl": null,
+                "source": {
+                    "paymentStatus": "Paid",
+                    "fulfillmentStatus": "Unfulfilled",
+                    "isCanceled": false
+                }
+            },
+            "soldTo": {
+                "customerId": "125104056",
+                "name": "Courtney Vanderwal",
+                "phone": "+61404641398",
+                "username": "6976189595890",
+                "email": "courtneyjvanderwal@gmail.com"
+            },
+            "shipTos": [
+                {
+                    "isModified": false,
+                    "name": "Courtney Vanderwal",
+                    "company": null,
+                    "phone": "+61404641398",
+                    "line1": "1/65-67 Smiths Avenue",
+                    "line2": null,
+                    "line3": null,
+                    "city": "Hurstville",
+                    "state": "NSW",
+                    "postalCode": "2220",
+                    "countryCode": "AU",
+                    "residentialIndicator": "Unknown",
+                    "verificationStatus": "VER",
+                    "verificationMessage": "There was a change or addition to the suite/unit number.",
+                    "verificationUtc": null,
+                    "lockAddress": false
+                }
+            ],
+            "amountSummary": {
+                "productTotal": {
+                    "value": 65.00,
+                    "code": "AUD"
+                },
+                "orderTotal": {
+                    "value": 65.00,
+                    "code": "AUD"
+                },
+                "shippingPaid": {
+                    "value": 7.00,
+                    "code": "AUD"
+                },
+                "taxPaid": {
+                    "value": 6.55,
+                    "code": "AUD"
+                },
+                "totalPaid": {
+                    "value": 72.00,
+                    "code": "AUD"
+                }
+            },
+            "discounts": [],
+            "premiumAttributes": [],
+            "tagIds": [],
+            "originalSource": null,
+            "otherIdentifiers": [],
+            "restrictions": null
+        }
+    ],
+    "fulfillmentPlans": [
+        {
+            "fulfillmentPlanId": "276024163",
+            "orderGridStatus": "AwaitingShipment",
+            "plannedReasonCode": null,
+            "isPlanned": false,
+            "packingSlipPrintedStatus": {
+                "fulfillmentPlanId": "276024163",
+                "modifiedByGuid": null,
+                "modifiedDateTime": null,
+                "isPrinted": false
+            },
+            "createDateTime": "2023-08-24T19:38:38.87+00:00",
+            "modifiedDateTime": "2023-08-24T19:38:45.33+00:00",
+            "holdUntilDateTime": null,
+            "assignedToUserId": null,
+            "salesOrdersFulfilledIds": [
+                "c4556bfb-d00f-5293-9cb5-14b887a63f92"
+            ],
+            "labelConfiguration": {
+                "sellerLabelProviderId": "331980",
+                "serviceId": "2384",
+                "serviceCollectionGuid": null,
+                "availableSellerShippingServices": [
+                    2300,
+                    2301,
+                    2302,
+                    2303,
+                    2310,
+                    2311,
+                    2314,
+                    2315,
+                    2316,
+                    2317,
+                    2318,
+                    2319,
+                    2320,
+                    2321,
+                    2322,
+                    2323,
+                    2324,
+                    2325,
+                    2326,
+                    2327,
+                    2328,
+                    2329,
+                    2330,
+                    2331,
+                    2332,
+                    2333,
+                    2334,
+                    2336,
+                    2337,
+                    2338,
+                    2339,
+                    2340,
+                    2341,
+                    2342,
+                    2343,
+                    2347,
+                    2348,
+                    2349,
+                    2350,
+                    2351,
+                    2352,
+                    2353,
+                    2354,
+                    2355,
+                    2356,
+                    2357,
+                    2358,
+                    2359,
+                    2361,
+                    2362,
+                    2363,
+                    2364,
+                    2365,
+                    2366,
+                    2368,
+                    2369,
+                    2370,
+                    2371,
+                    2377,
+                    2378,
+                    2379,
+                    2380,
+                    2381,
+                    2382,
+                    2383,
+                    2384,
+                    2385,
+                    2386,
+                    2387,
+                    2388,
+                    2391,
+                    2392,
+                    2393,
+                    2395,
+                    2396,
+                    2397,
+                    2398,
+                    2399,
+                    5500,
+                    5501,
+                    5502,
+                    5503,
+                    5504,
+                    5505,
+                    5506,
+                    5507,
+                    5508,
+                    5509,
+                    5510,
+                    5511,
+                    5512
+                ],
+                "availableShippingOptions": [],
+                "shipFromId": "617976",
+                "shipTo": {
+                    "name": "Courtney Vanderwal",
+                    "company": null,
+                    "phone": "+61404641398",
+                    "line1": "1/65-67 Smiths Avenue",
+                    "line2": null,
+                    "line3": null,
+                    "city": "Hurstville",
+                    "state": "NSW",
+                    "postalCode": "2220",
+                    "countryCode": "AU",
+                    "residentialIndicator": "Unknown",
+                    "verificationStatus": "VER",
+                    "verificationMessage": "There was a change or addition to the suite/unit number.",
+                    "verificationUtc": null,
+                    "lockAddress": false
+                },
+                "shipDate": null,
+                "pickup": null,
+                "driverTip": null,
+                "packages": [
+                    {
+                        "packageTypeId": "2307",
+                        "description": null,
+                        "weight": {
+                            "unit": "Grams",
+                            "value": 300.00
+                        },
+                        "dimensions": null,
+                        "insuredValue": {
+                            "value": 78.55,
+                            "code": "USD"
+                        },
+                        "contentDescription": null
+                    }
+                ],
+                "options": {
+                    "dryIce": null,
+                    "includeReturnLabel": null,
+                    "collectOnDelivery": null,
+                    "dangerousGoods": null,
+                    "dangerousGoodsPurolator": null,
+                    "dangerousGoodsDhlEcommerce": null,
+                    "ancillaryEndorsementOption": null,
+                    "consequentialLoss": null,
+                    "emailNotification": null,
+                    "smsNotification": null,
+                    "safeplace": null,
+                    "billToAccount": null,
+                    "globalEOrderInfo": null,
+                    "freightClassCode": null,
+                    "b13ACanada": null,
+                    "shipperRelease": null,
+                    "saturdayDelivery": false,
+                    "containsAlcohol": false,
+                    "confirmation": "None",
+                    "confirmationEnumId": 0,
+                    "nonMachinable": false,
+                    "deliveredDutyPaid": false,
+                    "holdForPickup": null,
+                    "specialHandling": null,
+                    "dontNotifyMarketplace": null,
+                    "saturdayGuarantee": null,
+                    "localCollect": null,
+                    "printPostage": false,
+                    "additionalHandling": false,
+                    "dontPrepayPostage": false,
+                    "ancillaryEndorsement": null,
+                    "goGreenPlus": null,
+                    "additionalOptions": []
+                },
+                "insuranceProvider": "None",
+                "customs": {
+                    "content": "Merchandise",
+                    "nonDelivery": "Return",
+                    "exemptionCodeOrITN": "",
+                    "postagePaid": {
+                        "value": 7.00,
+                        "code": "AUD"
+                    },
+                    "dutiesPaid": {
+                        "value": 6.55,
+                        "code": "AUD"
+                    },
+                    "customsItems": []
+                },
+                "email": null
+            },
+            "externalFulfillmentConfiguration": null,
+            "rateSummary": {
+                "shippingServiceId": 0,
+                "sellerProviderId": 0,
+                "rateError": null,
+                "rate": {
+                    "shippingCost": {
+                        "value": 4.62,
+                        "code": "AUD"
+                    },
+                    "insuranceCost": {
+                        "value": 0.00,
+                        "code": "AUD"
+                    },
+                    "confirmationCost": {
+                        "value": 0.00,
+                        "code": "AUD"
+                    },
+                    "otherCost": {
+                        "value": 0.79,
+                        "code": "AUD"
+                    },
+                    "totalCost": {
+                        "value": 5.41,
+                        "code": "AUD"
+                    },
+                    "driverTip": null,
+                    "lineItems": null,
+                    "shipDate": null,
+                    "minEstimatedDeliveryDate": null,
+                    "maxEstimatedDeliveryDate": null,
+                    "estimatedDeliveryByTime": null,
+                    "estimatedDelivery": null,
+                    "estimatedPickup": null,
+                    "rateWarnings": null
+                }
+            },
+            "items": [
+                {
+                    "salesOrderItemId": "b373af0b-a69f-5797-9c21-86243f857dcd",
+                    "fulfillmentPlanItemId": "459414481",
+                    "productId": null,
+                    "fillSku": null,
+                    "sku": null,
+                    "upc": "",
+                    "name": "Self Love Sloth Tote - Pink / Carrie Tote",
+                    "quantity": 1.0,
+                    "productThumbnailUrl": "https://cdn.shopify.com/s/files/1/0549/8005/1111/files/SelfLoveSlothTote1.png?v=1684910079",
+                    "unitPrice": {
+                        "value": 20.00,
+                        "code": "AUD"
+                    },
+                    "totalPrice": {
+                        "value": 20.00,
+                        "code": "AUD"
+                    },
+                    "isGift": false,
+                    "attributes": [],
+                    "inventoryItemIdentifier": "7913713139954:44520415625458",
+                    "warehouseLocation": null,
+                    "weight": {
+                        "unit": "Grams",
+                        "value": 150.00
+                    },
+                    "mergeKey": "28cdf9d7-33ec-22fa-1082-28923cf627b3",
+                    "bundleProductId": null,
+                    "bundleProductSku": null
+                },
+                {
+                    "salesOrderItemId": "fed69842-9301-50c1-b41d-c212d959b646",
+                    "fulfillmentPlanItemId": "459414482",
+                    "productId": 22040317,
+                    "fillSku": null,
+                    "sku": "TEE-SECONDRODEO-WHT-REG-XL-LT",
+                    "upc": "",
+                    "name": "Second Rodeo Tee - White / Regular / XL",
+                    "quantity": 1.0,
+                    "productThumbnailUrl": "https://cdn.shopify.com/s/files/1/0549/8005/1111/products/SecondRodeoTee4.png?v=1680581302",
+                    "unitPrice": {
+                        "value": 45.00,
+                        "code": "AUD"
+                    },
+                    "totalPrice": {
+                        "value": 45.00,
+                        "code": "AUD"
+                    },
+                    "isGift": false,
+                    "attributes": [],
+                    "inventoryItemIdentifier": "7882527965426:44379373011186",
+                    "warehouseLocation": null,
+                    "weight": {
+                        "unit": "Grams",
+                        "value": 150.00
+                    },
+                    "mergeKey": "8d0ddb73-264f-56b7-78e3-7dac53ded601",
+                    "bundleProductId": null,
+                    "bundleProductSku": null
+                }
+            ],
+            "international": {
+                "needsCustoms": false,
+                "isInternational": false
+            },
+            "packingSlipTemplateId": "4620",
+            "allocationStatus": "Unallocated",
+            "shipmentEmailNotificationTemplateId": null,
+            "deliveryEmailNotificationTemplateId": null,
+            "notificationEmails": null,
+            "zone": null,
+            "isGift": false,
+            "notes": [
+                {
+                    "type": "NotesFromBuyer",
+                    "body": "null<br/>esid: iPMNRGSzcAE"
+                }
+            ],
+            "fulfillmentPlanSetId": null,
+            "tagIds": [],
+            "fulfillmentType": "Shipment",
+            "verificationStatus": {
+                "verifiedByGuid": null,
+                "verifiedUtc": null
+            },
+            "sellerTaxIdentifiers": [],
+            "recipientTaxIdentifier": null,
+            "pickupLocation": null,
+            "sellerBrandId": null,
+            "restrictions": null,
+            "lockAddress": false,
+            "fulfillmentPlanDates": {
+                "shipByDate": null,
+                "holdUntilDate": null,
+                "paidDate": "2023-08-25T00:34:43Z"
+            },
+            "amountSummary": {
+                "totalPaid": {
+                    "value": 72.00,
+                    "code": "AUD"
+                },
+                "shipping": {
+                    "value": 7.00,
+                    "code": "AUD"
+                },
+                "tax": {
+                    "value": 6.55,
+                    "code": "AUD"
+                }
+            },
+            "recipientInfo": {
+                "name": "Courtney Vanderwal",
+                "phone": "+61404641398",
+                "email": "courtneyjvanderwal@gmail.com"
+            },
+            "marketplaceData": {
+                "requestedService": "Standard"
+            }
+        }
+    ],
+    "fulfillments": [],
+    "fulfillmentPlanSets": [],
+    "returns": [],
+    "products": [
+        {
+            "productId": "22040317",
+            "sku": "TEE-SECONDRODEO-WHT-REG-XL-LT",
+            "name": "Second Rodeo Tee - White / Regular / XL",
+            "fulfillmentSku": null,
+            "createDateUTC": "2023-08-03T12:21:38.627Z",
+            "modifyDateUTC": "2023-08-03T21:11:26.253Z",
+            "active": true,
+            "productType": "Unknown",
+            "categoryId": null,
+            "providerId": null,
+            "serviceId": null,
+            "packageTypeId": null,
+            "confirmationId": null,
+            "intlProviderId": null,
+            "intlServiceId": null,
+            "intlPackageTypeId": null,
+            "intlConfirmationId": null,
+            "weight": null,
+            "weightUnitOfMeasureId": "Unknown",
+            "warehouseLocation": null,
+            "length": null,
+            "width": null,
+            "height": null,
+            "dimensionUnitOfMeasureId": "Unknown",
+            "useProductName": null,
+            "upc": null,
+            "productProfileId": "4679",
+            "parentProduct": null,
+            "parentProductId": null,
+            "productVariantIds": [],
+            "tags": null,
+            "isReturnable": true,
+            "price": 45.00,
+            "currencyPrice": {
+                "value": 45.00,
+                "code": "AUD"
+            },
+            "defaultCost": null,
+            "currencyDefaultCost": null,
+            "internalNotes": null,
+            "lastWeightOz": null,
+            "customsDescription": null,
+            "customsValue": null,
+            "currencyCustomsValue": null,
+            "customsTariffNo": null,
+            "customsCountry": null,
+            "noAutoCustomsDeclaration": false,
+            "thumbnailUrl": null,
+            "archiveOrderCount": null,
+            "archiveOrderTotal": null,
+            "archiveLastOrderDateUtc": null,
+            "autoSplitOption": "DoNotAutoSplit",
+            "autoSplitCustomQuantity": null,
+            "reorderThreshold": null,
+            "inventoryDisabled": null,
+            "shouldTrackInventory": null,
+            "hasHadInventory": null,
+            "isDeleted": false,
+            "productOptions": [],
+            "productAliases": [],
+            "aggregateInventoryCounts": null,
+            "productWarehouses": [],
+            "bundleComponents": null,
+            "isBundle": false
+        }
+    ],
+    "debugInfo": null,
+    "page": 1,
+    "pageSize": 500,
+    "totalCount": 1
+}

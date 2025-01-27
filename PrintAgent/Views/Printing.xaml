@@ -1,0 +1,51 @@
+﻿<UserControl x:Class="PrintAgent.Views.Printing"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PrintAgent.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal">
+            <Button Content="Clear Items"
+                    Margin="4"
+                    Width="100"
+                    Command="{Binding ClearItemsCommand}"/>
+        </StackPanel>
+        <ScrollViewer Grid.Row="1">
+            <DataGrid x:Name="PrintRequestsDataGrid" 
+                      AutoGenerateColumns="False"
+                ItemsSource="{Binding PrintRequests}"
+                IsReadOnly="True">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="Action">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="Open File"
+                                        Command="{Binding DataContext.OpenGcrCommand, ElementName=PrintRequestsDataGrid}"
+                                        CommandParameter="{Binding}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Timestamp" 
+                        Binding="{Binding Timestamp}"
+                        Width="*"/>
+                    <DataGridTextColumn Header="LineItem" 
+                        Binding="{Binding LineItem}" 
+                        Width="*"/>
+                    <DataGridTextColumn Header="Print File" 
+                        Width="3*"
+                        Binding="{Binding PrintFile}"/>
+                    <DataGridTextColumn Header="Status" 
+                        Width="*"
+                        Binding="{Binding Status}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

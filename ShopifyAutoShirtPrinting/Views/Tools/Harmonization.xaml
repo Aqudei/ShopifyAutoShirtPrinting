@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="ShopifyEasyShirtPrinting.Views.Tools.Harmonization"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ShopifyEasyShirtPrinting.Views.Tools"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal">
+            <!--<Button Content="Import Excel"
+                    Width="150"
+                    Margin="2"
+                    Command="{Binding ImportCommand}"/>-->
+            
+            <Button Content="New Item"
+                    Width="150"
+                    Margin="2"
+                    Command="{Binding NewItemCommand}"/>
+            
+            <Button Content="Delete Selected"
+                    Margin="2"
+                    Width="150"
+                    Command="{Binding DeleteSelectedCommand}"/>
+        </StackPanel>
+        <DataGrid Grid.Row="1"
+                  Margin="2"
+                  IsReadOnly="True"
+                  ItemsSource="{Binding HarmonisationItems}"
+                  AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding Selected}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>    
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Code" Binding="{Binding Code}"/>
+                <DataGridTextColumn Header="Description" Binding="{Binding Description}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>
