@@ -1345,10 +1345,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
     }
 
-    public bool IsNavigationTarget(NavigationContext navigationContext)
-    {
-        return true;
-    }
+    public bool IsNavigationTarget(NavigationContext navigationContext) => true;
+
 
     public void OnNavigatedFrom(NavigationContext navigationContext)
     {

@@ -320,7 +320,7 @@
                                         Binding="{Binding Quantity}" />
 
                     <DataGridTextColumn Header="Printed Qty" Binding="{Binding PrintedQuantity}" />
-                    <DataGridTemplateColumn Header="Name">
+                    <DataGridTemplateColumn Header="Name" SortMemberPath="Name">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Grid VerticalAlignment="Top"
