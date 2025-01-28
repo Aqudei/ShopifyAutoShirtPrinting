@@ -317,8 +317,7 @@
                     </DataGridTextColumn>
 
                     <DataGridTextColumn Header="Qty" 
-                                        Binding="{Binding Quantity}"
-                                        Visibility="{Binding DataContext.ColumnVisibility, Converter={StaticResource DictionaryToVisibilityConverter}, ConverterParameter=Quantity, Source={x:Reference DummyElement}, Mode=OneWay}"/>
+                                        Binding="{Binding Quantity}" />
 
                     <DataGridTextColumn Header="Printed Qty" Binding="{Binding PrintedQuantity}" />
                     <DataGridTemplateColumn Header="Name">
