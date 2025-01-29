@@ -19,14 +19,15 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         private MyLineItem _theLineItem;
         private string _orderNumber;
         private IMapper _mapper;
-        private readonly ApiClient _apiClient;
+        private readonly ApiClient _api;
         private int _quantity = 1;
         private string notes;
         private string _name;
         private int _id;
         private string _title;
         private DelegateCommand _selectNoneCommand;
-
+        public ObservableCollection<string> ShippingTypes { get; set; } = new();
+        public string Shipping { get => _shipping; set => SetProperty(ref _shipping, value); }
 
 
         public DelegateCommand SelectNoneCommand
@@ -53,6 +54,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         private ICollectionView _variantsCollectionView;
         private Variant _selectedVariant;
         private string _sku;
+        private string _shipping;
 
         public Variant SelectedVariant { get => _selectedVariant; set => SetProperty(ref _selectedVariant, value); }
 
@@ -75,6 +77,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             _theLineItem.Quantity = Quantity;
             _theLineItem.Notes = Notes;
             _theLineItem.Sku = Sku;
+            _theLineItem.Shipping = Shipping;
 
             var prams = new DialogParameters { { "MyLineItem", _theLineItem } };
 
@@ -95,7 +98,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         public CrudDialogViewModel(IMapper mapper, ApiClient apiClient)
         {
             _mapper = mapper;
-            _apiClient = apiClient;
+            _api = apiClient;
 
             VariantsCollectionView = CollectionViewSource.GetDefaultView(_variants);
             PropertyChanged += CrudDialogViewModel_PropertyChanged;
@@ -109,7 +112,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
                     {
                         if (!string.IsNullOrWhiteSpace(SearchText) && SearchText.Length >= 3)
                         {
-                            var variants = await _apiClient.SearchVariants(SearchText);
+                            var variants = await _api.SearchVariants(SearchText);
                             if (variants != null && variants.Any())
                             {
                                 await _dispatcher.InvokeAsync(_variants.Clear);
@@ -149,8 +152,14 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             }
         }
 
-        public void OnDialogOpened(IDialogParameters parameters)
+        public async void OnDialogOpened(IDialogParameters parameters)
         {
+
+            var shippingTypes = await _api.ListShippingTypeAsync();
+            ShippingTypes.Clear();
+            if (shippingTypes != null && shippingTypes.Any())
+                ShippingTypes.AddRange(shippingTypes);
+
             if (parameters != null && parameters.TryGetValue<MyLineItem>("MyLineItem", out var myLineItem))
             {
                 _title = "Edit Item";

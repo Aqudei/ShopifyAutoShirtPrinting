@@ -5,6 +5,7 @@ using ImTools;
 using NLog;
 using OfficeOpenXml;
 using Prism.Commands;
+using Prism.Regions;
 using Prism.Services.Dialogs;
 using ShopifyEasyShirtPrinting.Views.Tools;
 using System;
@@ -18,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace ShopifyEasyShirtPrinting.ViewModels.Tools
 {
-    internal class HarmonizationViewModel : PageBase
+    internal class HarmonizationViewModel : PageBase, INavigationAware
     {
         internal class HarmonizationComparer : IEqualityComparer<Models.Harmonisation.HSN>
         {
@@ -198,6 +199,17 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
                     HarmonizationItems.Add(item);
                 }
             }
+        }
+
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            Task.Run(FetchItems);
+        }
+
+        public bool IsNavigationTarget(NavigationContext navigationContext) => true;
+
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
         }
 
         public HarmonizationViewModel(ApiClient api, IMapper mapper, IDialogService dialogService)

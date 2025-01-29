@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:ico="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:local="clr-namespace:ShopifyEasyShirtPrinting.Views.Dialogs"
              mc:Ignorable="d" 
@@ -24,6 +25,7 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -85,17 +87,34 @@
                         Command="{Binding SelectNoneCommand}"/>
             </Grid>
         </StackPanel>
+        <Grid Margin="2,2,2,2" Grid.Row="7">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            
+            <ico:PackIconFontAwesome Kind="ExclamationCircleSolid"
+                                     VerticalAlignment="Center"
+                                     Width="16" 
+                                     Height="16"
+                                     ToolTip="Changing shipping service will apply to whole order."/>
 
-        <Grid Grid.Row="6"
-              Grid.Column="1">
-              
+            <Label Content="Shipping Type"
+                   Grid.Column="1"
+                   ToolTip="Changing shipping service will apply to whole order."/>
+
         </Grid>
-        
+
+        <ComboBox ItemsSource="{Binding ShippingTypes}"
+                      SelectedItem="{Binding Shipping}"
+                      Grid.Column="1"
+                      ToolTip="Changing shipping service will apply to whole order." Margin="2,2,2,2" Grid.Row="7"/>
+
         <Button Content="Save"
                 Margin="4"
                 Width="200"
                 Grid.Column="1"
-                Grid.Row="7"
+                Grid.Row="8"
                 Command="{Binding DialogCommand}"
                 CommandParameter="Create"/>
     </Grid>

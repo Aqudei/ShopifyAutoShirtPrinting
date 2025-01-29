@@ -5,6 +5,7 @@ using RestSharp;
 using RestSharp.Authenticators;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -777,7 +778,7 @@ namespace Common.Api
             {
                 var request = new RestRequest($"/shipping/harmonizations/")
                               .AddJsonBody(hsn);
-                 response = await _client.ExecutePostAsync<HSN>(request);
+                response = await _client.ExecutePostAsync<HSN>(request);
             }
             else
             {
@@ -803,8 +804,21 @@ namespace Common.Api
         {
             var request = new RestRequest($"/shipping/harmonizations/{item.Id}/");
             var response = await _client.ExecuteDeleteAsync(request);
+
+            if (!response.IsSuccessful)
+            {
+                Logger.Error(response.Content);
+                Debug.WriteLine(response.Content);
+
+            }
         }
 
+        public async Task<IEnumerable<string>> ListShippingTypeAsync()
+        {
+            var request = new RestRequest($"/shipping/types");
+            var response = await _client.ExecuteGetAsync<IEnumerable<string>>(request);
+            return response.Data;
+        }
 
         #endregion
     }

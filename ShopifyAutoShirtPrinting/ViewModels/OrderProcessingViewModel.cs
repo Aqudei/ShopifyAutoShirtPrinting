@@ -52,7 +52,6 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     private readonly IDialogService _dialogService;
     private readonly SessionVariables _globalVariables;
     private readonly IDialogCoordinator _dialogCoordinator;
-    private readonly MyPrintService _myPrintService;
     private readonly IMapper _mapper;
     private readonly BinService _binService;
     private readonly ApiClient _apiClient;
@@ -395,7 +394,6 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         _dialogService = dialogService;
         _globalVariables = globalVariables;
         _dialogCoordinator = dialogCoordinator;
-        _myPrintService = myPrintService;
         _eventAggregator = eventAggregator;
         _binService = binService;
         _apiClient = apiClient;
@@ -543,7 +541,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             }
         }
 
-        UpdateDisplayAsync();
+        await UpdateDisplayAsync();
     }
 
     private DelegateCommand _browseQrCommand;
