@@ -77,7 +77,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             _theLineItem.Quantity = Quantity;
             _theLineItem.Notes = Notes;
             _theLineItem.Sku = Sku;
-            _theLineItem.Shipping = Shipping;
+            _theLineItem.Shipping = String.IsNullOrWhiteSpace(Shipping) ? _theLineItem.Shipping : Shipping;
 
             var prams = new DialogParameters { { "MyLineItem", _theLineItem } };
 
@@ -156,15 +156,23 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         {
 
             var shippingTypes = await _api.ListShippingTypeAsync();
-            ShippingTypes.Clear();
-            if (shippingTypes != null && shippingTypes.Any())
-                ShippingTypes.AddRange(shippingTypes);
+
+            await _dispatcher.InvokeAsync(() =>
+            {
+                ShippingTypes.Clear();
+                if (shippingTypes != null && shippingTypes.Any())
+                {
+                    ShippingTypes.AddRange(shippingTypes);
+                    Shipping = ShippingTypes.First();
+                }
+            });
 
             if (parameters != null && parameters.TryGetValue<MyLineItem>("MyLineItem", out var myLineItem))
             {
                 _title = "Edit Item";
                 _theLineItem = myLineItem;
-                _mapper.Map(_theLineItem, this);
+
+                await _dispatcher.InvokeAsync(() => _mapper.Map(_theLineItem, this));
             }
             else
             {
