@@ -41,7 +41,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
             }
         }
 
-        public ObservableCollection<Models.Harmonisation.HSN> HarmonizationItems { get; set; } = new();
+        public ObservableCollection<Models.Harmonisation.HSN> HarmonizationItems { get; } = new();
         public override string Title => "Harmonization";
 
         private DelegateCommand _importCommand;
@@ -66,7 +66,10 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
         {
             _dialogService.ShowDialog("HarmonizationDialog", r =>
             {
-
+                if (r.Result == ButtonResult.OK)
+                {
+                    Task.Run(FetchItems);
+                }
             });
         }
 
@@ -86,6 +89,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
                 {
                     await _api.DeleteHsnAsync(_mapper.Map<Common.Models.Harmonisation.HSN>(item));
                 }
+
+                await FetchItems();
             }
             catch (Exception)
             {

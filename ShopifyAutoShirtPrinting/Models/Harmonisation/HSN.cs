@@ -14,7 +14,20 @@ namespace ShopifyEasyShirtPrinting.Models.Harmonisation
         private string _description;
         private bool _isSelected;
 
-        public bool IsSelected { get => _isSelected; set => SetProperty(ref _isSelected, value); }
+        public bool IsSelected
+        {
+            get
+            {
+                return _isSelected;
+            }
+
+            set
+            {
+                SetProperty(ref _isSelected, value);
+            }
+        }
+
+
         [JsonPropertyName("id")]
         public int Id { get; set; }
         [JsonPropertyName("code")]
