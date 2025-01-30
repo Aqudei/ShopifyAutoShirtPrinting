@@ -856,17 +856,25 @@ public class ArchivedViewModel : PageBase, INavigationAware
 
     private async void OnSearch()
     {
-        var searchResult = (await _apiClient.FindArchivedItemAsync(SearchText)).Map(_mapper.Map<LineItemViewModel>);
-        foreach (var item in searchResult)
+        try
         {
-            if (_lineItems.Any(x => x.Id == item.Id))
-                continue;
-
-            item.PropertyChanged += LineItem_PropertyChanged;
-            await _dispatcher.InvokeAsync(() =>
+            var searchResult = (await _apiClient.FindArchivedItemAsync(SearchText)).Map(_mapper.Map<LineItemViewModel>);
+            foreach (var item in searchResult)
             {
-                _lineItems.Add(item);
-            });
+                if (_lineItems.Any(x => x.Id == item.Id))
+                    continue;
+
+                item.PropertyChanged += LineItem_PropertyChanged;
+                await _dispatcher.InvokeAsync(() =>
+                {
+                    _lineItems.Add(item);
+                });
+            }
+        }
+        catch (Exception e)
+        {
+            Logger.Error(e);
+            await _dialogCoordinator.ShowMessageAsync(this, "Error", e.Message);
         }
     }
 
@@ -880,17 +888,25 @@ public class ArchivedViewModel : PageBase, INavigationAware
 
     private async void OnRestore()
     {
-        var selectedItems = _lineItems.Where(x => x.IsSelected).ToArray();
-        await _apiClient.RestoreItemsAsync(selectedItems.Select(_mapper.Map<MyLineItem>));
-        for (int i = selectedItems.Length - 1; i >= 0; i--)
+        try
         {
-            var item = selectedItems[i];
-
-            await _dispatcher.InvokeAsync(() =>
+            var selectedItems = _lineItems.Where(x => x.IsSelected).ToArray();
+            await _apiClient.RestoreItemsAsync(selectedItems.Select(_mapper.Map<MyLineItem>));
+            for (int i = selectedItems.Length - 1; i >= 0; i--)
             {
-                item.PropertyChanged -= LineItem_PropertyChanged;
-                _lineItems.Remove(item);
-            });
+                var item = selectedItems[i];
+
+                await _dispatcher.InvokeAsync(() =>
+                {
+                    item.PropertyChanged -= LineItem_PropertyChanged;
+                    _lineItems.Remove(item);
+                });
+            }
+        }
+        catch (Exception e)
+        {
+            Logger.Error(e);
+            await _dialogCoordinator.ShowMessageAsync(this, "Error", e.Message);
         }
     }
 
