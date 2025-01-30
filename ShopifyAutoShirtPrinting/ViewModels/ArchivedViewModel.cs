@@ -30,7 +30,6 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using ZXing;
 using ZXing.Common;
-using static ImTools.Item<TItem, T>;
 using Application = System.Windows.Application;
 using Path = System.IO.Path;
 using PrintDocument = System.Drawing.Printing.PrintDocument;
