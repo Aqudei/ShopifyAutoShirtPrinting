@@ -30,6 +30,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using ZXing;
 using ZXing.Common;
+using static ImTools.Item<TItem, T>;
 using Application = System.Windows.Application;
 using Path = System.IO.Path;
 using PrintDocument = System.Drawing.Printing.PrintDocument;
@@ -953,8 +954,9 @@ public class ArchivedViewModel : PageBase, INavigationAware
         {
             var item = _lineItems[i];
             item.PropertyChanged -= LineItem_PropertyChanged;
-            await _dispatcher.InvokeAsync(() => _lineItems.Remove(item));
         }
+
+        await _dispatcher.InvokeAsync(_lineItems.Clear);
     }
 
 
@@ -1009,12 +1011,9 @@ public class ArchivedViewModel : PageBase, INavigationAware
         set => SetProperty(ref _detectedQr, value);
     }
 
-    public async void OnNavigatedTo(NavigationContext navigationContext)
+    public void OnNavigatedTo(NavigationContext navigationContext)
     {
-
-
-        await Task.Run(FetchArchivedLineItemsAsync);
-
+        Task.Run(FetchArchivedLineItemsAsync);
     }
 
     public bool IsNavigationTarget(NavigationContext navigationContext)
