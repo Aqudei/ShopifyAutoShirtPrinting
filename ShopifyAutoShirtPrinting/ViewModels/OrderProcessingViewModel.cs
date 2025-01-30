@@ -642,42 +642,29 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private async void OrderProcessingViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        switch (e.PropertyName)
+        try
         {
-            case nameof(SelectedTagFilter):
+            switch (e.PropertyName)
+            {
+                case nameof(SelectedTagFilter):
                 {
                     HandleTagFilter(SelectedTagFilter);
                     LastTagFilter = SelectedTagFilter;
                     break;
                 }
-            case nameof(SelectedLineItem):
+                case nameof(SelectedLineItem):
                 {
                     await UpdateUIForLineItem(SelectedLineItem);
                     break;
                 }
-            case nameof(SearchText):
+                case nameof(SearchText):
                 {
-                    if (!string.IsNullOrWhiteSpace(SearchText))
-                        LineItemsView.Filter = o =>
-                        {
-                            if (o is LineItemViewModel o1)
-                            {
-                                var sku = o1.Sku ?? "";
-                                var orderNumber = o1.OrderNumber?.ToString() ?? "";
-                                var shippingLines = o1.Shipping?.ToLower() ?? "";
-                                return orderNumber.Contains(SearchText) || sku.Contains(SearchText) ||
-                                                          o1.Name.ToLower().Contains(SearchText.ToLower()) || shippingLines.Contains(SearchText.ToLower());
-                            }
-
-                            return true;
-                        };
-                    else
-                        LineItemsView.Filter = o => true;
-
+                    HandleSearch();
+                    SelectedLineItem = null;
                     break;
                 }
 
-            case nameof(DetectedQr):
+                case nameof(DetectedQr):
                 {
                     if (!string.IsNullOrWhiteSpace(DetectedQr) && (DetectedQr.EndsWith("\n") || DetectedQr.EndsWith("\r") ||
                                                                    DetectedQr.EndsWith(" ")))
@@ -731,7 +718,47 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
                     break;
                 }
+            }
         }
+        catch (Exception ex)
+        {
+            Logger.Error(ex);
+            await _dialogCoordinator.ShowExceptionErrorAsync(this, ex);
+
+        }
+    }
+
+    private void HandleSearch()
+    {
+        if (!string.IsNullOrWhiteSpace(SearchText))
+            LineItemsView.Filter = o =>
+            {
+                var searchTextLower = SearchText.ToLower().Trim();
+
+                if (o is LineItemViewModel o1)
+                {
+                    var combined = string.Join(" ", o1.Sku, o1.OrderNumber, o1.Shipping, o1.Name, o1.Customer, o1.CustomerEmail, o1.Status);
+                    combined = Regex.Replace(combined, @"\s+", " ").ToLower();
+
+                    if (searchTextLower.StartsWith("\"") && searchTextLower.EndsWith("\""))
+                    {
+                        return combined.Contains(searchTextLower.Trim('"'));
+                    }
+
+                    var searchTextLowerTokens = searchTextLower.Split(' ');
+
+                    var result = searchTextLowerTokens.All(combined.Contains);
+
+                    return result;
+
+                    //return orderNumber.Contains(searchTextLower) || sku.Contains(searchTextLower) ||
+                    //       o1.Name.ToLower().Contains(searchTextLower) || shippingLines.Contains(searchTextLower);
+                }
+
+                return true;
+            };
+        else
+            LineItemsView.Filter = null;
     }
 
     private void TryOpenPrintFiles(LineItemViewModel lineItemVm, bool backPrint = false)
