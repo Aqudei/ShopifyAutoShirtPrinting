@@ -805,7 +805,7 @@ public class ArchivedViewModel : PageBase, INavigationAware
 
     public DelegateCommand<bool?> CheckBoxCommand
     {
-        get => checkBoxCommand ??= new DelegateCommand<bool?>(HandleCheckBoxCommand);
+        get { return checkBoxCommand ??= new DelegateCommand<bool?>(HandleCheckBoxCommand); }
     }
 
     public bool? MasterCheckBoxState { get => _masterCheckBoxState; set => SetProperty(ref _masterCheckBoxState, value); }

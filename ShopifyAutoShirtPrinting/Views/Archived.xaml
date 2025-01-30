@@ -17,6 +17,7 @@
         <converters:StatusToColorConverter x:Key="StatusToColorConverter"/>
     </UserControl.Resources>
     <Grid>
+        
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition Width="400"/>
@@ -26,7 +27,10 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-
+        
+        <ContentControl Visibility="Collapsed"
+                        x:Name="DataContextHolder" />
+        
         <StackPanel Orientation="Vertical">
 
             <Grid Margin="5">
@@ -148,8 +152,8 @@
                 <DataGrid.Columns>
                     <DataGridTemplateColumn>
                         <DataGridTemplateColumn.Header>
-                            <CheckBox IsChecked="{Binding DataContext.MasterCheckBoxState, ElementName=OrdersDataGrid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                      Command="{Binding DataContext.CheckBoxCommand, ElementName=OrdersDataGrid}"
+                            <CheckBox IsChecked="{Binding DataContext.MasterCheckBoxState, ElementName=DataContextHolder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      Command="{Binding DataContext.CheckBoxCommand, ElementName=DataContextHolder}"
                                       CommandParameter="{Binding IsChecked, RelativeSource={RelativeSource Self}}" />
                         </DataGridTemplateColumn.Header>
                         <DataGridTemplateColumn.CellTemplate>
