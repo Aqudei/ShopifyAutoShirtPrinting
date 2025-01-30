@@ -217,9 +217,9 @@ public class ArchivedViewModel : PageBase, INavigationAware
         }
     }
 
-    private async void RefreshData()
+    private void RefreshData()
     {
-        await FetchArchivedLineItemsAsync();
+        Task.Run(FetchArchivedLineItemsAsync);
     }
 
     public string SearchText
@@ -910,13 +910,12 @@ public class ArchivedViewModel : PageBase, INavigationAware
         }
     }
 
-    private async Task FetchArchivedLineItemsAsync()
+    private async void FetchArchivedLineItemsAsync()
     {
         var waitDialog = await _dialogCoordinator.ShowProgressAsync(this, "Please wait", "Fetching archived orders...");
-        waitDialog.SetIndeterminate();
-
         try
         {
+            waitDialog.SetIndeterminate();
             // Update UI
             await ClearUILineItems();
             var lineItems = await _apiClient.ListArchivedItemsAsync();
