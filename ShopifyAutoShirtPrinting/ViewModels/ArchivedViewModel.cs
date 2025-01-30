@@ -48,7 +48,7 @@ public class ArchivedViewModel : PageBase, INavigationAware
     private DelegateCommand _generateQrCommand;
     private LineItemViewModel _selectedLineItem;
     private readonly IDialogService _dialogService;
-    
+
     private readonly SessionVariables _globalVariables;
     private readonly IDialogCoordinator _dialogCoordinator;
     private readonly MyPrintService _myPrintService;
@@ -193,7 +193,7 @@ public class ArchivedViewModel : PageBase, INavigationAware
     private DelegateCommand _refreshCommand;
 
     public DelegateCommand RefreshCommand => _refreshCommand ??= new DelegateCommand(RefreshData);
-    
+
     public int TotalDisplayed
     {
         get
@@ -397,7 +397,38 @@ public class ArchivedViewModel : PageBase, INavigationAware
         var lineItemModel = _mapper.Map<MyLineItem>(SelectedLineItem);
         await _apiClient.UpdateLineItemAsync(lineItemModel);
     }
+    private void HandleSearch()
+    {
+        if (!string.IsNullOrWhiteSpace(SearchText))
+            LineItemsView.Filter = o =>
+            {
+                var searchTextLower = SearchText.ToLower().Trim();
 
+                if (o is LineItemViewModel o1)
+                {
+                    var combined = string.Join(" ", o1.Sku, o1.OrderNumber, o1.Shipping, o1.Name, o1.Customer, o1.CustomerEmail, o1.Status);
+                    combined = Regex.Replace(combined, @"\s+", " ").ToLower();
+
+                    if (searchTextLower.StartsWith("\"") && searchTextLower.EndsWith("\""))
+                    {
+                        return combined.Contains(searchTextLower.Trim('"'));
+                    }
+
+                    var searchTextLowerTokens = searchTextLower.Split(' ');
+
+                    var result = searchTextLowerTokens.All(combined.Contains);
+
+                    return result;
+
+                    //return orderNumber.Contains(searchTextLower) || sku.Contains(searchTextLower) ||
+                    //       o1.Name.ToLower().Contains(searchTextLower) || shippingLines.Contains(searchTextLower);
+                }
+
+                return true;
+            };
+        else
+            LineItemsView.Filter = null;
+    }
     private async void OrderProcessingViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         switch (e.PropertyName)
@@ -409,26 +440,8 @@ public class ArchivedViewModel : PageBase, INavigationAware
                 }
             case nameof(SearchText):
                 {
-                    if (!string.IsNullOrWhiteSpace(SearchText))
-                        LineItemsView.Filter = o =>
-                        {
-                            if (o is LineItemViewModel o1)
-                            {
-                                var sku = o1.Sku ?? "";
-                                var orderNumber = o1.OrderNumber?.ToString() ?? "";
-                                var shippingLines = o1.Shipping?.ToLower() ?? "";
-                                return orderNumber.Contains(SearchText) || sku.Contains(SearchText) ||
-                                                          o1.Name.ToLower().Contains(SearchText.ToLower()) || shippingLines.Contains(SearchText.ToLower());
-                            }
-
-                            return true;
-                        };
-                    else
-                    {
-                        LineItemsView.Filter = null;
-                        SelectedLineItem = null;
-                    }
-
+                    HandleSearch();
+                    SelectedLineItem = null;
                     break;
                 }
 
