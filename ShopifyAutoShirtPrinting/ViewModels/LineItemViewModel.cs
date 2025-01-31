@@ -90,6 +90,7 @@ namespace Common.Models
         private string _name;
         private int _originalBinNumber;
         private string _sku;
+        private string _shipping;
 
         public int PrintedQuantity
         {
@@ -113,7 +114,7 @@ namespace Common.Models
 
         public bool HasNotes => !string.IsNullOrWhiteSpace(Notes);
 
-        public string Shipping { get; set; }
+        public string Shipping { get => _shipping; set => SetProperty(ref _shipping, value); }
         public bool ForPickup { get; set; }
 
         public decimal Grams { get; set; }
