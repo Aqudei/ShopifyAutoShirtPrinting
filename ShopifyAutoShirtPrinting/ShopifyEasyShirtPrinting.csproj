@@ -28,12 +28,14 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>https://raw.githubusercontent.com/Aqudei/ShopifyAutoShirtPrinting/main/ShopifyAutoShirtPrinting/publish/</InstallUrl>
+    <InstallUrl>https://raw.githubusercontent.com/Aqudei/ShopifyAutoShirtPrinting/refs/heads/main/ShopifyAutoShirtPrinting/publish/</InstallUrl>
     <UpdateUrl>https://raw.githubusercontent.com/Aqudei/ShopifyAutoShirtPrinting/main/ShopifyAutoShirtPrinting/publish/</UpdateUrl>
     <ProductName>ShopifyEasyShirtPrinting</ProductName>
     <PublisherName>Aqudei</PublisherName>
     <SuiteName>Tools</SuiteName>
-    <ApplicationRevision>27</ApplicationRevision>
+    <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
+    <WebPage>publish.htm</WebPage>
+    <ApplicationRevision>29</ApplicationRevision>
     <ApplicationVersion>17.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
