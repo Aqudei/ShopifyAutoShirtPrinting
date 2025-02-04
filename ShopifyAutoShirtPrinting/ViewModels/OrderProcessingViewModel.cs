@@ -737,7 +737,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
                 if (o is LineItemViewModel o1)
                 {
-                    var combined = string.Join(" ", o1.Sku, o1.OrderNumber, o1.Shipping, o1.Name, o1.Customer, o1.CustomerEmail, o1.Status);
+                    var combined = string.Join(" ", o1.Sku, o1.OrderNumber, o1.Shipping, o1.Name, o1.Customer, o1.CustomerEmail, o1.Status, o1.Notes);
                     combined = Regex.Replace(combined, @"\s+", " ").ToLower();
 
                     if (searchTextLower.StartsWith("\"") && searchTextLower.EndsWith("\""))

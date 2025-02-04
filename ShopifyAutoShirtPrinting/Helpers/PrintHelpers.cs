@@ -28,18 +28,21 @@ namespace ShopifyEasyShirtPrinting.Helpers
 
         public static void PrintPdf(string pdfPath, string printerName)
         {
-            // Open the PDF document
-            using var document = PdfDocument.Load(pdfPath);
-            // Create a PrintDocument object
-            using var printDocument = document.CreatePrintDocument();
-            // Set the printer name, if specified
-            if (!string.IsNullOrEmpty(printerName))
+            Task.Run(() =>
             {
-                printDocument.PrinterSettings.PrinterName = printerName;
-            }
+                // Open the PDF document
+                using var document = PdfDocument.Load(pdfPath);
+                // Create a PrintDocument object
+                using var printDocument = document.CreatePrintDocument();
+                // Set the printer name, if specified
+                if (!string.IsNullOrEmpty(printerName))
+                {
+                    printDocument.PrinterSettings.PrinterName = printerName;
+                }
 
-            // Print the document
-            printDocument.Print();
+                // Print the document
+                printDocument.Print();
+            });
         }
     }
 }
