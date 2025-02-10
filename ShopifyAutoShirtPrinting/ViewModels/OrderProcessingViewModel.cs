@@ -600,10 +600,42 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
         LineItemsView.Filter = s =>
         {
-            return (s as LineItemViewModel)?.Status == statusTag;
+            if (s is LineItemViewModel o1)
+            {
+                if (!string.IsNullOrWhiteSpace(SearchText))
+                {
+                    return SearchFunction(o1) && o1.Status == statusTag;
+
+                    //return orderNumber.Contains(searchTextLower) || sku.Contains(searchTextLower) ||
+                    //       o1.Name.ToLower().Contains(searchTextLower) || shippingLines.Contains(searchTextLower);
+
+                }
+                return o1.Status == statusTag;
+            }
+
+            return true;
         };
 
         await UpdateDisplayAsync();
+    }
+
+    private bool SearchFunction(LineItemViewModel o1)
+    {
+        var searchTextLower = SearchText.ToLower().Trim();
+
+        var combined = string.Join(" ", o1.Sku, o1.OrderNumber, o1.Shipping, o1.Name, o1.Customer, o1.CustomerEmail, o1.Notes);
+        combined = Regex.Replace(combined, @"\s+", " ").ToLower();
+
+        if (searchTextLower.StartsWith("\"") && searchTextLower.EndsWith("\""))
+        {
+            return combined.Contains(searchTextLower.Trim('"'));
+        }
+
+        var searchTextLowerTokens = searchTextLower.Split(' ');
+
+        var result = searchTextLowerTokens.All(combined.Contains);
+
+        return result;
     }
 
     public DelegateCommand ApplyNotesCommand
@@ -647,77 +679,77 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             switch (e.PropertyName)
             {
                 case nameof(SelectedTagFilter):
-                {
-                    HandleTagFilter(SelectedTagFilter);
-                    LastTagFilter = SelectedTagFilter;
-                    break;
-                }
-                case nameof(SelectedLineItem):
-                {
-                    await UpdateUIForLineItem(SelectedLineItem);
-                    break;
-                }
-                case nameof(SearchText):
-                {
-                    HandleSearch();
-                    SelectedLineItem = null;
-                    break;
-                }
-
-                case nameof(DetectedQr):
-                {
-                    if (!string.IsNullOrWhiteSpace(DetectedQr) && (DetectedQr.EndsWith("\n") || DetectedQr.EndsWith("\r") ||
-                                                                   DetectedQr.EndsWith(" ")))
                     {
-                        try
-                        {
-                            var parsedQr = MyQr.Parse(DetectedQr.Trim(" \r\n\t".ToCharArray()));
-
-                            await _dispatcher.InvokeAsync(() => DetectedQr = "");
-
-                            if (parsedQr != null)
-                            {
-                                // QrInfo = FetchQrInfo(parsedQr);
-                                var lineItem = await _apiClient.GetLineItemByIdAsync(parsedQr.LineItemDatabaseId);
-                                if (lineItem == null)
-                                {
-                                    await _dialogCoordinator.ShowMessageAsync(this, "Error", "Cannot process or show items that were already Shipped / Archived");
-                                    return;
-                                }
-
-                                var lineItemVm = _mapper.Map<LineItemViewModel>(lineItem);
-
-                                await ShowScanInfoAsync(lineItemVm);
-
-                                switch (SelectedScanMode)
-                                {
-                                    case SCAN_MODE_SCAN_ONLY:
-                                        await ActivateLineItemInView(lineItemVm);
-                                        break;
-                                    case SCAN_MODE_GCR_FRONT:
-                                        await ActivateLineItemInView(lineItemVm);
-                                        TryOpenPrintFiles(lineItemVm);
-                                        break;
-                                    case SCAN_MODE_GCR_BACK:
-                                        await ActivateLineItemInView(lineItemVm);
-                                        TryOpenPrintFiles(lineItemVm, true);
-                                        break;
-                                    default:
-                                        await ProcessItemForPrintingAsync(lineItemVm);
-                                        break;
-                                }
-
-                            }
-                        }
-                        catch (Exception exception)
-                        {
-                            Logger.Error(exception);
-                            await _dialogCoordinator.ShowExceptionErrorAsync(this, exception);
-                        }
+                        HandleTagFilter(SelectedTagFilter);
+                        LastTagFilter = SelectedTagFilter;
+                        break;
+                    }
+                case nameof(SelectedLineItem):
+                    {
+                        await UpdateUIForLineItem(SelectedLineItem);
+                        break;
+                    }
+                case nameof(SearchText):
+                    {
+                        HandleSearch();
+                        SelectedLineItem = null;
+                        break;
                     }
 
-                    break;
-                }
+                case nameof(DetectedQr):
+                    {
+                        if (!string.IsNullOrWhiteSpace(DetectedQr) && (DetectedQr.EndsWith("\n") || DetectedQr.EndsWith("\r") ||
+                                                                       DetectedQr.EndsWith(" ")))
+                        {
+                            try
+                            {
+                                var parsedQr = MyQr.Parse(DetectedQr.Trim(" \r\n\t".ToCharArray()));
+
+                                await _dispatcher.InvokeAsync(() => DetectedQr = "");
+
+                                if (parsedQr != null)
+                                {
+                                    // QrInfo = FetchQrInfo(parsedQr);
+                                    var lineItem = await _apiClient.GetLineItemByIdAsync(parsedQr.LineItemDatabaseId);
+                                    if (lineItem == null)
+                                    {
+                                        await _dialogCoordinator.ShowMessageAsync(this, "Error", "Cannot process or show items that were already Shipped / Archived");
+                                        return;
+                                    }
+
+                                    var lineItemVm = _mapper.Map<LineItemViewModel>(lineItem);
+
+                                    await ShowScanInfoAsync(lineItemVm);
+
+                                    switch (SelectedScanMode)
+                                    {
+                                        case SCAN_MODE_SCAN_ONLY:
+                                            await ActivateLineItemInView(lineItemVm);
+                                            break;
+                                        case SCAN_MODE_GCR_FRONT:
+                                            await ActivateLineItemInView(lineItemVm);
+                                            TryOpenPrintFiles(lineItemVm);
+                                            break;
+                                        case SCAN_MODE_GCR_BACK:
+                                            await ActivateLineItemInView(lineItemVm);
+                                            TryOpenPrintFiles(lineItemVm, true);
+                                            break;
+                                        default:
+                                            await ProcessItemForPrintingAsync(lineItemVm);
+                                            break;
+                                    }
+
+                                }
+                            }
+                            catch (Exception exception)
+                            {
+                                Logger.Error(exception);
+                                await _dialogCoordinator.ShowExceptionErrorAsync(this, exception);
+                            }
+                        }
+
+                        break;
+                    }
             }
         }
         catch (Exception ex)
@@ -737,19 +769,13 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
                 if (o is LineItemViewModel o1)
                 {
-                    var combined = string.Join(" ", o1.Sku, o1.OrderNumber, o1.Shipping, o1.Name, o1.Customer, o1.CustomerEmail, o1.Status, o1.Notes);
-                    combined = Regex.Replace(combined, @"\s+", " ").ToLower();
-
-                    if (searchTextLower.StartsWith("\"") && searchTextLower.EndsWith("\""))
+                    if (string.IsNullOrWhiteSpace(SelectedTagFilter))
+                        return SearchFunction(o1);
+                    else
                     {
-                        return combined.Contains(searchTextLower.Trim('"'));
+                        return SearchFunction(o1) && o1.Status == SelectedTagFilter;
                     }
 
-                    var searchTextLowerTokens = searchTextLower.Split(' ');
-
-                    var result = searchTextLowerTokens.All(combined.Contains);
-
-                    return result;
 
                     //return orderNumber.Contains(searchTextLower) || sku.Contains(searchTextLower) ||
                     //       o1.Name.ToLower().Contains(searchTextLower) || shippingLines.Contains(searchTextLower);
@@ -758,7 +784,22 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 return true;
             };
         else
-            LineItemsView.Filter = null;
+        {
+            if (string.IsNullOrWhiteSpace(SelectedTagFilter))
+                LineItemsView.Filter = null;
+            else
+            {
+                LineItemsView.Filter = o =>
+                {
+                    if (o is LineItemViewModel o1)
+                    {
+                        return o1.Status == SelectedTagFilter;
+                    }
+
+                    return true;
+                };
+            }
+        }
     }
 
     private void TryOpenPrintFiles(LineItemViewModel lineItemVm, bool backPrint = false)

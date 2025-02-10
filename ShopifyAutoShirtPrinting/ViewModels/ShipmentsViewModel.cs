@@ -286,7 +286,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                             break;
                         }
                         else
-                        {
+                        { 
                             delta = DateTime.Now - timeStart;
                             shipmentOrder = await _apiClient.GetShipmentOrderByIdAsync(shipmentOrder.Id);
                         }
