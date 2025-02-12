@@ -1,0 +1,28 @@
+# name: SFTP Deploy on Push
+
+# on:
+#   push:
+#     branches:
+#       - main  # Change this to your target branch if needed
+
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v3
+
+#       - name: Install LFTP
+#         run: sudo apt-get install -y lftp
+
+#       - name: Upload files to SFTP
+#         env:
+#           SFTP_HOST: ${{ secrets.SFTP_HOST }}
+#           SFTP_USER: ${{ secrets.SFTP_USER }}
+#           SFTP_PASS: ${{ secrets.SFTP_PASS }}
+#         run: |
+#           lftp -u "$SFTP_USER","$SFTP_PASS" sftp://$SFTP_HOST << EOF
+#             mirror -R ./ShopifyAutoShirtPrinting /var/www/clickonce/
+#             bye
+#           EOF

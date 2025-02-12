@@ -30,6 +30,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Threading;
+using ControlzEx.Standard;
 using ZXing;
 using ZXing.Common;
 using Application = System.Windows.Application;
@@ -588,35 +589,43 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private async void HandleTagFilter(string statusTag)
     {
-        if (statusTag == "Archived")
+        try
         {
-            await FetchArchivedLineItemsAsync();
-        }
-        else
-        {
-            if (LastTagFilter == "Archived")
-                await FetchActiveLineItemsAsync();
-        }
-
-        LineItemsView.Filter = s =>
-        {
-            if (s is LineItemViewModel o1)
+            if (statusTag == "Archived")
             {
-                if (!string.IsNullOrWhiteSpace(SearchText))
-                {
-                    return SearchFunction(o1) && o1.Status == statusTag;
-
-                    //return orderNumber.Contains(searchTextLower) || sku.Contains(searchTextLower) ||
-                    //       o1.Name.ToLower().Contains(searchTextLower) || shippingLines.Contains(searchTextLower);
-
-                }
-                return o1.Status == statusTag;
+                await FetchArchivedLineItemsAsync();
+            }
+            else
+            {
+                if (LastTagFilter == "Archived")
+                    await FetchActiveLineItemsAsync();
             }
 
-            return true;
-        };
+            LineItemsView.Filter = s =>
+            {
+                if (s is LineItemViewModel o1)
+                {
+                    if (!string.IsNullOrWhiteSpace(SearchText))
+                    {
+                        return SearchFunction(o1) && o1.Status == statusTag;
 
-        await UpdateDisplayAsync();
+                        //return orderNumber.Contains(searchTextLower) || sku.Contains(searchTextLower) ||
+                        //       o1.Name.ToLower().Contains(searchTextLower) || shippingLines.Contains(searchTextLower);
+
+                    }
+                    return o1.Status == statusTag;
+                }
+
+                return true;
+            };
+
+            await UpdateDisplayAsync();
+        }
+        catch (Exception e)
+        {
+            Logger.Error(e);
+            await _dialogCoordinator.ShowMessageAsync(this, "Something went wrong", e.Message);
+        }
     }
 
     private bool SearchFunction(LineItemViewModel o1)
@@ -660,16 +669,24 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private async void HandleClearStatusFilter()
     {
-        if (LastTagFilter == "Archived")
+        try
         {
-            await FetchActiveLineItemsAsync();
-        }
+            if (LastTagFilter == "Archived")
+            {
+                await FetchActiveLineItemsAsync();
+            }
 
-        await _dispatcher.InvokeAsync(() =>
+            await _dispatcher.InvokeAsync(() =>
+            {
+                SelectedTagFilter = null;
+                Task.Run(HandleSearchAsync);
+            });
+        }
+        catch (Exception e)
         {
-            SelectedTagFilter = null;
-            LineItemsView.Filter = null;
-        });
+            Logger.Error(e);
+            await _dialogCoordinator.ShowMessageAsync(this, "Error", e.Message);
+        }
     }
 
     private async void OrderProcessingViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -686,12 +703,12 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                     }
                 case nameof(SelectedLineItem):
                     {
-                        await UpdateUIForLineItem(SelectedLineItem);
+                        await UpdateUiForLineItem(SelectedLineItem);
                         break;
                     }
                 case nameof(SearchText):
                     {
-                        HandleSearch();
+                        await HandleSearchAsync();
                         SelectedLineItem = null;
                         break;
                     }
@@ -760,45 +777,52 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
     }
 
-    private void HandleSearch()
+    private async Task HandleSearchAsync()
     {
-        if (!string.IsNullOrWhiteSpace(SearchText))
-            LineItemsView.Filter = o =>
-            {
-                var searchTextLower = SearchText.ToLower().Trim();
-
-                if (o is LineItemViewModel o1)
-                {
-                    if (string.IsNullOrWhiteSpace(SelectedTagFilter))
-                        return SearchFunction(o1);
-                    else
-                    {
-                        return SearchFunction(o1) && o1.Status == SelectedTagFilter;
-                    }
-
-
-                    //return orderNumber.Contains(searchTextLower) || sku.Contains(searchTextLower) ||
-                    //       o1.Name.ToLower().Contains(searchTextLower) || shippingLines.Contains(searchTextLower);
-                }
-
-                return true;
-            };
-        else
+        try
         {
-            if (string.IsNullOrWhiteSpace(SelectedTagFilter))
-                LineItemsView.Filter = null;
-            else
-            {
+            if (!string.IsNullOrWhiteSpace(SearchText))
                 LineItemsView.Filter = o =>
                 {
                     if (o is LineItemViewModel o1)
                     {
-                        return o1.Status == SelectedTagFilter;
+                        if (string.IsNullOrWhiteSpace(SelectedTagFilter))
+                            return SearchFunction(o1);
+                        else
+                        {
+                            return SearchFunction(o1) && o1.Status == SelectedTagFilter;
+                        }
+
+
+                        //return orderNumber.Contains(searchTextLower) || sku.Contains(searchTextLower) ||
+                        //       o1.Name.ToLower().Contains(searchTextLower) || shippingLines.Contains(searchTextLower);
                     }
 
                     return true;
                 };
+            else
+            {
+                if (string.IsNullOrWhiteSpace(SelectedTagFilter))
+                    LineItemsView.Filter = null;
+                else
+                {
+                    LineItemsView.Filter = o =>
+                    {
+                        if (o is LineItemViewModel o1)
+                        {
+                            return o1.Status == SelectedTagFilter;
+                        }
+
+                        return true;
+                    };
+                }
             }
+
+            await UpdateDisplayAsync();
+        }
+        catch (Exception e)
+        {
+            Logger.Error(e);
         }
     }
 
@@ -835,7 +859,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     public bool IsFilterEnabled { get => _isFilterEnabled; set => SetProperty(ref _isFilterEnabled, value); }
 
-    private async Task UpdateUIForLineItem(LineItemViewModel theSelectedLineItem)
+    private async Task UpdateUiForLineItem(LineItemViewModel theSelectedLineItem)
     {
         try
         {
@@ -1172,7 +1196,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         try
         {
             // Update UI
-            await ClearUILineItems();
+            await ClearUiLineItems();
             var lineItems = await _apiClient.ListArchivedItemsAsync();
 
             if (lineItems == null)
@@ -1199,7 +1223,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
     }
 
-    private async Task ClearUILineItems()
+    private async Task ClearUiLineItems()
     {
         foreach (var item in _lineItems)
         {
@@ -1218,7 +1242,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
         try
         {
-            await ClearUILineItems();
+            await ClearUiLineItems();
 
             // var lineItems = await _apiClient.ListItemsAsync();
             var lineItems = await _apiClient.ListItemsAsync(store: Store);
@@ -1233,8 +1257,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 lineItem.PropertyChanged += LineItem_PropertyChanged;
                 await _dispatcher.BeginInvoke(() => _lineItems.Add(lineItem));
             }
-
-            await UpdateDisplayAsync();
+            //await UpdateDisplayAsync();
         }
         catch (Exception e)
         {
@@ -1249,9 +1272,16 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     private async void LineItem_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         LineItemViewModel myLineItem;
-        if (e.PropertyName == nameof(myLineItem.IsSelected))
+        try
         {
-            await UpdateDisplayAsync();
+            if (e.PropertyName == nameof(myLineItem.IsSelected))
+            {
+                await UpdateDisplayAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.Error(ex);
         }
     }
 
@@ -1291,7 +1321,16 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private async void OnPrintQrTags()
     {
-        await PrintQrTagsAsync();
+        try
+        {
+            await PrintQrTagsAsync();
+        }
+        catch (Exception e)
+        {
+            Logger.Error(e);
+            await _dialogCoordinator.ShowMessageAsync(this, "Error", e.Message);
+
+        }
     }
 
     private async Task PrintQrTagsAsync()
