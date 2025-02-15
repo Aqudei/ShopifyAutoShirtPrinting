@@ -726,6 +726,11 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
                                 if (parsedQr != null)
                                 {
+                                    await _dispatcher.InvokeAsync(() =>
+                                    {
+                                        HandleClearStatusFilter();
+                                        SearchText = "";
+                                    });
                                     // QrInfo = FetchQrInfo(parsedQr);
                                     var lineItem = await _apiClient.GetLineItemByIdAsync(parsedQr.LineItemDatabaseId);
                                     if (lineItem == null)
