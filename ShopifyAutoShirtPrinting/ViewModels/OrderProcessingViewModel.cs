@@ -95,7 +95,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     public ObservableCollection<string> ShippingLines { get; set; } = new();
 
     private DelegateCommand _saveQrTagsCommand;
-    private DelegateCommand<string> _appplyTagCommand;
+    private DelegateCommand<string> _applyTagCommand;
     public ObservableCollection<Log> Logs { get; set; } = new();
     public ObservableCollection<KeyValuePair<string, string>> ScanInfo { set; get; } = new();
     public string Notes { get => _notes; set => SetProperty(ref _notes, value); }
@@ -157,9 +157,9 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
     }
 
-    public DelegateCommand<string> AppplyTagCommand
+    public DelegateCommand<string> ApplyTagCommand
     {
-        get { return _appplyTagCommand ??= new DelegateCommand<string>(HandleApplyTag); }
+        get { return _applyTagCommand ??= new DelegateCommand<string>(HandleApplyTag); }
     }
 
     private DelegateCommand<LineItemViewModel> _openInBrowserCommand;
