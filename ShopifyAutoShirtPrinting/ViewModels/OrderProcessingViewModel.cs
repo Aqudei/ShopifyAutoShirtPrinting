@@ -171,18 +171,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private void HandleOpenInBrowser(LineItemViewModel item)
     {
-        //Task.Run(async () =>
-        //{
-        //    var result = await _browserService.NavigateToOrderAsync(item.OrderNumber);
-        //    if (!result)
-        //    {
-        //        WindowHelper.FocusSelf();
-        //        await _dialogCoordinator.ShowMessageAsync(this, "Order Not Found!",
-        //            $"Cannot find Order #{item.OrderNumber} in ShipStation!\nYou may need to refresh/reload your store in Shipstaion.");
-        //    }
-
-        //});
-        //WindowHelper.FocusChrome();
+        // Removed
     }
 
     private async void HandleApplyTag(string tag)
@@ -251,7 +240,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 });
                 break;
             case "UPDATE":
-                if (SelectedLineItem == null) return;
+                if (SelectedLineItem == null)
+                    return;
 
                 var prams = new DialogParameters { { "MyLineItem", _mapper.Map<MyLineItem>(SelectedLineItem) } };
                 _dialogService.ShowDialog("CrudDialog", prams, async (r) =>
@@ -427,26 +417,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         dt.Start();
     }
 
-    private async void _messageBus_ItemsArchived(object sender, int[] archivedItemsId)
-    {
-        var array = _lineItems.Where(x => archivedItemsId.Contains(x.Id)).ToArray();
-        for (int i = array.Length - 1; i >= 0; i--)
-        {
-            try
-            {
-                var archivedItem = array[i];
-                await _dispatcher.InvokeAsync(() =>
-                {
-                    archivedItem.PropertyChanged -= LineItem_PropertyChanged;
-                    _lineItems.Remove(archivedItem);
-                });
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e);
-            }
-        }
-    }
+
 
     private void UpdateCounts()
     {
@@ -473,36 +444,73 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             MasterCheckBoxState = null;
         }
     }
+    private void _messageBus_ItemsArchived(object sender, int[] archivedItemsId)
+    {
+        Task.Run(() => HandleOnItemsArchivedTaskAsync(archivedItemsId));
+    }
+
+    private async Task HandleOnItemsArchivedTaskAsync(int[] archivedItemsId)
+    {
+        try
+        {
+            var archivedIdsSet = new HashSet<int>(archivedItemsId);
+            var itemsToRemove = _lineItems.Where(x => archivedIdsSet.Contains(x.Id)).ToList();
+
+            if (itemsToRemove.Count == 0)
+                return;
+
+            await _dispatcher.InvokeAsync(() =>
+            {
+                foreach (var item in itemsToRemove)
+                {
+                    item.PropertyChanged -= LineItem_PropertyChanged;
+                    _lineItems.Remove(item);
+                }
+            });
+        }
+        catch (Exception e)
+        {
+            Logger.Error(e);
+        }
+    }
 
     private void _messageBus_ItemsAdded(object sender, int[] ids)
     {
-        Task.Run(() => ItemsAdded(ids));
+        Task.Run(() => HandleItemsAddedTaskAsync(ids));
     }
 
-    private async Task ItemsAdded(int[] ids)
+    private async Task HandleItemsAddedTaskAsync(int[] ids)
     {
         Debug.WriteLine($"@_messageBus_ItemsAdded() -> {ids}");
 
-        var items = await _apiClient.ListLineItemsByIdAsync(ids);
-        foreach (var item in items.Select(_mapper.Map<LineItemViewModel>))
+        try
         {
-            try
-            {
-                var lineItem = _lineItems.FirstOrDefault(x => x.Id == item.Id);
-                if (lineItem == null)
-                {
-                    item.PropertyChanged += LineItem_PropertyChanged;
-                    await _dispatcher.InvokeAsync(() => _lineItems.Add(item));
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e);
-            }
-        }
+            var existingIds = _lineItems.Select(x => x.Id).ToHashSet();
+            var items = await _apiClient.ListLineItemsByIdAsync(ids);
 
-        await UpdateDisplayAsync();
+            var toAdd = items
+                .Select(_mapper.Map<LineItemViewModel>)
+                .Where(item => !existingIds.Contains(item.Id))
+                .ToList();
+
+            foreach (var item in toAdd)
+            {
+                item.PropertyChanged += LineItem_PropertyChanged;
+            }
+
+            if (toAdd.Count > 0)
+            {
+                await _dispatcher.InvokeAsync(() => _lineItems.AddRange(toAdd));
+            }
+
+            await UpdateDisplayAsync();
+        }
+        catch (Exception e)
+        {
+            Logger.Error(e);
+        }
     }
+
 
     private async Task UpdateDisplayAsync()
     {
@@ -515,34 +523,45 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private void _messageBus_ItemsUpdated(object sender, int[] ids)
     {
-        Task.Run(() => ItemsUpdated(ids));
+        Task.Run(() => HandleItemsUpdatedTaskAsync(ids));
     }
 
-    private async Task ItemsUpdated(int[] ids)
+    private async Task HandleItemsUpdatedTaskAsync(int[] ids)
     {
         Debug.WriteLine($"@_messageBus_ItemsUpdated() -> {ids}");
 
-        var items = await _apiClient.ListLineItemsByIdAsync(ids);
-        foreach (var item in items)
+        try
         {
-            try
+            var itemMap = _lineItems.ToDictionary(x => x.Id);
+            var items = await _apiClient.ListLineItemsByIdAsync(ids);
+
+            var updates = new List<Action>();
+
+            foreach (var item in items)
             {
-                var lineItemVm = _lineItems.FirstOrDefault(x => x.Id == item.Id);
-                if (lineItemVm != null)
+                if (itemMap.TryGetValue(item.Id, out var lineItemVm))
                 {
-                    await _dispatcher.InvokeAsync(() =>
-                    {
-                        _mapper.Map(item, lineItemVm);
-                    });
+                    updates.Add(() => _mapper.Map(item, lineItemVm));
                 }
             }
-            catch (Exception e)
-            {
-                Logger.Error(e);
-            }
-        }
 
-        await UpdateDisplayAsync();
+            if (updates.Count > 0)
+            {
+                await _dispatcher.InvokeAsync(() =>
+                {
+                    foreach (var update in updates)
+                    {
+                        update();
+                    }
+                });
+            }
+
+            await UpdateDisplayAsync();
+        }
+        catch (Exception e)
+        {
+            Logger.Error(e);
+        }
     }
 
     private DelegateCommand _browseQrCommand;
@@ -679,8 +698,11 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             await _dispatcher.InvokeAsync(() =>
             {
                 SelectedTagFilter = null;
-                Task.Run(HandleSearchAsync);
             });
+
+
+            await Task.Run(HandleSearchAsync);
+
         }
         catch (Exception e)
         {
@@ -782,12 +804,20 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
     }
 
+    private void SetLineItemsViewFilter(Predicate<object> filter)
+    {
+        _dispatcher.BeginInvoke(() =>
+        {
+            LineItemsView.Filter = filter;
+        });
+    }
+
     private async Task HandleSearchAsync()
     {
         try
         {
             if (!string.IsNullOrWhiteSpace(SearchText))
-                LineItemsView.Filter = o =>
+                SetLineItemsViewFilter(o =>
                 {
                     if (o is LineItemViewModel o1)
                     {
@@ -804,14 +834,14 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                     }
 
                     return true;
-                };
+                });
             else
             {
                 if (string.IsNullOrWhiteSpace(SelectedTagFilter))
-                    LineItemsView.Filter = null;
+                    SetLineItemsViewFilter(null);
                 else
                 {
-                    LineItemsView.Filter = o =>
+                    SetLineItemsViewFilter(o =>
                     {
                         if (o is LineItemViewModel o1)
                         {
@@ -819,7 +849,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                         }
 
                         return true;
-                    };
+                    });
                 }
             }
 
@@ -1242,27 +1272,27 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private async Task FetchActiveLineItemsAsync()
     {
-        var waitDialog = await _dialogCoordinator.ShowProgressAsync(this, "Please wait", "Fetching orders @ page # 1...");
+        var waitDialog = await _dialogCoordinator.ShowProgressAsync(this, "Please wait", "Fetching orders...");
         waitDialog.SetIndeterminate();
 
         try
         {
             await ClearUiLineItems();
 
-            // var lineItems = await _apiClient.ListItemsAsync();
             var lineItems = await _apiClient.ListItemsAsync(store: Store);
-
-            if (lineItems == null)
+            if (lineItems?.Any() != true)
             {
                 return;
             }
 
-            foreach (var lineItem in lineItems.Select(_mapper.Map<LineItemViewModel>))
+            var mappedItems = lineItems.Select(_mapper.Map<LineItemViewModel>).ToList();
+
+            foreach (var lineItem in mappedItems)
             {
                 lineItem.PropertyChanged += LineItem_PropertyChanged;
-                await _dispatcher.BeginInvoke(() => _lineItems.Add(lineItem));
             }
-            //await UpdateDisplayAsync();
+
+            await _dispatcher.InvokeAsync(() => _lineItems.AddRange(mappedItems));
         }
         catch (Exception e)
         {
@@ -1273,6 +1303,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             await waitDialog.CloseAsync();
         }
     }
+
 
     private async void LineItem_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
@@ -1438,12 +1469,12 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         Store = navigationContext.Parameters.TryGetValue<Store>("NavigationParam", out var store) ? store : _globalVariables.Stores.FirstOrDefault(s => s.IsDefault);
 
 
-        SetupColumnVisibility();
+        AddRemoveDataGridColumns();
 
         Task.Run(FetchActiveLineItemsAsync);
     }
 
-    private void SetupColumnVisibility()
+    private void AddRemoveDataGridColumns()
     {
         if (Store.Name.Contains("Louie"))
         {
@@ -1461,8 +1492,6 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     public void OnNavigatedFrom(NavigationContext navigationContext)
     {
         Debug.WriteLine(navigationContext.Parameters);
-
-
     }
 }
 
