@@ -820,6 +820,32 @@ namespace Common.Api
             return response.Data;
         }
 
+
+        public class MoveOrderBody
+        {
+            [JsonPropertyName("order_numbers")]
+            public string[] OrderNumbers { get; set; }
+
+            [JsonPropertyName("store_id")]
+            public int StoreId { get; set; }
+        }
+
+
+        public async Task MoveOrdersToStoreAsync(int? storeId, HashSet<string> orderNumbers)
+        {
+            var payload = new MoveOrderBody
+            {
+                OrderNumbers = orderNumbers.ToArray(),
+                StoreId = storeId.Value
+            };
+
+            var request = new RestRequest($"/api/Orders/move_orders/")
+                .AddJsonBody(payload);
+
+            var response = await _client.ExecutePostAsync(request);
+
+        }
+
         #endregion
     }
 }

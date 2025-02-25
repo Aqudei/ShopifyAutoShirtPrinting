@@ -1441,14 +1441,21 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private async void OnMoveOrderToStore(int? storeId)
     {
-        var store = Stores.First(s => s.Id == storeId);
+        var store = Stores.FirstOrDefault(s => s.Id == storeId);
+        if (store == null)
+        {
+            await _dialogCoordinator.ShowMessageAsync(this, "Warning", "Nothing to move.");
+            return;
+        }
+
         Logger.Info($"Moving selected order/s to store: {store.Name}");
 
-        var selected = _lineItems.Where(i => i.IsSelected).Take(10);
+        var selected = _lineItems.Where(i => i.IsSelected);
+            
         var message = $"Are you sure you want to move the selected items, along with any line items " +
             "associated with the same orders, to \"{store?.Name}\" ?\n\n";
-        message += string.Join("\n", selected.Select(s => $" - {s.Name}"));
-        var remaining = _lineItems.Where(i => i.IsSelected).Skip(10).Count();
+        message += string.Join("\n", selected.Take(10).Select(s => $" - {s.Name}"));
+        var remaining = selected.Skip(10).Count();
         if (remaining > 0)
         {
             message += $"\n{remaining} more items...";
@@ -1457,6 +1464,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         if (prompt == MessageDialogResult.Affirmative)
         {
             var orderNumbers = _lineItems.Where(i => i.IsSelected).Select(l => l.OrderNumber).ToHashSet();
+            await _apiClient.MoveOrdersToStoreAsync(storeId, orderNumbers);
         }
     }
 
