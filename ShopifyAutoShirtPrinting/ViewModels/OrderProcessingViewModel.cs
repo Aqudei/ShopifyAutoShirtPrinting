@@ -277,7 +277,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private async void RefreshData()
     {
-        await Task.Run(() => FetchActiveLineItemsAsync());
+        await Task.Run(FetchActiveLineItemsAsync);
         await ClearUIItemInfo();
     }
 
@@ -1451,7 +1451,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         Logger.Info($"Moving selected order/s to store: {store.Name}");
 
         var selected = _lineItems.Where(i => i.IsSelected);
-            
+
         var message = $"Are you sure you want to move the selected items, along with any line items " +
             "associated with the same orders, to \"{store?.Name}\" ?\n\n";
         message += string.Join("\n", selected.Take(10).Select(s => $" - {s.Name}"));
@@ -1465,6 +1465,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         {
             var orderNumbers = _lineItems.Where(i => i.IsSelected).Select(l => l.OrderNumber).ToHashSet();
             await _apiClient.MoveOrdersToStoreAsync(storeId, orderNumbers);
+            await Task.Run(RefreshData);
         }
     }
 
