@@ -1431,24 +1431,23 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     }
     public Store Store { get => _store; set => SetProperty(ref _store, value); }
 
-    private DelegateCommand<int?> _moveOrderToStoreCommand;
+    private DelegateCommand<Common.Models.Store> _moveOrderToStoreCommand;
     private Dictionary<string, bool> _columnVisibility;
 
-    public DelegateCommand<int?> MoveOrderToStoreCommand
+    public DelegateCommand<Common.Models.Store> MoveOrderToStoreCommand
     {
-        get { return _moveOrderToStoreCommand ??= new DelegateCommand<int?>(OnMoveOrderToStore); }
+        get { return _moveOrderToStoreCommand ??= new DelegateCommand<Common.Models.Store>(OnMoveOrderToStore); }
     }
 
-    private async void OnMoveOrderToStore(int? storeId)
+    private async void OnMoveOrderToStore(Common.Models.Store selectedStore)
     {
-        var store = Stores.FirstOrDefault(s => s.Id == storeId);
-        if (store == null)
+        if (selectedStore == null)
         {
             await _dialogCoordinator.ShowMessageAsync(this, "Warning", "Nothing to move.");
             return;
         }
 
-        Logger.Info($"Moving selected order/s to store: {store.Name}");
+        Logger.Info($"Moving selected order/s to store: {selectedStore.Name}");
 
         var selected = _lineItems.Where(i => i.IsSelected);
 
@@ -1464,7 +1463,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         if (prompt == MessageDialogResult.Affirmative)
         {
             var orderNumbers = _lineItems.Where(i => i.IsSelected).Select(l => l.OrderNumber).ToHashSet();
-            await _apiClient.MoveOrdersToStoreAsync(storeId, orderNumbers);
+            await _apiClient.MoveOrdersToStoreAsync(selectedStore.Id, orderNumbers);
             await Task.Run(RefreshData);
         }
     }
