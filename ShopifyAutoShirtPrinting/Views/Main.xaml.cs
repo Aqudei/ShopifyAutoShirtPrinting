@@ -1,4 +1,5 @@
-﻿using MahApps.Metro.Controls;
+﻿using Common.Models;
+using MahApps.Metro.Controls;
 using Prism.Regions;
 using Prism.Services.Dialogs;
 using ShopifyEasyShirtPrinting.ViewModels;
@@ -15,11 +16,13 @@ namespace ShopifyEasyShirtPrinting.Views
     {
         private readonly IRegionManager _regionManager;
         private readonly IDialogService _dialogService;
+        private readonly SessionVariables _sessionVariables;
 
-        public Main(IRegionManager regionManager, IDialogService dialogService)
+        public Main(IRegionManager regionManager, IDialogService dialogService, SessionVariables sessionVariables)
         {
             _regionManager = regionManager;
             _dialogService = dialogService;
+            _sessionVariables = sessionVariables;
 
             InitializeComponent();
 
@@ -38,11 +41,23 @@ namespace ShopifyEasyShirtPrinting.Views
                     Application.Current.Shutdown();
                 }
 
-                _regionManager.RequestNavigate("ContentRegion", "OrderProcessingView");
-                HamburgerMenu.SelectedItem = HamburgerMenu.Items.OfType<MyMenuItem>()
-                    .FirstOrDefault(x => x.NavigationPath == "OrderProcessingView");
-
                 (DataContext as MainViewModel)?.LoadStores();
+
+                var defaultStore = _sessionVariables.Stores.FirstOrDefault(s => s.IsDefault);
+                if (defaultStore != null)
+                {
+                    _regionManager.RequestNavigate("ContentRegion", "OrderProcessingView", new NavigationParameters { { "NavigationParam", defaultStore.Id } });
+                    HamburgerMenu.SelectedItem = HamburgerMenu.Items.OfType<MyMenuItem>()
+                                            .FirstOrDefault(x => x.NavigationPath == "OrderProcessingView" && x.NavigationParam == defaultStore);
+                }
+                else
+                {
+                    _regionManager.RequestNavigate("ContentRegion", "OrderProcessingView");
+
+                    HamburgerMenu.SelectedItem = HamburgerMenu.Items.OfType<MyMenuItem>()
+                            .FirstOrDefault(x => x.NavigationPath == "OrderProcessingView");
+                }
+
             });
 
             HamburgerMenu.ItemInvoked += HamburgerMenu_ItemInvoked;

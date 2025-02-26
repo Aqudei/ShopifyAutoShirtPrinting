@@ -154,7 +154,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         {
             foreach (var store in _sessionVariables.Stores?.OrderBy(s => s.IsDefault))
             {
-                Menu.Insert(0,new MenuItem
+                Menu.Insert(0, new MenuItem
                 {
                     Label = store.Name,
                     NavigationPath = "OrderProcessingView",
