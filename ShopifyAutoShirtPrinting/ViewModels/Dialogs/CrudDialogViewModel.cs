@@ -29,6 +29,14 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         public ObservableCollection<string> ShippingTypes { get; set; } = new();
         public string Shipping { get => _shipping; set => SetProperty(ref _shipping, value); }
 
+        private bool _isEditing = false;
+
+        public bool IsEditing
+        {
+            get { return _isEditing; }
+            set { SetProperty(ref _isEditing, value); }
+        }
+
 
         public DelegateCommand SelectNoneCommand
         {
@@ -171,6 +179,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             {
                 _title = "Edit Item";
                 _theLineItem = myLineItem;
+                IsEditing = true;
 
                 await _dispatcher.InvokeAsync(() => _mapper.Map(_theLineItem, this));
             }

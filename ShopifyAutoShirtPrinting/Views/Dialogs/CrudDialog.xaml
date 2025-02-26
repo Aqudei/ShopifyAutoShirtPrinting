@@ -38,6 +38,7 @@
 
         <Label Content="Order  Number" Margin="2,2,2,2"/>
         <TextBox Grid.Column="1"
+                 IsReadOnly="{Binding IsEditing}"
                  Text="{Binding OrderNumber}"
                  Margin="2,2,2,2"/>
 
