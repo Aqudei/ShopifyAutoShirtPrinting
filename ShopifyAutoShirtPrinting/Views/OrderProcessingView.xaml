@@ -265,7 +265,7 @@
                       ScrollViewer.HorizontalScrollBarVisibility="Visible"
                       FrozenColumnCount="1"
                       IsSynchronizedWithCurrentItem="True"
-                      SelectedItem="{Binding SelectedLineItem, Mode=OneWayToSource}"
+                      SelectedItem="{Binding SelectedLineItem, Mode=TwoWay}"
                       IsReadOnly="True"
                       Margin="5"
                       x:Name="OrdersDataGrid"

@@ -719,6 +719,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             {
                 case nameof(SelectedTagFilter):
                     {
+                        SelectedLineItem = null;
                         HandleTagFilter(SelectedTagFilter);
                         LastTagFilter = SelectedTagFilter;
                         break;
@@ -730,8 +731,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                     }
                 case nameof(SearchText):
                     {
-                        await HandleSearchAsync();
                         SelectedLineItem = null;
+                        await HandleSearchAsync();
                         break;
                     }
 
