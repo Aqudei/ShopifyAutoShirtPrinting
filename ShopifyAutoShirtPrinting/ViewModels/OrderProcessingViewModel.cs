@@ -692,7 +692,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         {
             if (LastTagFilter == "Archived")
             {
-                await FetchActiveLineItemsAsync();
+                await Task.Run(FetchActiveLineItemsAsync);
             }
 
             await _dispatcher.InvokeAsync(() =>
@@ -738,59 +738,58 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
                 case nameof(DetectedQr):
                     {
-                        if (!string.IsNullOrWhiteSpace(DetectedQr) && (DetectedQr.EndsWith("\n") || DetectedQr.EndsWith("\r") ||
-                                                                       DetectedQr.EndsWith(" ")))
+                        if (string.IsNullOrWhiteSpace(DetectedQr) ||
+                            !DetectedQr.EndsWith("\n") && !DetectedQr.EndsWith("\r") && !DetectedQr.EndsWith(" "))
                         {
-                            try
+                            break;
+                        }
+
+                        try
+                        {
+                            var parsedQr = MyQr.Parse(DetectedQr.TrimEnd(' ', '\r', '\n'));
+
+                            await _dispatcher.InvokeAsync(() =>
                             {
-                                var parsedQr = MyQr.Parse(DetectedQr.Trim(" \r\n\t".ToCharArray()));
+                                DetectedQr = "";
+                                HandleClearStatusFilter();
+                                SearchText = "";
+                            });
 
-                                await _dispatcher.InvokeAsync(() => DetectedQr = "");
-
-                                if (parsedQr != null)
-                                {
-                                    await _dispatcher.InvokeAsync(() =>
-                                    {
-                                        HandleClearStatusFilter();
-                                        SearchText = "";
-                                    });
-                                    // QrInfo = FetchQrInfo(parsedQr);
-                                    var lineItem = await _apiClient.GetLineItemByIdAsync(parsedQr.LineItemDatabaseId);
-                                    if (lineItem == null)
-                                    {
-                                        await _dialogCoordinator.ShowMessageAsync(this, "Error", "Cannot process or show items that were already Shipped / Archived");
-                                        return;
-                                    }
-
-                                    var lineItemVm = _mapper.Map<LineItemViewModel>(lineItem);
-
-                                    await ShowScanInfoAsync(lineItemVm);
-
-                                    switch (SelectedScanMode)
-                                    {
-                                        case SCAN_MODE_SCAN_ONLY:
-                                            await ActivateLineItemInView(lineItemVm);
-                                            break;
-                                        case SCAN_MODE_GCR_FRONT:
-                                            await ActivateLineItemInView(lineItemVm);
-                                            TryOpenPrintFiles(lineItemVm);
-                                            break;
-                                        case SCAN_MODE_GCR_BACK:
-                                            await ActivateLineItemInView(lineItemVm);
-                                            TryOpenPrintFiles(lineItemVm, true);
-                                            break;
-                                        default:
-                                            await ProcessItemForPrintingAsync(lineItemVm);
-                                            break;
-                                    }
-
-                                }
-                            }
-                            catch (Exception exception)
+                            if (parsedQr == null)
                             {
-                                Logger.Error(exception);
-                                await _dialogCoordinator.ShowExceptionErrorAsync(this, exception);
+                                break;
                             }
+
+                            var lineItem = await _apiClient.GetLineItemByIdAsync(parsedQr.LineItemDatabaseId);
+                            if (lineItem == null)
+                            {
+                                await _dialogCoordinator.ShowMessageAsync(this, "Error", "Cannot process or show items that were already Shipped / Archived");
+                                break;
+                            }
+
+                            var lineItemVm = _mapper.Map<LineItemViewModel>(lineItem);
+                            await ShowScanInfoAsync(lineItemVm);
+                            await ActivateLineItemInView(lineItemVm);
+
+                            switch (SelectedScanMode)
+                            {
+                                case SCAN_MODE_GCR_FRONT:
+                                    TryOpenPrintFiles(lineItemVm);
+                                    break;
+                                case SCAN_MODE_GCR_BACK:
+                                    TryOpenPrintFiles(lineItemVm, true);
+                                    break;
+                                case SCAN_MODE_SCAN_ONLY:
+                                    break;
+                                default:
+                                    await ProcessItemForPrintingAsync(lineItemVm);
+                                    break;
+                            }
+                        }
+                        catch (Exception exception)
+                        {
+                            Logger.Error(exception);
+                            await _dialogCoordinator.ShowExceptionErrorAsync(this, exception);
                         }
 
                         break;
@@ -1065,7 +1064,6 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         var existingLineItem = _lineItems.FirstOrDefault(o =>
                o.OrderId == orderItemResult.OrderId && o.LineItemId == orderItemResult.LineItemId);
 
-
         if (existingLineItem != null)
         {
             await _dispatcher.InvokeAsync(() =>
@@ -1073,10 +1071,9 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 existingLineItem.BinNumber = orderItemResult.BinNumber;
                 existingLineItem.PrintedQuantity = orderItemResult.PrintedQuantity;
                 existingLineItem.Status = orderItemResult.Status;
+                SelectedLineItem = existingLineItem;
             });
         }
-
-        await _dispatcher.InvokeAsync(() => SelectedLineItem = existingLineItem);
     }
 
     private static double MillimetersToInches(double mmValue)
@@ -1442,9 +1439,9 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private async void OnMoveOrderToStore(Common.Models.Store selectedStore)
     {
-        if (selectedStore == null)
+        if (selectedStore == null || !_lineItems.Where(i => i.IsSelected).Any())
         {
-            await _dialogCoordinator.ShowMessageAsync(this, "Warning", "Nothing to move.");
+            await _dialogCoordinator.ShowMessageAsync(this, "Warning", "No Order to move.");
             return;
         }
 
