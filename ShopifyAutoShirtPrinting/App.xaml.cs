@@ -36,12 +36,6 @@ namespace ShopifyEasyShirtPrinting
         private readonly SessionVariables _sessionVariables = new();
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
-        private string GetEnvironmentVariable(string name)
-        {
-            var value = Environment.GetEnvironmentVariable(name, EnvironmentVariableTarget.User) ?? Environment.GetEnvironmentVariable(name);
-            return value ?? Environment.GetEnvironmentVariable(name, EnvironmentVariableTarget.Machine);
-        }
-
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             try
@@ -158,7 +152,6 @@ namespace ShopifyEasyShirtPrinting
 
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // Required for EPPlus 5 and above
 
-
             Logger.Debug("Program Started!");
 
             var appName = Path.GetFileNameWithoutExtension(AppDomain.CurrentDomain.FriendlyName);
@@ -175,22 +168,7 @@ namespace ShopifyEasyShirtPrinting
             Directory.CreateDirectory(_sessionVariables.QrTagsPath);
             Directory.CreateDirectory(_sessionVariables.ImagesPath);
 
-
-
             base.OnStartup(e);
         }
-
-
-        private void PrismApplication_Exit(object sender, ExitEventArgs e)
-        {
-            //if (Container.IsRegistered<IShipStationBrowserService>())
-            //    Container.Resolve<IShipStationBrowserService>().Dispose();
-
-            //if (Container.IsRegistered<IMessageBus>())
-            //{
-            //    Container.Resolve<IMessageBus>().Dispose();
-            //}
-        }
-
     }
 }

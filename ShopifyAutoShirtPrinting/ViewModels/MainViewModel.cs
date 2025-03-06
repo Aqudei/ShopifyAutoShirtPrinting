@@ -1,13 +1,17 @@
 ﻿using Common.Models;
 using MahApps.Metro.Controls;
 using MahApps.Metro.IconPacks;
+using Prism.Commands;
+using ShopifyEasyShirtPrinting.Messaging;
 using ShopifyEasyShirtPrinting.Views;
 using ShopifyEasyShirtPrinting.Views.Tools;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Windows;
 
 namespace ShopifyEasyShirtPrinting.ViewModels
 {
@@ -15,6 +19,33 @@ namespace ShopifyEasyShirtPrinting.ViewModels
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly SessionVariables _sessionVariables;
+        private readonly IMessageBus _messageBus;
+        private bool _isLoggedIn = true;
+
+        public bool IsLoggedIn
+        {
+            get { return _isLoggedIn; }
+            set { SetProperty(ref _isLoggedIn, value); }
+        }
+
+        private DelegateCommand _signOutCommand;
+
+        public DelegateCommand SignOutCommand
+        {
+            get { return _signOutCommand ??= new DelegateCommand(OnSignOut); }
+        }
+
+        public static void RestartApplication()
+        {
+            Process.Start(Application.ResourceAssembly.Location);
+            Application.Current.Shutdown();
+        }
+
+        private void OnSignOut()
+        {
+            _messageBus?.Dispose();
+            RestartApplication();
+        }
 
         public override string Title
         {
@@ -34,7 +65,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         private BackgroundWorker _backGroundTaskRunner = new BackgroundWorker();
 
-        public MainViewModel(SessionVariables sessionVariables)
+        public MainViewModel(SessionVariables sessionVariables, IMessageBus messageBus)
         {
             //Menu.Add(new MenuItem
             //{
@@ -148,6 +179,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             });
 
             _sessionVariables = sessionVariables;
+            _messageBus = messageBus;
         }
 
         public void LoadStores()
