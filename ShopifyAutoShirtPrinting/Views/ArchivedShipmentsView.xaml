@@ -48,7 +48,7 @@
                 <DataGridTextColumn Header="Shipping" Binding="{Binding Shipping}"/>
                 <DataGridTextColumn Header="Total Weight" Binding="{Binding TotalWeight}"/>
                 <DataGridTextColumn Header="Postage Product" Binding="{Binding PostageProductId}"/>
-                <DataGridTextColumn Header="Create At" Binding="{Binding CreateAt}"/>
+                <DataGridTextColumn Header="Created At" Binding="{Binding CreatedAt}"/>
                 <DataGridTextColumn Header="Modified At" Binding="{Binding ModifiedAt}"/>
 
 

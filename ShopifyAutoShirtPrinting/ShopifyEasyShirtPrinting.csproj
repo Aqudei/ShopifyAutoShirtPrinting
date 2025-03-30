@@ -35,7 +35,7 @@
     <SuiteName>Tools</SuiteName>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>36</ApplicationRevision>
+    <ApplicationRevision>37</ApplicationRevision>
     <ApplicationVersion>17.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -67,10 +67,10 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>2E53352A784AA9172032B9A73AC4C3950D653012</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>AA4B5FD3176F598EE7053FFDEAD88FE5F92DAEED</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>ShopifyEasyShirtPrinting_2_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>ShopifyEasyShirtPrinting_3_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <TargetZone>LocalIntranet</TargetZone>
@@ -819,6 +819,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="ShopifyEasyShirtPrinting_2_TemporaryKey.pfx" />
+    <None Include="ShopifyEasyShirtPrinting_3_TemporaryKey.pfx" />
     <None Include="ShopifyEasyShirtPrinting_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
