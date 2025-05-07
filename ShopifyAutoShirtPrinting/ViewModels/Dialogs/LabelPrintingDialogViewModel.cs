@@ -396,11 +396,11 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
                 CustomerName = customerName;
                 CustomerEmail = customerEmail;
 
-
                 Postages.AddRange(postages);
                 PackagingTypes.AddRange(packaging);
 
-                TotalWeight = lineItems.Sum(l => l.Grams);
+                TotalWeight = shipment.TotalWeight > 0 ? shipment.TotalWeight : lineItems.Sum(l => l.Grams);
+                
                 SelectedPostage = Postages.FirstOrDefault(p =>
                     p.PostageShippings.Select(pp => pp.Shipping?.ToLower()).Contains(shippingLine.ToLower()));
                 SelectedPackagingType = PackagingTypes.FirstOrDefault(pk => pk.Code == PackageType);
