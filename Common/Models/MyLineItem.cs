@@ -75,6 +75,9 @@ namespace Common.Models
         [JsonPropertyName("Height")]
         public decimal Height{ get; set; }
 
+
+        [JsonPropertyName("DesignText")]
+        public string DesignText { get; set; }
         public override string ToString()
         {
             return $"#{OrderNumber} - {Sku} - {VariantTitle} - {Name}";

@@ -42,6 +42,7 @@ namespace Common.Models
 
         public string CustomerEmail { get; set; }
 
+        public string DesignText { get; set; }
 
         public DateTime? DateModified
         {
