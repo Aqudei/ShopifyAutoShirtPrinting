@@ -613,7 +613,7 @@ namespace Common.Api
             if (response.StatusCode != HttpStatusCode.Created)
             {
                 Logger.Error(response.Content ?? response.ErrorMessage);
-                return null;
+                throw new Exception("");
             }
 
             return response.Data;

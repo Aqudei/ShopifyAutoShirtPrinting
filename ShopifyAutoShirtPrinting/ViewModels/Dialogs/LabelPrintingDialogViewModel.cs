@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Common.Api;
 using Common.Models;
+using DryIoc;
 using Prism.Commands;
 using Prism.Services.Dialogs;
 using ShopifyEasyShirtPrinting.Helpers;
@@ -244,7 +245,14 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
             await _dispatcher.BeginInvoke(() => IsBusy = true);
 
             var shipmentInfo = await _apiClient.CreateShipmentAsync(createShipmentBody);
-            if (shipmentInfo == null) return false;
+            if (shipmentInfo == null)
+            {
+                await _dispatcher.BeginInvoke(() => ShipmentErrors.Add(new FieldDetail
+                {
+                    
+                }));
+                return false;
+            }
 
             var timeStart = DateTime.Now;
             var timeout = TimeSpan.FromSeconds(20);
@@ -400,7 +408,7 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
                 PackagingTypes.AddRange(packaging);
 
                 TotalWeight = shipment.TotalWeight > 0 ? shipment.TotalWeight : lineItems.Sum(l => l.Grams);
-                
+
                 SelectedPostage = Postages.FirstOrDefault(p =>
                     p.PostageShippings.Select(pp => pp.Shipping?.ToLower()).Contains(shippingLine.ToLower()));
                 SelectedPackagingType = PackagingTypes.FirstOrDefault(pk => pk.Code == PackageType);

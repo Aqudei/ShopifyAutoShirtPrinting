@@ -95,6 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\ApiClient.cs" />
+    <Compile Include="Models\ErrorResponseModel.cs" />
     <Compile Include="BGTasker\IBGTask.cs" />
     <Compile Include="Models\Bin.cs" />
     <Compile Include="Models\EntityBase.cs" />
