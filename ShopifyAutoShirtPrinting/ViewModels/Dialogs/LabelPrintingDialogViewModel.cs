@@ -245,14 +245,6 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
             await _dispatcher.BeginInvoke(() => IsBusy = true);
 
             var shipmentInfo = await _apiClient.CreateShipmentAsync(createShipmentBody);
-            if (shipmentInfo == null)
-            {
-                await _dispatcher.BeginInvoke(() => ShipmentErrors.Add(new FieldDetail
-                {
-                    
-                }));
-                return false;
-            }
 
             var timeStart = DateTime.Now;
             var timeout = TimeSpan.FromSeconds(20);
@@ -295,6 +287,10 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
         catch (Exception ex)
         {
             Logger.Error(ex);
+            await _dispatcher.BeginInvoke(() => ShipmentErrors.Add(new FieldDetail
+            {
+                Message = ex.Message,
+            }));
             return true;
         }
         finally

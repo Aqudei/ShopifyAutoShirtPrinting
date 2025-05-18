@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
@@ -602,21 +603,45 @@ namespace Common.Api
             return new Variant[] { null };
         }
 
-
-
         public async Task<Shipment> CreateShipmentAsync(CreateShipmentRequestBody shipment)
         {
-            var request = new RestRequest($"/shipping/CreateShipment/")
-                .AddBody(shipment);
+            var request = new RestRequest("/shipping/CreateShipment/")
+                .AddJsonBody(shipment);
 
-            var response = await _client.ExecutePostAsync<Shipment>(request);
+            var response = await _client.ExecutePostAsync(request);
+
             if (response.StatusCode != HttpStatusCode.Created)
             {
-                Logger.Error(response.Content ?? response.ErrorMessage);
-                throw new Exception("");
+                string errorMessage;
+
+                try
+                {
+                    var errorResponse = JsonSerializer.Deserialize<ErrorResponseModel>(response.Content);
+                    errorMessage = errorResponse?.Errors ?? "Unknown error occurred while creating shipment.";
+                }
+                catch (JsonException)
+                {
+                    errorMessage = $"Failed to parse error response: {response.Content ?? response.ErrorMessage}";
+                }
+
+                Logger.Error(errorMessage);
+                throw new Exception(errorMessage);
             }
 
-            return response.Data;
+            try
+            {
+                var shipmentResponse = JsonSerializer.Deserialize<Shipment>(response.Content);
+                if (shipmentResponse == null)
+                {
+                    throw new Exception("Failed to deserialize shipment response.");
+                }
+                return shipmentResponse;
+            }
+            catch (JsonException ex)
+            {
+                Logger.Error($"Deserialization error: {ex.Message}");
+                throw new Exception("Failed to parse shipment response.", ex);
+            }
         }
 
         public async Task<IEnumerable<PostageProduct>> ListPostageProductsAsync()
