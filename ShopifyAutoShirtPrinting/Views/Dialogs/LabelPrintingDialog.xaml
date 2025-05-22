@@ -85,6 +85,7 @@
 
         <TextBlock Text="{Binding Notes}"
                    Grid.Row="4"
+                   TextWrapping="Wrap"
                    FontStyle="Italic"/>
 
         <GroupBox Header="Shipping" 
