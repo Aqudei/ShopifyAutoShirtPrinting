@@ -22,11 +22,19 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         private readonly IMapper _mapper;
 
         public ObservableCollection<string> Printers { get; set; } = new();
-        
+
         public string DownloadedImagesPath { get => _downloadedImagesPath; set => SetProperty(ref _downloadedImagesPath, value); }
         public string QrPrinter { get => qrPrinter; set => SetProperty(ref qrPrinter, value); }
         public string ManifestPrinter { get => _manifestPrinter; set => SetProperty(ref _manifestPrinter, value); }
         public string LabelPrinter { get => _labelPrinter; set => SetProperty(ref _labelPrinter, value); }
+        private string _internationalLabelPrinter;
+
+        public string InternationalLabelPrinter
+        {
+            get { return _internationalLabelPrinter; }
+            set { SetProperty(ref _internationalLabelPrinter, value); }
+        }
+
         public string HotFoldersConfig { get => hotFoldersConfig; set => SetProperty(ref hotFoldersConfig, value); }
 
         private string _printFilesFolder;

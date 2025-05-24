@@ -13,34 +13,42 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+
         <StackPanel Orientation="Vertical" Grid.Row="2">
             <StackPanel Orientation="Horizontal">
-                <Label Margin="2,2,2,2" Width="120">Label Printer</Label>
+                <Label Margin="2,2,2,2" Width="160" Content="Domestic Label Printer"/>
                 <ComboBox x:Name="comboBox" Margin="2,2,2,2" Width="400" 
                           ItemsSource="{Binding Printers}"
                           SelectedItem="{Binding LabelPrinter}"/>
             </StackPanel>
-
             <StackPanel Orientation="Horizontal">
-                <Label Margin="2,2,2,2" Width="120">QR Tag Printer</Label>
+                <Label Margin="2,2,2,2" Width="160" Content="International Label Printer"/>
+                <ComboBox x:Name="InternationalLabelPrinterComboBox" 
+                          Margin="2,2,2,2" 
+                          Width="400"
+                          ItemsSource="{Binding Printers}"
+                          SelectedItem="{Binding InternationalLabelPrinter}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Margin="2,2,2,2" Width="160" Content="QR Tag Printer"/>
                 <ComboBox x:Name="comboBox1" Margin="2,2,2,2" Width="400"
                           ItemsSource="{Binding Printers}"
                           SelectedItem="{Binding QrPrinter}"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal">
-                <Label Margin="2,2,2,2" Width="120">ManifestPrinter</Label>
+                <Label Margin="2,2,2,2" Width="160" Content="Manifest Printer"/>
                 <ComboBox Margin="2,2,2,2" Width="400"
                 ItemsSource="{Binding Printers}"
                 SelectedItem="{Binding ManifestPrinter}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
-                <Label Margin="2" Width="120">Paper Width</Label>
+                <Label Margin="2" Width="160" Content="QR Paper Width"/>
                 <TextBox Margin="2" Text="{Binding PaperWidth}" Width="400"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal">
-                <Label Margin="2" Width="120">Paper Height</Label>
+                <Label Margin="2" Width="160" Content="QR Paper Height"/>
                 <TextBox Margin="2" Text="{Binding PaperHeight}" Width="400"/>
             </StackPanel>
 
@@ -51,29 +59,29 @@
             </StackPanel>-->
 
             <StackPanel Orientation="Horizontal">
-                <Label Margin="2" Width="120">Font Size</Label>
+                <Label Margin="2" Width="160" Content="QR Font Size"/>
                 <TextBox Margin="2" Text="{Binding FontSize}" Width="400"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal">
-                <Label Margin="2" Width="120" Content="Server IP Address:"/>
+                <Label Margin="2" Width="160" Content="Server IP Address:"/>
                 <TextBox Margin="2" Text="{Binding ServerHost, UpdateSourceTrigger=PropertyChanged}" Width="400"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal">
-                <Label Margin="2" Width="120">API Base URL:</Label>
+                <Label Margin="2" Width="160">API Base URL:</Label>
                 <TextBox Margin="2" Text="{Binding ApiBaseUrl}" Width="400"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal">
-                <Label Margin="2" Width="120">Print Files Location:</Label>
+                <Label Margin="2" Width="160">Print Files Location:</Label>
                 <TextBox Margin="2" Text="{Binding PrintFilesFolder}" Width="400"/>
                 <Button Content="Browse" 
                         Command="{Binding BrowsePrintFilesLocationCommand}"
                         Margin='2'/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
-                <Label Margin="2" Width="120" Content="Downloaded Images:"/>
+                <Label Margin="2" Width="160" Content="Downloaded Images:"/>
                 <TextBox Margin="2" 
                          IsReadOnly="True"
                          Text="{Binding DownloadedImagesPath}" 
@@ -84,16 +92,17 @@
                         Width="53"/>
                 <Label Width="120" Content="{Binding ImagesTotalSize}"/>
             </StackPanel>
+            <StackPanel Orientation="Horizontal"
+                        Margin="165,10,10,10">
 
-
-            <Button Margin="10" Width="520"
-                    HorizontalAlignment="Left"
-                        Content="Save Settings"
-                        Command="{Binding SaveSettingsCommand}"/>
-            <Button Margin="10" Width="520"
-                    HorizontalAlignment="Left"
-                        Content="Reset Database"
-                        Command="{Binding ResetDatabaseCommand}"/>
+                <Button 
+                    Width="144"
+                    Content="Save Settings"
+                    Command="{Binding SaveSettingsCommand}" Margin="10,10,10,10"/>
+                <Button Width="144"
+                    Content="Reset Database"
+                    Command="{Binding ResetDatabaseCommand}" Margin="10,10,10,10"/>
+            </StackPanel>
         </StackPanel>
     </Grid>
 </UserControl>

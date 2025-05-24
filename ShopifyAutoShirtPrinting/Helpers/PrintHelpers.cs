@@ -1,6 +1,7 @@
 ﻿using PdfiumViewer;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -28,6 +29,9 @@ namespace ShopifyEasyShirtPrinting.Helpers
 
         public static void PrintPdf(string pdfPath, string printerName)
         {
+            if (string.IsNullOrWhiteSpace(pdfPath) || !File.Exists(pdfPath))
+                return;
+
             Task.Run(() =>
             {
                 // Open the PDF document

@@ -260,8 +260,9 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
                     var labelPath = Path.Combine(_globalVariables.PdfsPath, Path.GetFileName(labelUrl.ToString()));
                     var destination = await PrintHelpers.DownloadRemoteFileToLocalAsync(labelUrl, labelPath);
 
-                    if (!string.IsNullOrWhiteSpace(destination) && File.Exists(destination))
-                        PrintHelpers.PrintPdf(destination, Properties.Settings.Default.LabelPrinter);
+                    var printerName = shipmentInfo.Shipping.ToLower().Contains("international") ? Properties.Settings.Default.InternationalLabelPrinter : Properties.Settings.Default.LabelPrinter;
+
+                    PrintHelpers.PrintPdf(destination, printerName);
 
                     return false;
                 }
