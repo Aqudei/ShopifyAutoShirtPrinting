@@ -11,6 +11,6 @@ namespace Common.Api
     public class ErrorResponseModel
     {
         [JsonPropertyName("errors")]
-        public string Errors { get; set; }
+        public string[] Errors { get; set; }
     }
 }

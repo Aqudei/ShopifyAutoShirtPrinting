@@ -617,7 +617,7 @@ namespace Common.Api
                 try
                 {
                     var errorResponse = JsonSerializer.Deserialize<ErrorResponseModel>(response.Content);
-                    errorMessage = errorResponse?.Errors ?? "Unknown error occurred while creating shipment.";
+                    errorMessage = string.Join("\n", errorResponse?.Errors) ?? "Unknown error occurred while creating shipment.";
                 }
                 catch (JsonException)
                 {
