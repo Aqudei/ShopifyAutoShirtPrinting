@@ -82,6 +82,7 @@ namespace Common.Api
 
         public async Task<MyLineItem[]> ListArchivedItemsAsync(int limit = 800, int offset = 0)
         {
+
             var request = new RestRequest($"/api/ArchivedItems/")
                 .AddQueryParameter("limit", limit)
                 .AddQueryParameter("offset", offset);
@@ -114,16 +115,16 @@ namespace Common.Api
             File.WriteAllText(@".\\lineitems.json", content);
         }
 
-        public async Task<MyLineItem[]> ListItemsAsync(Dictionary<string, string> queryParams = null, Store store = null)
+        public async Task<MyLineItem[]> ListItemsAsync(Dictionary<string, string> queryParams = null, int storeId = 0)
         {
             if (_client == null)
                 return new List<MyLineItem>().ToArray();
 
             var request = new RestRequest("/api/LineItems/");
 
-            if (store != null)
+            if (storeId != 0)
             {
-                request = request.AddHeader("Use-Store", store.Id);
+                request = request.AddHeader("Use-Store", storeId);
             }
 
             if (queryParams != null && queryParams.Count > 0)
@@ -748,7 +749,7 @@ namespace Common.Api
             throw new Exception(response.Content ?? response.ErrorMessage);
         }
 
-        public async Task<Shipment> GetShipmentByAsync(Dictionary<string, string> getParameters)
+        public async Task<Shipment> GetShipmentByAsync(Dictionary<string, string> getParameters, int storeId = 0)
         {
             if (getParameters != null && getParameters.Count > 0)
             {
@@ -757,6 +758,11 @@ namespace Common.Api
                 {
                     request = request.AddQueryParameter(kvp.Key, kvp.Value);
                 }
+                if (storeId != 0)
+                {
+                    request.AddHeader("Use-Store", storeId);
+                }
+
                 var response = await _client.ExecuteGetAsync<IEnumerable<Shipment>>(request);
                 if (response.StatusCode == HttpStatusCode.OK)
                 {

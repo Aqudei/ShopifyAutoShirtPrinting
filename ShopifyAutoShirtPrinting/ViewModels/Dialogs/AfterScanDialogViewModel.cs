@@ -26,7 +26,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         private string _customerEmail;
         public ObservableCollection<LineItemViewModel> MyLineItems { get; set; } = new();
 
-
         public string OrderNumber { get => _orderNumber; set => SetProperty(ref _orderNumber, value); }
         public int? BinNumber { get => _binNumber; set => SetProperty(ref _binNumber, value); }
         public string CustomerName { get => _customerName; set => SetProperty(ref _customerName, value); }

@@ -37,6 +37,8 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
     private readonly IMapper _mapper;
     private readonly SessionVariables _globalVariables;
     private string _shippingFirstName;
+    public int StoreId { get; set; }
+
 
     public string ShippingFirstName
     {
@@ -280,7 +282,7 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
 
                 await Task.Delay(3000);
                 shipmentInfo = await _apiClient.GetShipmentByAsync(new Dictionary<string, string>
-                    { { "OrderNumber", createShipmentBody.OrderNumber } });
+                    { { "OrderNumber", createShipmentBody.OrderNumber } }, StoreId = StoreId);
             }
 
             return true;
@@ -350,12 +352,18 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
 
     public void OnDialogOpened(IDialogParameters parameters)
     {
-        if (parameters.TryGetValue<string>("Message", out var message)) Message = message;
+        if (parameters.TryGetValue<string>("Message", out var message))
+            Message = message;
 
-        if (parameters.TryGetValue<string>("OrderNumber", out var orderNumber))
+        parameters.TryGetValue<string>("OrderNumber", out var orderNumber);
+        parameters.TryGetValue<int>("StoreId", out var storeId);
+
+
+        if (orderNumber != null && storeId != 0)
         {
             LineItems.Clear();
             OrderNumber = orderNumber;
+            StoreId = storeId;
             Task.Run(LoadData);
         }
     }
@@ -377,8 +385,8 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
     private async Task LoadData()
     {
         var orderNumberParams = new Dictionary<string, string>() { { "OrderNumber", $"{OrderNumber}" } };
-        var lineItems = await _apiClient.ListItemsAsync(orderNumberParams);
-        var shipment = await _apiClient.GetShipmentByAsync(orderNumberParams);
+        var lineItems = await _apiClient.ListItemsAsync(orderNumberParams, StoreId);
+        var shipment = await _apiClient.GetShipmentByAsync(orderNumberParams, StoreId);
         var postages = await _apiClient.ListPostageProductsAsync();
         var packaging = await _apiClient.ListPackagingTypesAsync();
 

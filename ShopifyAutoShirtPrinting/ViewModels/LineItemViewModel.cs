@@ -20,7 +20,7 @@ namespace Common.Models
         }
         public string OrderNumber { get => _orderNumber; set => SetProperty(ref _orderNumber, value); }
 
-
+        public long? Store { get => _store; set => SetProperty(ref _store, value); }
         public string Sku { get => _sku; set => SetProperty(ref _sku, value); }
 
 
@@ -92,6 +92,7 @@ namespace Common.Models
         private int _originalBinNumber;
         private string _sku;
         private string _shipping;
+        private long? _store;
 
         public int PrintedQuantity
         {

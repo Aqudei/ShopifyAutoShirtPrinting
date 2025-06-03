@@ -4,6 +4,8 @@ namespace Common.Models
 {
     public class OrderInfo : EntityBase
     {
+        [JsonPropertyName("Store")]
+        public long? Store { get; set; }
 
         [JsonPropertyName("BinNumber")]
         public int BinNumber { get; set; }
@@ -34,7 +36,7 @@ namespace Common.Models
 
         [JsonPropertyName("OriginalBinNumber")]
         public int OriginalBinNumber { get; set; }
-        
+
         [JsonPropertyName("Shipping")]
         public string Shipping { get; set; }
 

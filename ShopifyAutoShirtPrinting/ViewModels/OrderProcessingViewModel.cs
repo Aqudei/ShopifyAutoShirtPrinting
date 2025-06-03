@@ -1277,7 +1277,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         {
             await ClearUiLineItems();
 
-            var lineItems = await _apiClient.ListItemsAsync(store: Store);
+            var lineItems = await _apiClient.ListItemsAsync(storeId: Store.Id);
             if (lineItems?.Any() != true)
             {
                 return;

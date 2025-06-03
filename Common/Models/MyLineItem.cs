@@ -8,6 +8,9 @@ namespace Common.Models
 {
     public class MyLineItem : EntityBase
     {
+        [JsonPropertyName("Store")]
+        public long? Store { get; set; }
+
         [JsonPropertyName("OrderNumber")]
         public string OrderNumber { get; set; }
 
