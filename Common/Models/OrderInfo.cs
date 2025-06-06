@@ -4,6 +4,8 @@ namespace Common.Models
 {
     public class OrderInfo : EntityBase
     {
+        [JsonPropertyName("Order")]
+        public long? Order { get; set; }
         [JsonPropertyName("Store")]
         public long? Store { get; set; }
 

@@ -11,6 +11,8 @@ namespace Common.Models
     {
         private bool _isSelected;
 
+        public long? Order { get; set; }
+
         public int Id { get; set; }
 
         public bool IsSelected

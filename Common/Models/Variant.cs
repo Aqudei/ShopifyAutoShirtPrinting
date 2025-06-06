@@ -9,6 +9,9 @@ namespace Common.Models
 {
     public class Variant : IEquatable<Variant>
     {
+        [JsonPropertyName("store")]
+        public long? Store { get; set; }
+
         [JsonPropertyName("sku")]
         public string Sku { get; set; }
         [JsonPropertyName("title")]

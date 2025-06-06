@@ -9,6 +9,9 @@ namespace Common.Models
 {
     public class Product
     {
+        [JsonPropertyName("store")]
+        public long? Store { get; set; }
+
         [JsonPropertyName("id")]
         public int Id { get; set; }
         [JsonPropertyName("handle")]

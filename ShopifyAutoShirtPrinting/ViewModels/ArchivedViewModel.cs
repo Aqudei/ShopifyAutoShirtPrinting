@@ -583,7 +583,7 @@ public class ArchivedViewModel : PageBase, INavigationAware
             var processingItemResult = await _apiClient.ProcessItemAsync(lineItem.Id);
 
             await ActivateLineItemInView(_mapper.Map<LineItemViewModel>(processingItemResult.LineItem));
-            var prams = new Dictionary<string, string> { { "OrderNumber", $"{lineItem.OrderNumber}" } };
+            var prams = new Dictionary<string, string> { { "Order", $"{lineItem.Order}" } };
             var relatedLineItems = await _apiClient.ListItemsAsync(prams);
 
             if (processingItemResult.AllItemsPrinted)
@@ -601,7 +601,7 @@ public class ArchivedViewModel : PageBase, INavigationAware
                 else
                     await _dispatcher.InvokeAsync(() =>
                     {
-                        _dialogService.ShowLabelPrintingDialog(lineItem.OrderNumber, "Ready to Print Shipping label?", async result =>
+                        _dialogService.ShowLabelPrintingDialog(lineItem.OrderNumber, 0, "Ready to Print Shipping label?", async result =>
                         {
                             if (result.Result == ButtonResult.Yes)
                             {
@@ -631,7 +631,7 @@ public class ArchivedViewModel : PageBase, INavigationAware
             }
             else
             {
-                var prams2 = new Dictionary<string, string> { { "OrderNumber", $"{lineItem.OrderNumber}" } };
+                var prams2 = new Dictionary<string, string> { { "Id", $"{lineItem.Id}" } };
                 var orderInfo = _apiClient.GetOrderOrderByAsync(prams2);
 
                 if (relatedLineItems.Where(l => l.BinNumber > 0 && l.OrderId == lineItem.OrderId).Sum(x => x.PrintedQuantity) > 1)

@@ -23,12 +23,13 @@ namespace ShopifyEasyShirtPrinting.Extensions
             dialogService.ShowDialog("AfterScanDialog", dlgParams, callback);
         }
 
-        public static void ShowLabelPrintingDialog(this IDialogService dialogService, string orderNumber, string message, Action<IDialogResult> callback)
+        public static void ShowLabelPrintingDialog(this IDialogService dialogService, string orderNumber, int storeId, string message, Action<IDialogResult> callback)
         {
             var dlgParams = new DialogParameters
             {
                 { "OrderNumber", orderNumber },
-                { "Message", message }
+                { "Message", message },
+                { "StoreId", storeId}
             };
 
             dialogService.ShowDialog("LabelPrintingDialog", dlgParams, callback);

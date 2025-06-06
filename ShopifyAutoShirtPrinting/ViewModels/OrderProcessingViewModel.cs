@@ -68,9 +68,6 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         set => SetProperty(ref _columnVisibility, value);
     }
 
-
-    public ObservableCollection<Store> Stores { get; set; } = [];
-
     public string[] ScanModes =>
     [
         SCAN_MODE_PROCESSING,
@@ -235,7 +232,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 {
                     if (r.Parameters.TryGetValue<MyLineItem>("MyLineItem", out var myLineItem))
                     {
-                        var createdLineItem = await _apiClient.CreateLineItemForStoreAsync(Store, myLineItem);
+                        var createdLineItem = await _apiClient.CreateLineItemForStoreAsync(_globalVariables.ActiveStore, myLineItem);
                     }
                 });
                 break;
@@ -992,7 +989,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 else
                     await _dispatcher.InvokeAsync(() =>
                     {
-                        _dialogService.ShowLabelPrintingDialog(lineItemVm.OrderNumber, "Ready to Print Shipping label?", async result =>
+                        _dialogService.ShowLabelPrintingDialog(lineItemVm.OrderNumber, _globalVariables.ActiveStore.Id, "Ready to Print Shipping label?", async result =>
                         {
                             if (result.Result == ButtonResult.Yes)
                             {
@@ -1016,7 +1013,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             }
             else
             {
-                var prams2 = new Dictionary<string, string> { { "OrderNumber", $"{lineItemVm.OrderNumber}" } };
+                var prams2 = new Dictionary<string, string> { { "Id", $"{lineItemVm.Id}" } };
                 var orderInfo = _apiClient.GetOrderOrderByAsync(prams2);
 
                 if (relatedLineItems.Where(l => l.BinNumber > 0 && l.OrderId == lineItemVm.OrderId).Sum(x => x.PrintedQuantity) > 1)
@@ -1277,7 +1274,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         {
             await ClearUiLineItems();
 
-            var lineItems = await _apiClient.ListItemsAsync(storeId: Store.Id);
+            var lineItems = await _apiClient.ListItemsAsync(storeId: _globalVariables.ActiveStore.Id);
             if (lineItems?.Any() != true)
             {
                 return;
@@ -1427,7 +1424,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         get => _detectedQr;
         set => SetProperty(ref _detectedQr, value);
     }
-    public Store Store { get => _store; set => SetProperty(ref _store, value); }
+    // public Store Store { get => _store; set => SetProperty(ref _store, value); }
 
     private DelegateCommand<Common.Models.Store> _moveOrderToStoreCommand;
     private Dictionary<string, bool> _columnVisibility;
@@ -1460,21 +1457,16 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         var prompt = await _dialogCoordinator.ShowMessageAsync(this, "Confirm action", message, MessageDialogStyle.AffirmativeAndNegative);
         if (prompt == MessageDialogResult.Affirmative)
         {
-            var orderNumbers = _lineItems.Where(i => i.IsSelected).Select(l => l.OrderNumber).ToHashSet();
-            await _apiClient.MoveOrdersToStoreAsync(selectedStore.Id, orderNumbers);
+            var orderIds = _lineItems.Where(i => i.IsSelected).Select(l => l.Id).ToHashSet();
+            await _apiClient.MoveOrdersToStoreAsync(selectedStore.Id, orderIds);
             await Task.Run(RefreshData);
         }
     }
 
     public void OnNavigatedTo(NavigationContext navigationContext)
     {
-        Stores.Clear();
-        Stores.AddRange(_globalVariables.Stores);
-
         Debug.WriteLine(navigationContext.Parameters);
-        Store = navigationContext.Parameters.TryGetValue<Store>("NavigationParam", out var store) ? store : _globalVariables.Stores.FirstOrDefault(s => s.IsDefault);
-
-
+        
         AddRemoveDataGridColumns();
 
         Task.Run(FetchActiveLineItemsAsync);
@@ -1482,7 +1474,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private void AddRemoveDataGridColumns()
     {
-        if (Store.Name.Contains("Louie"))
+        if (_globalVariables.ActiveStore.Name.Contains("Louie"))
         {
             ColumnVisibility = new Dictionary<string, bool> { { "Sku", false } };
         }

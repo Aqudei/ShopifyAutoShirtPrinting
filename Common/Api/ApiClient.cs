@@ -254,7 +254,7 @@ namespace Common.Api
 
             }
 
-            throw new ArgumentNullException(nameof(parameters));
+            throw new Exception("No criteria specified!");
         }
 
         public async Task<OrderInfo[]> ListOrdersInfo(Dictionary<string, string> parameters = null)
@@ -854,20 +854,20 @@ namespace Common.Api
 
         public class MoveOrderBody
         {
-            [JsonPropertyName("order_numbers")]
-            public string[] OrderNumbers { get; set; }
+            [JsonPropertyName("order_ids")]
+            public int[] OrderIds { get; set; }
 
             [JsonPropertyName("store_id")]
             public int StoreId { get; set; }
         }
 
 
-        public async Task MoveOrdersToStoreAsync(int? storeId, HashSet<string> orderNumbers)
+        public async Task MoveOrdersToStoreAsync(int? storeId, HashSet<int> orderIds)
         {
             // Move Order to specific store
             var payload = new MoveOrderBody
             {
-                OrderNumbers = orderNumbers.ToArray(),
+                OrderIds = orderIds.ToArray(),
                 StoreId = storeId.Value
             };
 

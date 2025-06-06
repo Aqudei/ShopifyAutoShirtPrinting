@@ -46,9 +46,10 @@ namespace ShopifyEasyShirtPrinting.Views
                 var defaultStore = _sessionVariables.Stores.FirstOrDefault(s => s.IsDefault);
                 if (defaultStore != null)
                 {
+                    _sessionVariables.ActiveStore = defaultStore;
                     _regionManager.RequestNavigate("ContentRegion", "OrderProcessingView", new NavigationParameters { { "NavigationParam", defaultStore.Id } });
                     HamburgerMenu.SelectedItem = HamburgerMenu.Items.OfType<MyMenuItem>()
-                                            .FirstOrDefault(x => x.NavigationPath == "OrderProcessingView" && x.NavigationParam == defaultStore);
+                                            .FirstOrDefault(x => x.NavigationPath == "OrderProcessingView" && (x.NavigationParam as Store) == defaultStore);
                 }
                 else
                 {
@@ -66,6 +67,10 @@ namespace ShopifyEasyShirtPrinting.Views
         private void HamburgerMenu_ItemInvoked(object sender, HamburgerMenuItemInvokedEventArgs args)
         {
             var item = args.InvokedItem as MyMenuItem;
+
+            if (item.NavigationParam != null && item.NavigationParam is Store activeStore)
+                _sessionVariables.ActiveStore = activeStore;
+
             _regionManager.RequestNavigate("ContentRegion", item.NavigationPath, new NavigationParameters() { { "NavigationParam", item.NavigationParam } });
 
         }

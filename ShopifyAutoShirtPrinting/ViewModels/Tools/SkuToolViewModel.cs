@@ -15,8 +15,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
 {
     public class SkuToolViewModel : PageBase
     {
-
-
         public override string Title => "Sku";
 
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
