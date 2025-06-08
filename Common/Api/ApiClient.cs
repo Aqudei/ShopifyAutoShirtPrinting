@@ -604,10 +604,11 @@ namespace Common.Api
             return new Variant[] { null };
         }
 
-        public async Task<Shipment> CreateShipmentAsync(CreateShipmentRequestBody shipment)
+        public async Task<Shipment> CreateShipmentAsync(CreateShipmentRequestBody shipment, int storeId)
         {
             var request = new RestRequest("/shipping/CreateShipment/")
-                .AddJsonBody(shipment);
+                .AddJsonBody(shipment)
+                .AddHeader("Use-Store", storeId);
 
             var response = await _client.ExecutePostAsync(request);
 

@@ -246,7 +246,7 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
         {
             await _dispatcher.BeginInvoke(() => IsBusy = true);
 
-            var shipmentInfo = await _apiClient.CreateShipmentAsync(createShipmentBody);
+            var shipmentInfo = await _apiClient.CreateShipmentAsync(createShipmentBody, StoreId);
 
             var timeStart = DateTime.Now;
             var timeout = TimeSpan.FromSeconds(20);
