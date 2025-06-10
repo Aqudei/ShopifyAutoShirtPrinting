@@ -313,7 +313,7 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
         {
             var shipment = _mapper.Map<CreateShipmentRequestBody>(this);
             shipment.PostageProductId = SelectedPostage.PostageProductId;
-
+            shipment.PackageType = SelectedPackagingType.Code;
 
             ValidateProperty(nameof(ShippingAddress1), _shippingAddress1);
             ValidateProperty(nameof(ShippingAddress2), _shippingAddress2);
@@ -416,7 +416,7 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
 
                 SelectedPostage = Postages.FirstOrDefault(p =>
                     p.PostageShippings.Select(pp => pp.Shipping?.ToLower()).Contains(shippingLine.ToLower()));
-                SelectedPackagingType = PackagingTypes.FirstOrDefault(pk => pk.Code == PackageType);
+                SelectedPackagingType = PackagingTypes.FirstOrDefault(pk => pk.Code == PackageType) ?? PackagingTypes.FirstOrDefault();
             });
         }
     }

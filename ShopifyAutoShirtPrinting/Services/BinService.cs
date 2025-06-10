@@ -15,8 +15,6 @@ namespace ShopifyEasyShirtPrinting.Services
         {
             var bins = await apiClient.ListBinsAsync();
             return bins.Select(mapper.Map<BinViewModel>).ToArray();
-
-
         }
 
         public async Task EmptyBinAsync(int binNumber)

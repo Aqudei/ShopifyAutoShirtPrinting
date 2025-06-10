@@ -127,7 +127,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             await _apiClient.UpdateBinAsync(binModel);
         }
 
-        public BinsViewModel(IDialogCoordinator dialogCoordinator, BinService binService, IDialogService dialogService, 
+        public BinsViewModel(IDialogCoordinator dialogCoordinator, BinService binService, IDialogService dialogService,
             IMessageBus messageBus, ApiClient apiClient, IMapper mapper)
         {
             _mapper = mapper;
@@ -217,10 +217,14 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         private async Task LoadBins()
         {
             await _dispatcher.InvokeAsync(_bins.Clear);
-            foreach (var bin in await _binService.ListBinsAsync())
+
+            var bins = await _binService.ListBinsAsync();
+            await _dispatcher.InvokeAsync(() =>
             {
-                await _dispatcher.InvokeAsync(() => _bins.Add(bin));
-            }
+                _bins.AddRange(bins);
+                Bins.GroupDescriptions.Add(new PropertyGroupDescription("StoreName"));
+            });
+
         }
 
 

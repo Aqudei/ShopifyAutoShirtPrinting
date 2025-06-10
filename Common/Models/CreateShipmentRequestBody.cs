@@ -9,6 +9,9 @@ namespace Common.Models
 {
     public class CreateShipmentRequestBody
     {
+        [JsonPropertyName("PackageType")]
+        public string PackageType { get; set; }
+
         [JsonPropertyName("id")]
         public int Id { get; set; }
 
