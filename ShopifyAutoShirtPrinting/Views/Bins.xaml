@@ -37,8 +37,15 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock FontWeight="Bold" FontSize="14"><Run Text="Bin Number"/><Run Text=" "/><Run Text="#"/><Run Text=" "/><Run Text="{Binding BinNumber}"/></TextBlock>
-                    <TextBlock Grid.Row="1" 
-                               FontSize="14"><Run Text="Order"/><Run Text=" "/><Run Text=" "/><Run Text="#"/><Run Text=" "/><Run Text="{Binding OrderNumber}"/></TextBlock>
+                    <StackPanel Orientation="Horizontal" Grid.Row="1">
+                        <TextBlock 
+                            FontSize="14" Height="19"><Run Text="Order"/><Run Text=" "/><Run Text=" "/><Run Text="#: "/><Run Text=" "/><Run Text="{Binding OrderNumber}"/>
+                        </TextBlock>
+                        <TextBlock FontSize="14" Height="19" Width="380">
+                            <Run Text=" / Shop: "/>
+                            <Run Text="{Binding StoreName}"/>
+                        </TextBlock>
+                    </StackPanel>
                     <DataGrid x:Name="dataGrid" 
                             Grid.Row="2"
                             IsReadOnly="True"

@@ -18,6 +18,14 @@ namespace ShopifyEasyShirtPrinting.Models
             set => SetProperty(ref _id, value);
         }
 
+        private int _store;
+
+        public int Store
+        {
+            get { return _store; }
+            set { SetProperty(ref _store, value); }
+        }
+
         private bool _manifested;
         public bool Manifested
         {

@@ -17,6 +17,9 @@ namespace Common.Models
         [JsonPropertyName("Notes")]
         public string Notes { get; set; }
 
+        [JsonPropertyName("StoreName")]
+        public string StoreName { get; set; }
+
 
 
     }

@@ -15,6 +15,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         public int BinNumber { get; set; }
         public string OrderNumber { get; set; }
+        public string StoreName { get; set; }
         public LineItemViewModel[] LineItems { get; set; }
 
         public string Notes
