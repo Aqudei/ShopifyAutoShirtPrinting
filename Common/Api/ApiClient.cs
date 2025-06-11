@@ -614,18 +614,7 @@ namespace Common.Api
 
             if (response.StatusCode != HttpStatusCode.Created)
             {
-                string errorMessage;
-
-                try
-                {
-                    var errorResponse = JsonSerializer.Deserialize<ErrorResponseModel>(response.Content);
-                    errorMessage = string.Join("\n", errorResponse?.Errors) ?? "Unknown error occurred while creating shipment.";
-                }
-                catch (JsonException)
-                {
-                    errorMessage = $"Failed to parse error response: {response.Content ?? response.ErrorMessage}";
-                }
-
+                var errorMessage = response.ErrorMessage ?? response.Content;
                 Logger.Error(errorMessage);
                 throw new Exception(errorMessage);
             }

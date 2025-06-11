@@ -416,7 +416,7 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
 
                 SelectedPostage = Postages.FirstOrDefault(p =>
                     p.PostageShippings.Select(pp => pp.Shipping?.ToLower()).Contains(shippingLine.ToLower()));
-                SelectedPackagingType = PackagingTypes.FirstOrDefault(pk => pk.Code == PackageType) ?? PackagingTypes.FirstOrDefault();
+                SelectedPackagingType = PackagingTypes.FirstOrDefault(pk => pk.Code == PackageType) ?? PackagingTypes.FirstOrDefault(p=>p.Code=="SAT") ?? PackagingTypes.FirstOrDefault();
             });
         }
     }
