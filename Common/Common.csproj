@@ -95,11 +95,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\ApiClient.cs" />
+    <Compile Include="Models\CustomDesign.cs" />
     <Compile Include="Models\ErrorResponseModel.cs" />
     <Compile Include="BGTasker\IBGTask.cs" />
     <Compile Include="Models\Bin.cs" />
     <Compile Include="Models\EntityBase.cs" />
     <Compile Include="Models\Harmonisation\HSN.cs" />
+    <Compile Include="Models\MetaProp.cs" />
     <Compile Include="Models\PackagingType.cs" />
     <Compile Include="Models\PostageProduct.cs" />
     <Compile Include="Models\SessionVariables.cs" />

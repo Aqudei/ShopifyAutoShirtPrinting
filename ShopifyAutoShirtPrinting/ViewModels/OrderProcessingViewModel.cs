@@ -771,10 +771,10 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                             switch (SelectedScanMode)
                             {
                                 case SCAN_MODE_GCR_FRONT:
-                                    TryOpenPrintFiles(lineItemVm);
+                                    await TryOpenPrintFiles(lineItemVm);
                                     break;
                                 case SCAN_MODE_GCR_BACK:
-                                    TryOpenPrintFiles(lineItemVm, true);
+                                    await TryOpenPrintFiles(lineItemVm, true);
                                     break;
                                 case SCAN_MODE_SCAN_ONLY:
                                     break;
@@ -858,36 +858,66 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
     }
 
-    private void TryOpenPrintFiles(LineItemViewModel lineItemVm, bool backPrint = false)
+    private async Task TryOpenPrintFiles(LineItemViewModel lineItemVm, bool backPrint = false)
     {
-        if (string.IsNullOrWhiteSpace(lineItemVm.Sku) || string.IsNullOrWhiteSpace(Properties.Settings.Default.PrintFilesFolder))
+        if (lineItemVm == null) return;
+
+        string printFolder = Properties.Settings.Default.PrintFilesFolder;
+        string sku = lineItemVm.Sku;
+
+        // Try direct print files path first if SKU and PrintFilesFolder are present
+        if (!string.IsNullOrWhiteSpace(sku) && !string.IsNullOrWhiteSpace(printFolder))
         {
-            return;
-        }
+            string basePath = backPrint
+                ? Path.Combine(printFolder, "backprints", sku)
+                : Path.Combine(printFolder, sku);
 
+            string gcrPath = Path.ChangeExtension(basePath, ".gcr");
+            string pngPath = Path.ChangeExtension(basePath, ".png");
 
-        var basePath = Path.Combine(Properties.Settings.Default.PrintFilesFolder, lineItemVm.Sku);
-        if (backPrint)
-        {
-            basePath = Path.Combine(Properties.Settings.Default.PrintFilesFolder, "backprints", lineItemVm.Sku);
-        }
-        var gcrPath = Path.ChangeExtension(basePath, ".gcr");
-        var pngPath = Path.ChangeExtension(basePath, ".png");
+            if (File.Exists(gcrPath))
+            {
+                Process.Start(gcrPath);
+                return;
+            }
 
-
-
-        if (File.Exists(gcrPath))
-        {
-            Process.Start(gcrPath);
-        }
-        else
-        {
             if (File.Exists(pngPath))
             {
                 Process.Start(pngPath);
+                return;
             }
         }
+
+        // If design-based fallback is needed
+        if (lineItemVm.Designs == null || !lineItemVm.Designs.Any() || string.IsNullOrWhiteSpace(Properties.Settings.Default.GarmentCreatorPath))
+            return;
+
+        
+        if(File.Exists(Properties.Settings.Default.GarmentCreatorPath) == false)
+        {
+            await _dialogCoordinator.ShowMessageAsync(this, "Error", "Garment Creator path is not set or the file does not exist.");
+            return;
+        }
+
+        string keyword = backPrint ? "back" : "front";
+        var design = lineItemVm.Designs
+            .FirstOrDefault(d => d.Name?.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
+            ?? lineItemVm.Designs.First();
+
+        string fileName = Path.GetFileName(design.ImageValue);
+        string localFilePath = Path.Combine(_globalVariables.ImagesPath, fileName);
+
+        if (File.Exists(localFilePath))
+        {
+            Process.Start(Properties.Settings.Default.GarmentCreatorPath, $"\"{localFilePath}\"" );
+        }
+        else
+        {
+            await PrintHelpers.DownloadRemoteFileToLocalAsync(design.ImageValue, localFilePath);
+            Process.Start(Properties.Settings.Default.GarmentCreatorPath, $"\"{localFilePath}\"");
+        }
     }
+
 
     public bool IsFilterEnabled { get => _isFilterEnabled; set => SetProperty(ref _isFilterEnabled, value); }
 
@@ -1200,7 +1230,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
         try
         {
-            var imagePath = Path.Combine(_globalVariables.ImagesPath, $"{lineItemOrderId}-{lineItemVariantId}");
+            var imagePath = Path.Combine(_globalVariables.ImagesPath, $"{lineItem.Store}-{lineItemOrderId}-{lineItemVariantId}");
             if (File.Exists(imagePath))
             {
                 return imagePath;
@@ -1466,7 +1496,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     public void OnNavigatedTo(NavigationContext navigationContext)
     {
         Debug.WriteLine(navigationContext.Parameters);
-        
+
         AddRemoveDataGridColumns();
 
         Task.Run(FetchActiveLineItemsAsync);

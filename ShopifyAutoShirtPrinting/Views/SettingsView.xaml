@@ -92,6 +92,20 @@
                         Width="53"/>
                 <Label Width="120" Content="{Binding ImagesTotalSize}"/>
             </StackPanel>
+
+            <StackPanel Orientation="Horizontal">
+                <Label Margin="2" Width="160" Content="Garment Creator Path"/>
+                <TextBox Margin="2" 
+                         IsReadOnly="True"
+                         Text="{Binding GarmentCreatorPath}" 
+                         Width="400"/>
+                <Button Content="Browse" 
+                        Command="{Binding BrowseGarmentCreatorPathCommand}"
+                        Margin='2'
+                        Width="53"/>
+                <Label Width="120" Content="{Binding ImagesTotalSize}"/>
+            </StackPanel>
+
             <StackPanel Orientation="Horizontal"
                         Margin="165,10,10,10">
 

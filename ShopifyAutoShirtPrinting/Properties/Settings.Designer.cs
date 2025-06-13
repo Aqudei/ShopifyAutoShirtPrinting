@@ -249,5 +249,17 @@ namespace ShopifyEasyShirtPrinting.Properties {
                 this["InternationalLabelPrinter"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string GarmentCreatorPath {
+            get {
+                return ((string)(this["GarmentCreatorPath"]));
+            }
+            set {
+                this["GarmentCreatorPath"] = value;
+            }
+        }
     }
 }

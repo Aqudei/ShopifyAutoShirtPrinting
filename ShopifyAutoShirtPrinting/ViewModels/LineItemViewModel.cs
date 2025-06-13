@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
@@ -128,5 +129,16 @@ namespace Common.Models
         public decimal Width { get; set; }
         public decimal Height { get; set; }
 
+        private Dictionary<string, object> _properties;
+
+        public Dictionary<string, object> Properties
+        {
+            get { return _properties; }
+            set { SetProperty(ref _properties, value); }
+        }
+
+
+        public string PropertiesDisplay => string.Join(Environment.NewLine, Properties.Select(p => $"{p.Key}:{p.Value}"));
+        public IEnumerable<CustomDesign> Designs { get; set; }
     }
 }

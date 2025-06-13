@@ -22,7 +22,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         private readonly IMapper _mapper;
 
         public ObservableCollection<string> Printers { get; set; } = new();
-
+        public string GarmentCreatorPath { get => _garmentCreatorPath; set => SetProperty(ref _garmentCreatorPath, value); }
         public string DownloadedImagesPath { get => _downloadedImagesPath; set => SetProperty(ref _downloadedImagesPath, value); }
         public string QrPrinter { get => qrPrinter; set => SetProperty(ref qrPrinter, value); }
         public string ManifestPrinter { get => _manifestPrinter; set => SetProperty(ref _manifestPrinter, value); }
@@ -228,7 +228,28 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             await _dialogCoordinator.ShowMessageAsync(this, "Success", "Settings successfully saved.");
         }
 
+        private DelegateCommand _BrowseGarmentCreatorPathCommand;
+        private string _garmentCreatorPath;
 
+        public DelegateCommand BrowseGarmentCreatorPathCommand
+        {
+            get { return _BrowseGarmentCreatorPathCommand ??= new DelegateCommand(OnBrowseGarmentCreatorPath); }
+        }
 
+        private void OnBrowseGarmentCreatorPath()
+        {
+            var dialog = new Microsoft.WindowsAPICodePack.Dialogs.CommonOpenFileDialog
+            {
+                Multiselect = false,
+            };
+
+            var dlgResult = dialog.ShowDialog();
+            if (dlgResult != Microsoft.WindowsAPICodePack.Dialogs.CommonFileDialogResult.Ok)
+            {
+                return;
+            }
+
+            GarmentCreatorPath = dialog.FileName;
+        }
     }
 }

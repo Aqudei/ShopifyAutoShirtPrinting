@@ -76,14 +76,25 @@ namespace Common.Models
 
         public decimal Width { get; set; }
         [JsonPropertyName("Height")]
-        public decimal Height{ get; set; }
+        public decimal Height { get; set; }
 
 
-        [JsonPropertyName("DesignText")]
-        public string DesignText { get; set; }
-        public override string ToString()
+        //[JsonPropertyName("DesignText")]
+        //public string DesignText { get; set; }
+        //public override string ToString()
+        //{
+        //    return $"#{OrderNumber} - {Sku} - {VariantTitle} - {Name}";
+        //}
+
+        [JsonPropertyName("Properties")]
+        public Dictionary<string, object> Properties
         {
-            return $"#{OrderNumber} - {Sku} - {VariantTitle} - {Name}";
+            get; set;
         }
+
+        [JsonPropertyName("Designs")]
+        public IEnumerable<CustomDesign> Designs { get; set; }
+
+
     }
 }

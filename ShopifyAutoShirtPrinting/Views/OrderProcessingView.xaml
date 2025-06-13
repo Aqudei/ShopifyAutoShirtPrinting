@@ -348,16 +348,16 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="Metafields"
+                    <!--<DataGridTemplateColumn Header="Metafields"
                                             Width="350">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding DesignText}" 
+                                <TextBlock Text="{Binding PropertiesDisplay}" 
                                            TextWrapping="Wrap" 
                                            VerticalAlignment="Center"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
+                    </DataGridTemplateColumn>-->
 
                     <DataGridTextColumn Header="SKU" Binding="{Binding Sku}"
                                         Visibility="{Binding DataContext.ColumnVisibility, Converter={StaticResource DictionaryToVisibilityConverter}, ConverterParameter='Sku', Source={x:Reference DummyElement}, Mode=OneWay}"/>
