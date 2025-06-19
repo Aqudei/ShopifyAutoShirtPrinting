@@ -324,19 +324,19 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 };
 
         bool? color = null;
-        bool? isDtf = null;
+        bool isDtf = false;
 
         if (!string.IsNullOrWhiteSpace(lineItem.Sku))
         {
-            isDtf = lineItem.Sku.ToUpper().EndsWith("-DTF") ? true : false;
+            isDtf = Regex.IsMatch(lineItem.Sku?.ToUpper(), @"-DTF-?");
 
-            if (isDtf.Value)
+            if (isDtf)
             {
                 color = null;
             }
             else
             {
-                color = lineItem.Sku.ToUpper().EndsWith("-LT") ? true : false;
+                color = Regex.IsMatch(lineItem.Sku?.ToUpper(), @"-LT-?");
             }
         }
 
@@ -892,8 +892,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         if (lineItemVm.Designs == null || !lineItemVm.Designs.Any() || string.IsNullOrWhiteSpace(Properties.Settings.Default.GarmentCreatorPath))
             return;
 
-        
-        if(File.Exists(Properties.Settings.Default.GarmentCreatorPath) == false)
+
+        if (File.Exists(Properties.Settings.Default.GarmentCreatorPath) == false)
         {
             await _dialogCoordinator.ShowMessageAsync(this, "Error", "Garment Creator path is not set or the file does not exist.");
             return;
@@ -909,7 +909,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
         if (File.Exists(localFilePath))
         {
-            Process.Start(Properties.Settings.Default.GarmentCreatorPath, $"\"{localFilePath}\"" );
+            Process.Start(Properties.Settings.Default.GarmentCreatorPath, $"\"{localFilePath}\"");
         }
         else
         {

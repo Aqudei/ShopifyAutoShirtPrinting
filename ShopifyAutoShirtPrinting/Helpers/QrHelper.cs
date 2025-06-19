@@ -87,7 +87,7 @@ namespace ShopifyEasyShirtPrinting.Helpers
             return qrCode;
         }
 
-        public Bitmap DrawQrTagInfo(string text, Bitmap refImage, string orderNumber, bool hasNotes, bool? color, bool? hasBackPrint = false, bool? isDtf = false)
+        public Bitmap DrawQrTagInfo(string text, Bitmap refImage, string orderNumber, bool hasNotes, bool? color, bool? hasBackPrint = false, bool isDtf = false)
         {
             var aspectRatio = Properties.Settings.Default.PaperWidth / Properties.Settings.Default.PaperHeight;
             var width = (int)(aspectRatio * refImage.Height) - refImage.Width;
@@ -155,7 +155,7 @@ namespace ShopifyEasyShirtPrinting.Helpers
 
             if (color.HasValue)
             {
-                if (color == false)
+                if (color.Value == false)
                 {
                     graphics.FillEllipse(brush, offset, nextLine, icon_size, icon_size);
                     offset = offset - icon_size - 5;
@@ -174,7 +174,7 @@ namespace ShopifyEasyShirtPrinting.Helpers
                 offset = offset - icon_size - 5;
             }
 
-            if (isDtf.HasValue && isDtf.Value)
+            if (isDtf)
             {
                 var image = Properties.Resources.section_sign;
                 graphics.DrawImage(image, offset, nextLine, icon_size, icon_size);
