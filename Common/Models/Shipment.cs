@@ -15,6 +15,9 @@ namespace Common.Models
         [JsonPropertyName("Store")]
         public int Store { get; set; }
 
+        [JsonPropertyName("StoreName")]
+        public string StoreName { get; set; }
+
         [JsonPropertyName("Manifested")]
         public bool Manifested { get; set; }
 

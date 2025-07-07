@@ -23,6 +23,8 @@ using System;
 using System.IO;
 using System.Windows;
 using DotNetEnv;
+using ControlzEx.Theming;
+using System.Linq;
 
 namespace ShopifyEasyShirtPrinting
 {
@@ -168,7 +170,18 @@ namespace ShopifyEasyShirtPrinting
             Directory.CreateDirectory(_sessionVariables.QrTagsPath);
             Directory.CreateDirectory(_sessionVariables.ImagesPath);
 
+
             base.OnStartup(e);
+
+
+            if (!string.IsNullOrWhiteSpace(Settings.Default.ThemeName))
+            {
+                var selectedTheme = ThemeManager.Current.Themes.FirstOrDefault(t => t.Name == Settings.Default.ThemeName);
+                if (selectedTheme != null)
+                {
+                    ThemeManager.Current.ChangeTheme(this, selectedTheme);
+                }
+            }
         }
     }
 }

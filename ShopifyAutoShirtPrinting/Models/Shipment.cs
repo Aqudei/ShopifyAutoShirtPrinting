@@ -26,6 +26,8 @@ namespace ShopifyEasyShirtPrinting.Models
             set { SetProperty(ref _store, value); }
         }
 
+        public string StoreName { get => _storeName; set => SetProperty(ref _storeName, value); }
+
         private bool _manifested;
         public bool Manifested
         {
@@ -246,6 +248,8 @@ namespace ShopifyEasyShirtPrinting.Models
         }
 
         private DebugInfo _debugInfo;
+        private string _storeName;
+
         public DebugInfo DebugInfo
         {
             get => _debugInfo;

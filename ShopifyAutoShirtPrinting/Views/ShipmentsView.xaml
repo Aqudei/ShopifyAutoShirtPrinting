@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:ShopifyEasyShirtPrinting.Views"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:ico="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mah:DialogParticipation.Register="{Binding}"
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
@@ -22,16 +23,35 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <TextBox Grid.Column="0" Text="{Binding SearchText}"/>
+            <TextBox Grid.Column="0" 
+                     Margin="2"
+                     mah:TextBoxHelper.Watermark="[Type to Seach]"
+                     Text="{Binding SearchText}"/>
             <StackPanel Grid.Column="1" Orientation="Horizontal">
-                <Button Content="Refresh" Command="{Binding RefreshCommand}" />
-                <Button Content="Search" Command="{Binding SearchCommand}" />
-                <Button Command="{Binding ManifestPendingCommand}" >
-                    <Label Content="{Binding TotalPendingText}"/>
+                <Button Margin="2" Command="{Binding RefreshCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <ico:PackIconMaterial Kind="Refresh" Width="16" Height="16" Margin="0,0,5,0" />
+                        <TextBlock Text="Refresh" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Margin="2" Command="{Binding SearchCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <ico:PackIconMaterial Kind="Magnify" Width="16" Height="16" Margin="0,0,5,0" />
+                        <TextBlock Text="Search" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Margin="2" Command="{Binding ManifestPendingCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <ico:PackIconMaterial Kind="ClockOutline" Width="16" Height="16" Margin="0,0,5,0" />
+                        <TextBlock Text="{Binding TotalPendingText}" VerticalAlignment="Center"/>
+                    </StackPanel>
                 </Button>
             </StackPanel>
         </Grid>
         <DataGrid Grid.Row="1" 
+                  Margin="2"
                   FontSize="14"
                   ItemsSource="{Binding ShippedItems}"
                   x:Name="ShipmentsDataGrid"
@@ -68,6 +88,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 
+                <DataGridTextColumn Header="Store" Binding="{Binding StoreName}"/>
                 <DataGridTextColumn Header="Manifested" Binding="{Binding Manifested}"/>
                 <!--<DataGridTextColumn Header="Shipment Id" Binding="{Binding ShipmentId}"/>-->
                 <DataGridTextColumn Header="Order Number" Binding="{Binding OrderNumber}"/>

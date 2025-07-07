@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Common.Api;
 using Common.Models;
+using ControlzEx.Theming;
 using MahApps.Metro.Controls.Dialogs;
 using Prism.Commands;
 using ShopifyEasyShirtPrinting.Helpers;
@@ -11,6 +12,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Drawing.Printing;
 using System.IO;
+using System.Windows;
 
 namespace ShopifyEasyShirtPrinting.ViewModels
 {
@@ -127,6 +129,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             set { SetProperty(ref _imagesTotalSize, value); }
         }
 
+        public ObservableCollection<Theme> Themes { get; set; } = new();
+        public Theme SelectedTheme { get => _selectedTheme; set => SetProperty(ref _selectedTheme, value); }
         public override string Title => "Settings";
         public SettingsViewModel(IDialogCoordinator dialogCoordinator, IMapper mapper, ApiClient apiClient, SessionVariables globalVariables)
         {
@@ -135,12 +139,15 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             _globalVariables = globalVariables;
             _dialogCoordinator = dialogCoordinator;
 
+            LoadThemes();
             CalculateImagesUsageSize();
 
             foreach (string printerName in PrinterSettings.InstalledPrinters)
             {
                 Printers.Add(printerName);
             }
+
+
 
             _mapper.Map(Settings.Default, this);
 
@@ -150,7 +157,30 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 {
                     ApiBaseUrl = $"https://{ServerHost}";
                 }
+
+                if (e.PropertyName == nameof(SelectedTheme))
+                {
+                    ThemeManager.Current.ChangeTheme(Application.Current, SelectedTheme);
+                }
             };
+        }
+
+        private void LoadThemes()
+        {
+            var savedThem = Properties.Settings.Default.ThemeName;
+
+            Themes.Clear();
+            foreach (var theme in ThemeManager.Current.Themes)
+            {
+                Themes.Add(theme);
+                if (!string.IsNullOrWhiteSpace(savedThem))
+                {
+                    if (savedThem == theme.Name)
+                    {
+                        SelectedTheme = theme;
+                    }
+                }
+            }
         }
 
         private void CalculateImagesUsageSize()
@@ -224,12 +254,14 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         private async void HandleSaveSettings()
         {
             _mapper.Map(this, Settings.Default);
+            Settings.Default.ThemeName = SelectedTheme.Name;
             Settings.Default.Save();
             await _dialogCoordinator.ShowMessageAsync(this, "Success", "Settings successfully saved.");
         }
 
         private DelegateCommand _BrowseGarmentCreatorPathCommand;
         private string _garmentCreatorPath;
+        private Theme _selectedTheme;
 
         public DelegateCommand BrowseGarmentCreatorPathCommand
         {

@@ -103,9 +103,16 @@
                         Command="{Binding BrowseGarmentCreatorPathCommand}"
                         Margin='2'
                         Width="53"/>
-                <Label Width="120" Content="{Binding ImagesTotalSize}"/>
             </StackPanel>
 
+            <StackPanel Orientation="Horizontal">
+                <Label Margin="2" Width="160" Content="Theme"/>
+                <ComboBox Margin="2" 
+                          DisplayMemberPath="DisplayName"
+                          SelectedItem="{Binding SelectedTheme, Mode=TwoWay}"
+                          ItemsSource="{Binding Themes}"
+                          Width="400"/>
+            </StackPanel>
             <StackPanel Orientation="Horizontal"
                         Margin="165,10,10,10">
 
