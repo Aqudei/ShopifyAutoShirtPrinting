@@ -29,6 +29,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         private readonly SessionVariables _globalVariables;
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly IMapper _mapper;
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
         public ObservableCollection<string> Printers { get; set; } = new();
         public string GarmentCreatorPath { get => _garmentCreatorPath; set => SetProperty(ref _garmentCreatorPath, value); }
@@ -145,62 +146,70 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         public async Task LoadStatuses()
         {
-            // Default fallback colors
-            var _defaultColorLookup = new Dictionary<string, SolidColorBrush>()
+            try
             {
-                ["Pending"] = new SolidColorBrush(Color.FromArgb(50, 0xff, 0xff, 0xff)),
-                ["Processed"] = new SolidColorBrush(Color.FromArgb(50, 0x00, 0xde, 0xff)),
-                ["LabelPrinted"] = new SolidColorBrush(Color.FromArgb(50, 0x0c, 0x00, 0xff)),
-                ["Shipped"] = new SolidColorBrush(Color.FromArgb(50, 0x00, 0xff, 0x22)),
-                ["Archived"] = new SolidColorBrush(Color.FromArgb(50, 0x00, 0x00, 0x00)),
-                ["Need To Order From Supplier"] = new SolidColorBrush(Color.FromArgb(50, 0xff, 0x00, 0x00)),
-                ["Have Ordered From Supplier"] = new SolidColorBrush(Color.FromArgb(50, 0x00, 0xf0, 0x00)),
-                ["Issue Needs Resolving"] = new SolidColorBrush(Color.FromArgb(50, 0xff, 0x00, 0xff)),
-            };
-
-            // Try loading saved colors
-            Dictionary<string, SolidColorBrush> existingColorsDict = new();
-
-            if (!string.IsNullOrWhiteSpace(Properties.Settings.Default.LineColor))
-            {
-                try
+                // Default fallback colors
+                var _defaultColorLookup = new Dictionary<string, SolidColorBrush>()
                 {
-                    var existingColors = JsonSerializer.Deserialize<IEnumerable<KeyValuePair<string, SolidColorBrush>>>(Properties.Settings.Default.LineColor);
-                    if (existingColors != null)
+                    ["Pending"] = new SolidColorBrush(Color.FromArgb(50, 0xff, 0xff, 0xff)),
+                    ["Processed"] = new SolidColorBrush(Color.FromArgb(50, 0x00, 0xde, 0xff)),
+                    ["LabelPrinted"] = new SolidColorBrush(Color.FromArgb(50, 0x0c, 0x00, 0xff)),
+                    ["Shipped"] = new SolidColorBrush(Color.FromArgb(50, 0x00, 0xff, 0x22)),
+                    ["Archived"] = new SolidColorBrush(Color.FromArgb(50, 0x00, 0x00, 0x00)),
+                    ["Need To Order From Supplier"] = new SolidColorBrush(Color.FromArgb(50, 0xff, 0x00, 0x00)),
+                    ["Have Ordered From Supplier"] = new SolidColorBrush(Color.FromArgb(50, 0x00, 0xf0, 0x00)),
+                    ["Issue Needs Resolving"] = new SolidColorBrush(Color.FromArgb(50, 0xff, 0x00, 0xff)),
+                };
+
+                // Try loading saved colors
+                Dictionary<string, SolidColorBrush> existingColorsDict = new();
+
+                if (!string.IsNullOrWhiteSpace(Properties.Settings.Default.LineColor))
+                {
+                    try
                     {
-                        existingColorsDict = existingColors.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                        var existingColors = JsonSerializer.Deserialize<IEnumerable<KeyValuePair<string, SolidColorBrush>>>(Properties.Settings.Default.LineColor);
+                        if (existingColors != null)
+                        {
+                            existingColorsDict = existingColors.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log or handle error if necessary
                     }
                 }
-                catch (Exception ex)
+
+                // Get the current MahApps theme accent color
+                var currentTheme = ThemeManager.Current.DetectTheme();
+                var accentColorBrush = currentTheme?.Resources["Accent"] as SolidColorBrush ?? Brushes.Gray;
+
+                // Fetch statuses from API
+                var statuses = await _apiClient.FetchLineStatusesAsync();
+
+                await _dispatcher.InvokeAsync(LineStatuses.Clear);
+
+                foreach (var status in statuses)
                 {
-                    // Log or handle error if necessary
+                    if (existingColorsDict.TryGetValue(status, out var existingColor))
+                    {
+                        await _dispatcher.InvokeAsync(() => LineStatuses.Add(new KeyValuePair<string, SolidColorBrush>(status, existingColor)));
+
+                    }
+                    else if (_defaultColorLookup.TryGetValue(status, out var defaultColor))
+                    {
+                        await _dispatcher.InvokeAsync(() => LineStatuses.Add(new KeyValuePair<string, SolidColorBrush>(status, defaultColor)));
+                    }
+                    else
+                    {
+                        await _dispatcher.InvokeAsync(() => LineStatuses.Add(new KeyValuePair<string, SolidColorBrush>(status, accentColorBrush)));
+                    }
                 }
             }
-
-            // Get the current MahApps theme accent color
-            var currentTheme = ThemeManager.Current.DetectTheme();
-            var accentColorBrush = currentTheme?.Resources["Accent"] as SolidColorBrush ?? Brushes.Gray;
-
-            // Fetch statuses from API
-            var statuses = await _apiClient.FetchLineStatusesAsync();
-
-            await _dispatcher.InvokeAsync(LineStatuses.Clear);
-
-            foreach (var status in statuses)
+            catch (Exception ex)
             {
-                if (existingColorsDict.TryGetValue(status, out var existingColor))
-                {
-                    await _dispatcher.InvokeAsync(() => LineStatuses.Add(new KeyValuePair<string, SolidColorBrush>(status, existingColor)));
-
-                }
-                else if (_defaultColorLookup.TryGetValue(status, out var defaultColor))
-                {
-                    await _dispatcher.InvokeAsync(() => LineStatuses.Add(new KeyValuePair<string, SolidColorBrush>(status, defaultColor)));
-                }
-                else
-                {
-                    await _dispatcher.InvokeAsync(() => LineStatuses.Add(new KeyValuePair<string, SolidColorBrush>(status, accentColorBrush)));
-                }
+                Logger.Error("ERROR @ LoadStatuses()");
+                Logger.Error(ex);
             }
         }
 
@@ -213,9 +222,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             _dialogCoordinator = dialogCoordinator;
 
 
-            Task.Run(LoadStatuses);
-
-            LoadThemes();
             CalculateImagesUsageSize();
 
             foreach (string printerName in PrinterSettings.InstalledPrinters)
@@ -224,6 +230,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             }
 
             _mapper.Map(Settings.Default, this);
+
 
             PropertyChanged += (s, e) =>
             {
@@ -237,23 +244,35 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                     ThemeManager.Current.ChangeTheme(Application.Current, SelectedTheme);
                 }
             };
+
+            LoadThemes();
+
+            Task.Run(LoadStatuses);
         }
 
         private void LoadThemes()
         {
-            var savedThem = Properties.Settings.Default.ThemeName;
-
-            Themes.Clear();
-            foreach (var theme in ThemeManager.Current.Themes)
+            try
             {
-                Themes.Add(theme);
-                if (!string.IsNullOrWhiteSpace(savedThem))
+                var savedThem = Properties.Settings.Default.ThemeName;
+
+                Themes.Clear();
+                foreach (var theme in ThemeManager.Current.Themes)
                 {
-                    if (savedThem == theme.Name)
+                    Themes.Add(theme);
+                    if (!string.IsNullOrWhiteSpace(savedThem))
                     {
-                        SelectedTheme = theme;
+                        if (savedThem == theme.Name)
+                        {
+                            SelectedTheme = theme;
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("ERROR @ LoadThemes");
+                Logger.Error(ex);
             }
         }
 
