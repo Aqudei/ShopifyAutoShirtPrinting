@@ -40,6 +40,7 @@ namespace ShopifyEasyShirtPrinting
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+           
             try
             {
 

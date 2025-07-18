@@ -370,6 +370,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         {
             _mapper.Map(this, Settings.Default);
             Settings.Default.ThemeName = SelectedTheme.Name;
+
+            Properties.Settings.Default.LineColor = JsonSerializer.Serialize(LineStatuses);
             Settings.Default.Save();
             await _dialogCoordinator.ShowMessageAsync(this, "Success", "Settings successfully saved.");
         }
