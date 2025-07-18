@@ -124,8 +124,10 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition/>
                                 </Grid.ColumnDefinitions>
-                                <Label Content="{Binding Key}"/>
-                                <Label Content="{Binding Value}" Grid.Column="1"/>
+                                <Label Content="{Binding Key}" />
+                                <mah:ColorPicker SelectedColor="{Binding Color}" 
+                                                 mah:TextBoxHelper.Watermark="Select a color"
+                                                 Grid.Column="1"/>
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>

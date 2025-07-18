@@ -6,6 +6,7 @@ using ControlzEx.Theming;
 using MahApps.Metro.Controls.Dialogs;
 using Netco.Monads;
 using Prism.Commands;
+using Prism.Mvvm;
 using ShopifyEasyShirtPrinting.Helpers;
 using ShopifyEasyShirtPrinting.Models;
 using ShopifyEasyShirtPrinting.Properties;
@@ -23,6 +24,15 @@ using System.Windows.Media;
 
 namespace ShopifyEasyShirtPrinting.ViewModels
 {
+    public class ColorSetting : BindableBase
+    {
+        private string key;
+        private Color color;
+
+        public string Key { get => key; set => SetProperty(ref key, value); }
+        public System.Windows.Media.Color Color { get => color; set => SetProperty(ref color, value); }
+
+    }
     public class SettingsViewModel : PageBase
     {
         private readonly ApiClient _apiClient;
@@ -141,40 +151,39 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         public Theme SelectedTheme { get => _selectedTheme; set => SetProperty(ref _selectedTheme, value); }
         public override string Title => "Settings";
 
-
-        public ObservableCollection<KeyValuePair<string, SolidColorBrush>> LineStatuses = new();
+        public ObservableCollection<ColorSetting> LineStatuses { get; set; } = new();
 
         public async Task LoadStatuses()
         {
             try
             {
                 // Default fallback colors
-                var _defaultColorLookup = new Dictionary<string, SolidColorBrush>()
+                var _defaultColorLookup = new Dictionary<string, Color>()
                 {
-                    ["Pending"] = new SolidColorBrush(Color.FromArgb(50, 0xff, 0xff, 0xff)),
-                    ["Processed"] = new SolidColorBrush(Color.FromArgb(50, 0x00, 0xde, 0xff)),
-                    ["LabelPrinted"] = new SolidColorBrush(Color.FromArgb(50, 0x0c, 0x00, 0xff)),
-                    ["Shipped"] = new SolidColorBrush(Color.FromArgb(50, 0x00, 0xff, 0x22)),
-                    ["Archived"] = new SolidColorBrush(Color.FromArgb(50, 0x00, 0x00, 0x00)),
-                    ["Need To Order From Supplier"] = new SolidColorBrush(Color.FromArgb(50, 0xff, 0x00, 0x00)),
-                    ["Have Ordered From Supplier"] = new SolidColorBrush(Color.FromArgb(50, 0x00, 0xf0, 0x00)),
-                    ["Issue Needs Resolving"] = new SolidColorBrush(Color.FromArgb(50, 0xff, 0x00, 0xff)),
+                    ["Pending"] = Color.FromArgb(50, 0xff, 0xff, 0xff),
+                    ["Processed"] = Color.FromArgb(50, 0x00, 0xde, 0xff),
+                    ["LabelPrinted"] = Color.FromArgb(50, 0x0c, 0x00, 0xff),
+                    ["Shipped"] = Color.FromArgb(50, 0x00, 0xff, 0x22),
+                    ["Archived"] = Color.FromArgb(50, 0x00, 0x00, 0x00),
+                    ["Need To Order From Supplier"] = Color.FromArgb(50, 0xff, 0x00, 0x00),
+                    ["Have Ordered From Supplier"] = Color.FromArgb(50, 0x00, 0xf0, 0x00),
+                    ["Issue Needs Resolving"] = Color.FromArgb(50, 0xff, 0x00, 0xff),
                 };
 
                 // Try loading saved colors
-                Dictionary<string, SolidColorBrush> existingColorsDict = new();
+                Dictionary<string, Color> existingColorsDict = new();
 
                 if (!string.IsNullOrWhiteSpace(Properties.Settings.Default.LineColor))
                 {
                     try
                     {
-                        var existingColors = JsonSerializer.Deserialize<IEnumerable<KeyValuePair<string, SolidColorBrush>>>(Properties.Settings.Default.LineColor);
+                        var existingColors = JsonSerializer.Deserialize<IEnumerable<ColorSetting>>(Properties.Settings.Default.LineColor);
                         if (existingColors != null)
                         {
-                            existingColorsDict = existingColors.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                            existingColorsDict = existingColors.ToDictionary(kvp => kvp.Key, kvp => kvp.Color);
                         }
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         // Log or handle error if necessary
                     }
@@ -183,6 +192,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 // Get the current MahApps theme accent color
                 var currentTheme = ThemeManager.Current.DetectTheme();
                 var accentColorBrush = currentTheme?.Resources["Accent"] as SolidColorBrush ?? Brushes.Gray;
+                var accentColor = accentColorBrush.Color;
 
                 // Fetch statuses from API
                 var statuses = await _apiClient.FetchLineStatusesAsync();
@@ -193,16 +203,28 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 {
                     if (existingColorsDict.TryGetValue(status, out var existingColor))
                     {
-                        await _dispatcher.InvokeAsync(() => LineStatuses.Add(new KeyValuePair<string, SolidColorBrush>(status, existingColor)));
+                        await _dispatcher.InvokeAsync(() => LineStatuses.Add(new ColorSetting
+                        {
+                            Color = existingColor,
+                            Key = status,
+                        }));
 
                     }
                     else if (_defaultColorLookup.TryGetValue(status, out var defaultColor))
                     {
-                        await _dispatcher.InvokeAsync(() => LineStatuses.Add(new KeyValuePair<string, SolidColorBrush>(status, defaultColor)));
+                        await _dispatcher.InvokeAsync(() => LineStatuses.Add(new ColorSetting
+                        {
+                            Key = status,
+                            Color = defaultColor,
+                        }));
                     }
                     else
                     {
-                        await _dispatcher.InvokeAsync(() => LineStatuses.Add(new KeyValuePair<string, SolidColorBrush>(status, accentColorBrush)));
+                        await _dispatcher.InvokeAsync(() => LineStatuses.Add(new ColorSetting
+                        {
+                            Color = accentColor,
+                            Key = status,
+                        }));
                     }
                 }
             }
