@@ -1,18 +1,25 @@
-﻿using AutoMapper;
+﻿using AngleSharp.Common;
+using AutoMapper;
 using Common.Api;
 using Common.Models;
 using ControlzEx.Theming;
 using MahApps.Metro.Controls.Dialogs;
+using Netco.Monads;
 using Prism.Commands;
 using ShopifyEasyShirtPrinting.Helpers;
 using ShopifyEasyShirtPrinting.Models;
 using ShopifyEasyShirtPrinting.Properties;
 using ShopifyEasyShirtPrinting.Services;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing.Printing;
 using System.IO;
+using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 
 namespace ShopifyEasyShirtPrinting.ViewModels
 {
@@ -132,12 +139,81 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         public ObservableCollection<Theme> Themes { get; set; } = new();
         public Theme SelectedTheme { get => _selectedTheme; set => SetProperty(ref _selectedTheme, value); }
         public override string Title => "Settings";
+
+
+        public ObservableCollection<KeyValuePair<string, SolidColorBrush>> LineStatuses = new();
+
+        public async Task LoadStatuses()
+        {
+            // Default fallback colors
+            var _defaultColorLookup = new Dictionary<string, SolidColorBrush>()
+            {
+                ["Pending"] = new SolidColorBrush(Color.FromArgb(50, 0xff, 0xff, 0xff)),
+                ["Processed"] = new SolidColorBrush(Color.FromArgb(50, 0x00, 0xde, 0xff)),
+                ["LabelPrinted"] = new SolidColorBrush(Color.FromArgb(50, 0x0c, 0x00, 0xff)),
+                ["Shipped"] = new SolidColorBrush(Color.FromArgb(50, 0x00, 0xff, 0x22)),
+                ["Archived"] = new SolidColorBrush(Color.FromArgb(50, 0x00, 0x00, 0x00)),
+                ["Need To Order From Supplier"] = new SolidColorBrush(Color.FromArgb(50, 0xff, 0x00, 0x00)),
+                ["Have Ordered From Supplier"] = new SolidColorBrush(Color.FromArgb(50, 0x00, 0xf0, 0x00)),
+                ["Issue Needs Resolving"] = new SolidColorBrush(Color.FromArgb(50, 0xff, 0x00, 0xff)),
+            };
+
+            // Try loading saved colors
+            Dictionary<string, SolidColorBrush> existingColorsDict = new();
+
+            if (!string.IsNullOrWhiteSpace(Properties.Settings.Default.LineColor))
+            {
+                try
+                {
+                    var existingColors = JsonSerializer.Deserialize<IEnumerable<KeyValuePair<string, SolidColorBrush>>>(Properties.Settings.Default.LineColor);
+                    if (existingColors != null)
+                    {
+                        existingColorsDict = existingColors.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Log or handle error if necessary
+                }
+            }
+
+            // Get the current MahApps theme accent color
+            var currentTheme = ThemeManager.Current.DetectTheme();
+            var accentColorBrush = currentTheme?.Resources["Accent"] as SolidColorBrush ?? Brushes.Gray;
+
+            // Fetch statuses from API
+            var statuses = await _apiClient.FetchLineStatusesAsync();
+
+            await _dispatcher.InvokeAsync(LineStatuses.Clear);
+
+            foreach (var status in statuses)
+            {
+                if (existingColorsDict.TryGetValue(status, out var existingColor))
+                {
+                    await _dispatcher.InvokeAsync(() => LineStatuses.Add(new KeyValuePair<string, SolidColorBrush>(status, existingColor)));
+
+                }
+                else if (_defaultColorLookup.TryGetValue(status, out var defaultColor))
+                {
+                    await _dispatcher.InvokeAsync(() => LineStatuses.Add(new KeyValuePair<string, SolidColorBrush>(status, defaultColor)));
+                }
+                else
+                {
+                    await _dispatcher.InvokeAsync(() => LineStatuses.Add(new KeyValuePair<string, SolidColorBrush>(status, accentColorBrush)));
+                }
+            }
+        }
+
+
         public SettingsViewModel(IDialogCoordinator dialogCoordinator, IMapper mapper, ApiClient apiClient, SessionVariables globalVariables)
         {
             _mapper = mapper;
             _apiClient = apiClient;
             _globalVariables = globalVariables;
             _dialogCoordinator = dialogCoordinator;
+
+
+            Task.Run(LoadStatuses);
 
             LoadThemes();
             CalculateImagesUsageSize();
@@ -146,8 +222,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             {
                 Printers.Add(printerName);
             }
-
-
 
             _mapper.Map(Settings.Default, this);
 

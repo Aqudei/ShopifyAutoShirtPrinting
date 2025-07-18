@@ -868,6 +868,24 @@ namespace Common.Api
 
         }
 
+        public async Task<IEnumerable<string>> FetchLineStatusesAsync()
+        {
+            try
+            {
+                var request = new RestRequest("/api/Statuses/");
+                var response = await _client.ExecuteGetAsync<IEnumerable<string>>(request);
+                if (response.IsSuccessful)
+                {
+                    return response.Data;
+                }
+                return Enumerable.Empty<string>();
+            }
+            catch (Exception)
+            {
+                return Enumerable.Empty<string>();
+            }
+        }
+
         #endregion
     }
 }

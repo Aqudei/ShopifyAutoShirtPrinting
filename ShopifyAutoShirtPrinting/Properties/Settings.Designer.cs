@@ -273,5 +273,17 @@ namespace ShopifyEasyShirtPrinting.Properties {
                 this["ThemeName"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LineColor {
+            get {
+                return ((string)(this["LineColor"]));
+            }
+            set {
+                this["LineColor"] = value;
+            }
+        }
     }
 }

@@ -8,7 +8,7 @@
              mah:DialogParticipation.Register="{Binding}"
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="525.711" d:DesignWidth="826.897">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -113,6 +113,25 @@
                           ItemsSource="{Binding Themes}"
                           Width="400"/>
             </StackPanel>
+
+            <StackPanel Orientation="Horizontal">
+                <Label Margin="2" Width="160" Content="Colors"/>
+                <ItemsControl ItemsSource="{Binding LineStatuses}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="{Binding Key}"/>
+                                <Label Content="{Binding Value}" Grid.Column="1"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+
             <StackPanel Orientation="Horizontal"
                         Margin="165,10,10,10">
 
