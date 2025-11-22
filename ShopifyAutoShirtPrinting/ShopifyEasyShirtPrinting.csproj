@@ -67,10 +67,10 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>AA4B5FD3176F598EE7053FFDEAD88FE5F92DAEED</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>340BE396AB040F57B9E8B620BADABADE5B13AA1D</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>ShopifyEasyShirtPrinting_3_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>ShopifyEasyShirtPrinting_1_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <TargetZone>LocalIntranet</TargetZone>
@@ -131,11 +131,11 @@
     <Reference Include="LiteDB, Version=5.0.17.0, Culture=neutral, PublicKeyToken=4ee40123013c9f27, processorArchitecture=MSIL">
       <HintPath>..\packages\LiteDB.5.0.17\lib\net45\LiteDB.dll</HintPath>
     </Reference>
-    <Reference Include="Magick.NET-Q8-x64, Version=13.3.0.0, Culture=neutral, PublicKeyToken=2004825badfa91ec, processorArchitecture=AMD64">
-      <HintPath>..\packages\Magick.NET-Q8-x64.13.3.0\lib\netstandard20\Magick.NET-Q8-x64.dll</HintPath>
+    <Reference Include="Magick.NET-Q16-AnyCPU, Version=14.9.0.0, Culture=neutral, PublicKeyToken=2004825badfa91ec, processorArchitecture=MSIL">
+      <HintPath>..\packages\Magick.NET-Q16-AnyCPU.14.9.1\lib\netstandard20\Magick.NET-Q16-AnyCPU.dll</HintPath>
     </Reference>
-    <Reference Include="Magick.NET.Core, Version=13.3.0.0, Culture=neutral, PublicKeyToken=2004825badfa91ec, processorArchitecture=MSIL">
-      <HintPath>..\packages\Magick.NET.Core.13.3.0\lib\netstandard20\Magick.NET.Core.dll</HintPath>
+    <Reference Include="Magick.NET.Core, Version=14.9.0.0, Culture=neutral, PublicKeyToken=2004825badfa91ec, processorArchitecture=MSIL">
+      <HintPath>..\packages\Magick.NET.Core.14.9.1\lib\netstandard20\Magick.NET.Core.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro, Version=2.0.0.0, Culture=neutral, PublicKeyToken=51482d6f650b2b3f, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.2.4.10\lib\net47\MahApps.Metro.dll</HintPath>
@@ -818,6 +818,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="ShopifyEasyShirtPrinting_1_TemporaryKey.pfx" />
     <None Include="ShopifyEasyShirtPrinting_2_TemporaryKey.pfx" />
     <None Include="ShopifyEasyShirtPrinting_3_TemporaryKey.pfx" />
     <None Include="ShopifyEasyShirtPrinting_TemporaryKey.pfx" />
@@ -868,9 +869,9 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.Extensions.Logging.Abstractions.6.0.0\build\Microsoft.Extensions.Logging.Abstractions.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Extensions.Logging.Abstractions.6.0.0\build\Microsoft.Extensions.Logging.Abstractions.targets'))" />
-    <Error Condition="!Exists('..\packages\Magick.NET-Q8-x64.13.3.0\build\netstandard20\Magick.NET-Q8-x64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Magick.NET-Q8-x64.13.3.0\build\netstandard20\Magick.NET-Q8-x64.targets'))" />
     <Error Condition="!Exists('..\packages\PdfiumViewer.Native.x86_64.v8-xfa.2018.4.8.256\build\PdfiumViewer.Native.x86_64.v8-xfa.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\PdfiumViewer.Native.x86_64.v8-xfa.2018.4.8.256\build\PdfiumViewer.Native.x86_64.v8-xfa.props'))" />
+    <Error Condition="!Exists('..\packages\Magick.NET-Q16-AnyCPU.14.9.1\build\netstandard20\Magick.NET-Q16-AnyCPU.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Magick.NET-Q16-AnyCPU.14.9.1\build\netstandard20\Magick.NET-Q16-AnyCPU.targets'))" />
   </Target>
   <Import Project="..\packages\Microsoft.Extensions.Logging.Abstractions.6.0.0\build\Microsoft.Extensions.Logging.Abstractions.targets" Condition="Exists('..\packages\Microsoft.Extensions.Logging.Abstractions.6.0.0\build\Microsoft.Extensions.Logging.Abstractions.targets')" />
-  <Import Project="..\packages\Magick.NET-Q8-x64.13.3.0\build\netstandard20\Magick.NET-Q8-x64.targets" Condition="Exists('..\packages\Magick.NET-Q8-x64.13.3.0\build\netstandard20\Magick.NET-Q8-x64.targets')" />
+  <Import Project="..\packages\Magick.NET-Q16-AnyCPU.14.9.1\build\netstandard20\Magick.NET-Q16-AnyCPU.targets" Condition="Exists('..\packages\Magick.NET-Q16-AnyCPU.14.9.1\build\netstandard20\Magick.NET-Q16-AnyCPU.targets')" />
 </Project>

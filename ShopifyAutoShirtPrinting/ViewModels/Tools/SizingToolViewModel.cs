@@ -52,18 +52,18 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
             get => _backgroundColor;
             set => SetProperty(ref _backgroundColor, value);
         }
-        private int _canvasWidth;
+        private uint _canvasWidth;
 
-        private int _canvasHeight;
+        private uint _canvasHeight;
         private DelegateCommand clearItemsCommand;
 
-        public int CanvasWidth
+        public uint CanvasWidth
         {
             get { return _canvasWidth; }
             set { SetProperty(ref _canvasWidth, value); }
         }
 
-        public int CanvasHeight
+        public uint CanvasHeight
         {
             get { return _canvasHeight; }
             set { SetProperty(ref _canvasHeight, value); }
