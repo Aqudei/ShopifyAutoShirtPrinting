@@ -174,7 +174,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 NavigationType = typeof(TasksView),
                 Icon = new PackIconFontAwesome
                 {
-                    Kind = PackIconFontAwesomeKind.TasksSolid
+                    Kind = PackIconFontAwesomeKind.ListCheckSolid
                 }
             });
 
@@ -194,7 +194,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                     NavigationParam = store,
                     Icon = new PackIconFontAwesome
                     {
-                        Kind = PackIconFontAwesomeKind.ShoppingBagSolid
+                        Kind = PackIconFontAwesomeKind.BagShoppingSolid
                     }
                 });
             }
