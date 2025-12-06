@@ -136,7 +136,9 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             _binService = binService;
             _dialogService = dialogService;
             _dialogCoordinator = dialogCoordinator;
+            
             Bins = CollectionViewSource.GetDefaultView(_bins);
+            Bins.GroupDescriptions.Add(new PropertyGroupDescription("StoreName"));
 
             _messageBus.BinsDestroyed += _messageBus_BinsDestroyed;
             _messageBus.BinsUpdated += _messageBus_BinsUpdated;
@@ -220,9 +222,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
             var bins = await _binService.ListBinsAsync();
             await _dispatcher.InvokeAsync(() =>
-            {
+            {;
                 _bins.AddRange(bins);
-                Bins.GroupDescriptions.Add(new PropertyGroupDescription("StoreName"));
             });
 
         }

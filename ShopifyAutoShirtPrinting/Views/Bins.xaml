@@ -96,7 +96,7 @@
                         </Grid.ColumnDefinitions>
                         <Button CommandParameter="{Binding}"
                                 Command="{Binding DataContext.DeleteNotesCommand, ElementName=BinsItemsControl, Mode=OneWay}">
-                            <ico:PackIconFontAwesome Kind="TrashAltRegular" 
+                            <ico:PackIconFontAwesome Kind="BoxSolid" 
                                                   Width="16"
                                                   Height="16"/>
                         </Button>
