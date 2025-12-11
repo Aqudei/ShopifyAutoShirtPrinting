@@ -94,7 +94,7 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             
-            <ico:PackIconFontAwesome Kind="ExclamationCircleSolid"
+            <ico:PackIconFontAwesome Kind="ExclamationSolid"
                                      VerticalAlignment="Center"
                                      Width="16" 
                                      Height="16"
