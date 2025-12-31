@@ -7,10 +7,12 @@
              xmlns:prism="http://prismlibrary.com/"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls" 
              xmlns:ico="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:Converters="clr-namespace:ShopifyEasyShirtPrinting.Converters"
              x:Class="ShopifyEasyShirtPrinting.Views.Dialogs.LoginDialog"
              mc:Ignorable="d" 
              d:DesignHeight="277.935" d:DesignWidth="841.885">
     <UserControl.Resources>
+        <Converters:MessageTypeToColorConverter x:Key="MessageTypeToColorConverter"/>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </UserControl.Resources>
     <prism:Dialog.WindowStyle>
@@ -55,14 +57,14 @@
                     VerticalAlignment="Top" Width="117"/>
 
             <TextBlock x:Name="MessageTextBlock" 
-                       Text="{Binding ErrorMessage}"
+                       Text="{Binding Message.Message}"
                        HorizontalAlignment="Left" 
                        Margin="273,149,0,0" 
                        TextWrapping="Wrap"
                        Width="476" 
                        FontWeight="Bold"
                        VerticalAlignment="Top" 
-                       Foreground="#FFBB1010" Height="47" />
+                       Foreground="{Binding Message.MessageType, Converter={StaticResource MessageTypeToColorConverter}}" Height="47" />
 
             <Image x:Name="image" HorizontalAlignment="Left" Height="147" Margin="27,38,0,0" VerticalAlignment="Top" Width="159" Source="pack://application:,,,/ShopifyEasyShirtPrinting;component/Resources/padlock-login3.png"/>
             <Label x:Name="label_Copy1" Content="Server:" HorizontalAlignment="Left" Margin="183,23,0,0" VerticalAlignment="Top" FontSize="16"/>
@@ -83,12 +85,7 @@
                               Height="32" 
                               Width="36" 
                               Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-            <TextBlock x:Name="textBlock" 
-                       HorizontalAlignment="Left" Margin="369,201,0,0" 
-                       TextWrapping="Wrap" 
-                       Text="{Binding Message}" VerticalAlignment="Top" 
-                       Width="255" 
-                       FontSize="13"/>
+
             <Button Command="{Binding DeleteServerCommand}"
                 HorizontalAlignment="Left" 
                 Margin="716,27,0,0" 

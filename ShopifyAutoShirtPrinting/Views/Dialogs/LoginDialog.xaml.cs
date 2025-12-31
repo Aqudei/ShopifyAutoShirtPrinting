@@ -32,7 +32,7 @@ namespace ShopifyEasyShirtPrinting.Views.Dialogs
             if (vm != null)
             {
                 vm.Password = MyPasswordBox.SecurePassword;
-                vm.ErrorMessage = "";
+                vm.Message = null;
             }
         }
     }
