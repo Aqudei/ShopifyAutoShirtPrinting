@@ -19,8 +19,5 @@ namespace Common.Models
 
         [JsonPropertyName("StoreName")]
         public string StoreName { get; set; }
-
-
-
     }
 }
