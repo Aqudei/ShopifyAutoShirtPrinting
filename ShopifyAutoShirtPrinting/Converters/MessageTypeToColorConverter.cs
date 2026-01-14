@@ -20,16 +20,16 @@ namespace ShopifyEasyShirtPrinting.Converters
             switch (messageType)
             {
                 case DisplayMessage.MESSAGE_TYPE.Info:
-                    return Brushes.LightBlue;
+                    return Brushes.Blue;
 
                 case DisplayMessage.MESSAGE_TYPE.Warning:
-                    return Brushes.Orange;
+                    return Brushes. DarkOrange;
 
                 case DisplayMessage.MESSAGE_TYPE.Error:
                     return Brushes.IndianRed;
 
                 case DisplayMessage.MESSAGE_TYPE.Success:
-                    return Brushes.LightGreen;
+                    return Brushes.Green;
 
                 default:
                     return Brushes.Transparent;

@@ -24,6 +24,28 @@ namespace ShopifyEasyShirtPrinting.Views.Dialogs
         public LoginDialog()
         {
             InitializeComponent();
+            Loaded += LoginDialog_Loaded;
+
+            UserNameTextBox.GotFocus += HighlightFocusHandler;
+            MyPasswordBox.GotFocus += HighlightFocusHandler;
+        }
+
+        private void HighlightFocusHandler(object sender, RoutedEventArgs e)
+        {
+            if(sender is PasswordBox pb)
+            {
+                pb.SelectAll();
+            }
+
+            if (sender is TextBox tb)
+            {
+                tb.SelectAll();
+            }
+        }
+
+        private void LoginDialog_Loaded(object sender, RoutedEventArgs e)
+        {
+            UserNameTextBox.Focus();
         }
 
         private void MyPasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
