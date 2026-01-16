@@ -112,6 +112,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     public string[] TagsFilter =>
     [
         "Pending",
+        "Printed",
         "Processed",
         "LabelPrinted",
         "Shipped",

@@ -19,6 +19,7 @@ namespace ShopifyEasyShirtPrinting.Converters
             _colorLookup = new Dictionary<string, SolidColorBrush>()
             {
                 ["Pending"] = new SolidColorBrush(Color.FromArgb(50, 0xff, 0xff, 0xff)),
+                ["Printed"] = new SolidColorBrush(Color.FromArgb(50, 0xff, 0xff, 0xff)),
                 ["Processed"] = new SolidColorBrush(Color.FromArgb(50, 0, 0xde, 0xff)),
                 ["LabelPrinted"] = new SolidColorBrush(Color.FromArgb(50, 0x0c, 0, 0xff)),
                 ["Shipped"] = new SolidColorBrush(Color.FromArgb(50, 0, 0xff, 0x22)),
