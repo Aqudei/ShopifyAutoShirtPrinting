@@ -85,7 +85,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     }
 
     private const string SCAN_MODE_SCAN_ONLY = "Scan Only";
-    private const string SCAN_MODE_PROCESSING = "Processing";
+    private const string SCAN_MODE_PROCESSING = "Print+";
     private const string SCAN_MODE_GCR_FRONT = "Open GCR (Front)";
     private const string SCAN_MODE_GCR_BACK = "Open GCR (Back)";
 
