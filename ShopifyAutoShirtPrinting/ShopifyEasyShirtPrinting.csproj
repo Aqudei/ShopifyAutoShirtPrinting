@@ -35,7 +35,7 @@
     <SuiteName>Tools</SuiteName>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>14</ApplicationRevision>
+    <ApplicationRevision>15</ApplicationRevision>
     <ApplicationVersion>18.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -570,6 +570,7 @@
     <Compile Include="Models\DisplayMessage.cs" />
     <Compile Include="Models\Harmonisation\HSN.cs" />
     <Compile Include="Models\ImageItem.cs" />
+    <Compile Include="Models\OrderConstants.cs" />
     <Compile Include="Models\Shipment.cs" />
     <Compile Include="ViewModels\ArchivedShipmentsViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\EditTextDialogViewModel.cs" />

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Common.Api;
 using Common.Models;
+using ControlzEx.Standard;
 using ImTools;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -30,9 +31,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Threading;
-using ControlzEx.Standard;
 using ZXing;
 using ZXing.Common;
+using static ShopifyEasyShirtPrinting.Models.OrderStatusDisplay;
 using Application = System.Windows.Application;
 using Path = System.IO.Path;
 using PrintDocument = System.Drawing.Printing.PrintDocument;
@@ -68,12 +69,23 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         set => SetProperty(ref _columnVisibility, value);
     }
 
+    private const string SCAN_MODE_SCAN_ONLY = "Scan Only";
+    private const string SCAN_MODE_PROCESSING = "Print+";
+    private const string SCAN_MODE_GCR_FRONT = "Open GCR (Front)";
+    private const string SCAN_MODE_GCR_BACK = "Open GCR (Back)";
+    private const string SCAN_MODE_NEED_TO_ORDER = "Need to Order";
+    private const string SCAN_MODE_HAVE_ORDERED = "Have Ordered";
+    private const string SCAN_MODE_FLAG_ISSUE = "Flag Issue";
+
     public string[] ScanModes =>
     [
         SCAN_MODE_PROCESSING,
         SCAN_MODE_SCAN_ONLY,
         SCAN_MODE_GCR_FRONT,
-        SCAN_MODE_GCR_BACK
+        SCAN_MODE_GCR_BACK,
+        SCAN_MODE_NEED_TO_ORDER,
+        SCAN_MODE_HAVE_ORDERED,
+        SCAN_MODE_FLAG_ISSUE
     ];
 
     private string _selectedScanMode;
@@ -84,45 +96,26 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         set => SetProperty(ref _selectedScanMode, value);
     }
 
-    private const string SCAN_MODE_SCAN_ONLY = "Scan Only";
-    private const string SCAN_MODE_PROCESSING = "Print+";
-    private const string SCAN_MODE_GCR_FRONT = "Open GCR (Front)";
-    private const string SCAN_MODE_GCR_BACK = "Open GCR (Back)";
 
     public ObservableCollection<string> ShippingLines { get; set; } = new();
 
     private DelegateCommand _saveQrTagsCommand;
-    private DelegateCommand<string> _applyTagCommand;
+    private DelegateCommand<OrderStatus> _applyTagCommand;
     public ObservableCollection<Log> Logs { get; set; } = new();
     public ObservableCollection<KeyValuePair<string, string>> ScanInfo { set; get; } = new();
     public string Notes { get => _notes; set => SetProperty(ref _notes, value); }
 
-    public string[] Tags =>
-    [
-        "Pending",
-        "Processed",
-        "LabelPrinted",
-        "Shipped",
-        "Archived",
-        "Issue Needs Resolving",
-        "Need To Order From Supplier",
-        "Have Ordered From Supplier"
-    ];
+  
+    public Dictionary<OrderStatusDisplay.OrderStatus, string> Tags
+    {
+        get
+        {
+            return OrderStatusDisplay.OrderStatusNames;
+        }
+    }
 
-    public string[] TagsFilter =>
-    [
-        "Pending",
-        "Printed",
-        "Processed",
-        "LabelPrinted",
-        "Shipped",
-        "Issue Needs Resolving",
-        "Need To Order From Supplier",
-        "Have Ordered From Supplier"
-    ];
-
-    private string _selectedTagFilter;
-    public string SelectedTagFilter
+    private OrderStatus? _selectedTagFilter;
+    public OrderStatus? SelectedTagFilter
     {
         get { return _selectedTagFilter; }
         set { SetProperty(ref _selectedTagFilter, value); }
@@ -155,9 +148,9 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
     }
 
-    public DelegateCommand<string> ApplyTagCommand
+    public DelegateCommand<OrderStatus> ApplyTagCommand
     {
-        get { return _applyTagCommand ??= new DelegateCommand<string>(HandleApplyTag); }
+        get { return _applyTagCommand ??= new DelegateCommand<OrderStatus>(HandleApplyTag); }
     }
 
     private DelegateCommand<LineItemViewModel> _openInBrowserCommand;
@@ -172,7 +165,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         // Removed
     }
 
-    private async void HandleApplyTag(string tag)
+    private async void HandleApplyTag(OrderStatus tag)
     {
         var selectedItems = _lineItems.Where(l => l.IsSelected).ToArray();
 
@@ -193,9 +186,9 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
     }
 
-    private async Task ApplyTagForLineItem(LineItemViewModel myLineItem, string tag)
+    private async Task ApplyTagForLineItem(LineItemViewModel myLineItem, OrderStatus tag)
     {
-        if (myLineItem.Status == tag)
+        if (myLineItem.Status == OrderStatusDisplay.OrderStatusNames[tag])
         {
             return;
         }
@@ -205,7 +198,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             return;
         }
 
-        await _apiClient.UpdateLineItemStatusAsync(myLineItem.Id, tag);
+        await _apiClient.UpdateLineItemStatusAsync(myLineItem.Id, OrderStatusDisplay.OrderStatusNames[tag]);
     }
 
     public DelegateCommand SaveQrTagsCommand => _saveQrTagsCommand ??= new DelegateCommand(OnSaveQrTag, () => TotalSelected > 0)
@@ -604,17 +597,20 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         // QR code not found or could not be decoded
     }
 
-    private async void HandleTagFilter(string statusTag)
+    private async void HandleTagFilter(OrderStatus? statusTag)
     {
+        if (statusTag == null)
+            return;
+
         try
         {
-            if (statusTag == "Archived")
+            if (statusTag == OrderStatus.Archived)
             {
                 await FetchArchivedLineItemsAsync();
             }
             else
             {
-                if (LastTagFilter == "Archived")
+                if (LastTagFilter == OrderStatus.Archived)
                     await FetchActiveLineItemsAsync();
             }
 
@@ -624,13 +620,13 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 {
                     if (!string.IsNullOrWhiteSpace(SearchText))
                     {
-                        return SearchFunction(o1) && o1.Status == statusTag;
+                        return SearchFunction(o1) && o1.Status == OrderStatusDisplay.OrderStatusNames[statusTag.Value];
 
                         //return orderNumber.Contains(searchTextLower) || sku.Contains(searchTextLower) ||
                         //       o1.Name.ToLower().Contains(searchTextLower) || shippingLines.Contains(searchTextLower);
 
                     }
-                    return o1.Status == statusTag;
+                    return o1.Status == OrderStatusDisplay.OrderStatusNames[statusTag.Value];
                 }
 
                 return true;
@@ -688,7 +684,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     {
         try
         {
-            if (LastTagFilter == "Archived")
+            if (LastTagFilter == OrderStatus.Archived)
             {
                 await Task.Run(FetchActiveLineItemsAsync);
             }
@@ -779,6 +775,17 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                                     break;
                                 case SCAN_MODE_SCAN_ONLY:
                                     break;
+                                case SCAN_MODE_NEED_TO_ORDER:
+                                    await ApplyTagForLineItem(lineItemVm, OrderStatus.NeedToOrderFromSupplier);
+                                    break;
+
+                                case SCAN_MODE_HAVE_ORDERED:
+                                    await ApplyTagForLineItem(lineItemVm, OrderStatus.HaveOrderedFromSupplier);
+                                    break;
+
+                                case SCAN_MODE_FLAG_ISSUE:
+                                    await ApplyTagForLineItem(lineItemVm, OrderStatus.IssueNeedsResolving);
+                                    break;
                                 default:
                                     await ProcessItemForPrintingAsync(lineItemVm);
                                     break;
@@ -819,11 +826,11 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 {
                     if (o is LineItemViewModel o1)
                     {
-                        if (string.IsNullOrWhiteSpace(SelectedTagFilter))
+                        if (!SelectedTagFilter.HasValue)
                             return SearchFunction(o1);
                         else
                         {
-                            return SearchFunction(o1) && o1.Status == SelectedTagFilter;
+                            return SearchFunction(o1) && o1.Status == OrderStatusDisplay.OrderStatusNames[SelectedTagFilter.Value];
                         }
 
 
@@ -835,7 +842,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                 });
             else
             {
-                if (string.IsNullOrWhiteSpace(SelectedTagFilter))
+                if (!SelectedTagFilter.HasValue)
                     SetLineItemsViewFilter(null);
                 else
                 {
@@ -843,7 +850,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                     {
                         if (o is LineItemViewModel o1)
                         {
-                            return o1.Status == SelectedTagFilter;
+                            return o1.Status == OrderStatusDisplay.OrderStatusNames[SelectedTagFilter.Value];
                         }
 
                         return true;
@@ -1013,7 +1020,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                     {
                         foreach (var lineItem in relatedLineItems.Select(_mapper.Map<LineItemViewModel>))
                         {
-                            await ApplyTagForLineItem(lineItem, "LabelPrinted");
+                            await ApplyTagForLineItem(lineItem, OrderStatus.LabelPrinted);
                         }
                     });
                 }
@@ -1032,7 +1039,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                                 {
                                     foreach (var lineItem in relatedLineItems.Select(_mapper.Map<LineItemViewModel>))
                                     {
-                                        await ApplyTagForLineItem(lineItem, "LabelPrinted");
+                                        await ApplyTagForLineItem(lineItem, OrderStatus.LabelPrinted);
                                     }
 
                                     if (processingItemResult.LineItem.BinNumber.HasValue)
@@ -1352,7 +1359,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     private bool _isScanOnly;
     private DelegateCommand<bool?> checkBoxCommand;
     private bool? _masterCheckBoxState;
-    private string LastTagFilter;
+    private OrderStatus? LastTagFilter;
     private bool _isFilterEnabled = true;
     private int _totalDisplayed;
     private int _totalItems;

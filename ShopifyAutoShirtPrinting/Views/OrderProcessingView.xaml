@@ -74,12 +74,14 @@
                                   Width="200"
                                   VerticalAlignment="Bottom"
                                   ItemsSource="{Binding Tags}"
+                                  SelectedValuePath="Key"
+                                  DisplayMemberPath="Value"
                                   mah:TextBoxHelper.Watermark="Mark Order As" />
                     </StackPanel>
                     <Button Content="Apply"
                             VerticalAlignment="Bottom"
                             Command="{Binding ApplyTagCommand}"
-                            CommandParameter="{Binding SelectedItem, ElementName=comboBox}"
+                            CommandParameter="{Binding SelectedValue, ElementName=comboBox}"
                             Margin="2,0,2,0"
                             Width="64" />
                     <StackPanel Orientation="Vertical"
@@ -93,8 +95,10 @@
                                   VerticalAlignment="Bottom"
                                   IsReadOnly="True"
                                   x:Name="comboBoxStatus"
-                                  ItemsSource="{Binding TagsFilter}"
-                                  SelectedItem="{Binding SelectedTagFilter}"
+                                  ItemsSource="{Binding Tags}"
+                                  SelectedValue="{Binding SelectedTagFilter}"
+                                  SelectedValuePath="Key"
+                                  DisplayMemberPath="Value"
                                   IsEnabled="{Binding IsFilterEnabled}"
                                   mah:TextBoxHelper.Watermark="Filter By Status" />
 
