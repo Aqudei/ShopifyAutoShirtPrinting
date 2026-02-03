@@ -100,12 +100,12 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     public ObservableCollection<string> ShippingLines { get; set; } = new();
 
     private DelegateCommand _saveQrTagsCommand;
-    private DelegateCommand<OrderStatus> _applyTagCommand;
+    private DelegateCommand<OrderStatus?> _applyTagCommand;
     public ObservableCollection<Log> Logs { get; set; } = new();
     public ObservableCollection<KeyValuePair<string, string>> ScanInfo { set; get; } = new();
     public string Notes { get => _notes; set => SetProperty(ref _notes, value); }
 
-  
+
     public Dictionary<OrderStatusDisplay.OrderStatus, string> Tags
     {
         get
@@ -148,10 +148,9 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
     }
 
-    public DelegateCommand<OrderStatus> ApplyTagCommand
-    {
-        get { return _applyTagCommand ??= new DelegateCommand<OrderStatus>(HandleApplyTag); }
-    }
+    public DelegateCommand<OrderStatus?> ApplyTagCommand =>
+        _applyTagCommand ??= new DelegateCommand<OrderStatus?>(HandleApplyTag);
+
 
     private DelegateCommand<LineItemViewModel> _openInBrowserCommand;
 
@@ -165,8 +164,13 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         // Removed
     }
 
-    private async void HandleApplyTag(OrderStatus tag)
+    private async void HandleApplyTag(OrderStatus? tag)
     {
+        if(tag==null)
+        {
+            return;
+        }
+
         var selectedItems = _lineItems.Where(l => l.IsSelected).ToArray();
 
         var sb = new StringBuilder();
@@ -180,7 +184,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         {
             foreach (var selectedItem in selectedItems)
             {
-                await ApplyTagForLineItem(selectedItem, tag);
+                await ApplyTagForLineItem(selectedItem, tag.Value);
                 await _dispatcher.InvokeAsync(() => selectedItem.IsSelected = false);
             }
         }
