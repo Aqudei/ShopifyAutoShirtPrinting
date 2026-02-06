@@ -70,8 +70,10 @@
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button Content="Close" Margin="5" Width="100"
                     Command="{Binding DialogCommand}"
+                    IsCancel="True"
                     CommandParameter="Close"/>
             <Button Content="Save" Margin="5" Width="100"
+                    IsDefault="True"
                     Command="{Binding DialogCommand}"
                     CommandParameter="Save"/>
         </StackPanel>

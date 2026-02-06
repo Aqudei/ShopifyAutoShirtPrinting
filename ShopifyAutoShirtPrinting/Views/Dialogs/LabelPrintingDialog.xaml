@@ -239,12 +239,14 @@
                     IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}"
                     Command="{Binding DialogCommand}"    
                     Margin="10" Content="YES (AusPost Direct)" 
+                    IsDefault="True"
                     CommandParameter="AUSPOST"/>
 
             <Button Width="100" 
-                        Command="{Binding DialogCommand}"
-                        CommandParameter="NO"
-                        Margin="10" Content="No" />
+                    Command="{Binding DialogCommand}"
+                    CommandParameter="NO"
+                    IsCancel="True"
+                    Margin="10" Content="No" />
 
         </StackPanel>
     </Grid>

@@ -110,13 +110,25 @@
                       SelectedItem="{Binding Shipping}"
                       Grid.Column="1"
                       ToolTip="Changing shipping service will apply to whole order." Margin="2,2,2,2" Grid.Row="7"/>
+        
+        <StackPanel Grid.Column="1"
+                    Orientation="Horizontal" 
+                    Grid.Row="8"
+                    HorizontalAlignment="Center">
 
-        <Button Content="Save"
-                Margin="4"
-                Width="200"
-                Grid.Column="1"
-                Grid.Row="8"
-                Command="{Binding DialogCommand}"
-                CommandParameter="Create"/>
+            <Button Content="Cancel"
+                    Margin="2"
+                    Width="150"
+                    IsCancel="True"
+                    Command="{Binding DialogCommand}"
+                    CommandParameter="Cancel" />
+            
+            <Button Content="Save"
+                    Margin="2"
+                    Width="150"
+                    IsDefault="True"
+                    Command="{Binding DialogCommand}"
+                    CommandParameter="Create" />
+        </StackPanel>
     </Grid>
 </UserControl>

@@ -80,16 +80,23 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
         private void OnDialogCommand(string command)
         {
-            _theLineItem.OrderNumber = OrderNumber;
-            _theLineItem.Name = Name;
-            _theLineItem.Quantity = Quantity;
-            _theLineItem.Notes = Notes;
-            _theLineItem.Sku = Sku;
-            _theLineItem.Shipping = String.IsNullOrWhiteSpace(Shipping) ? _theLineItem.Shipping : Shipping;
+            if (command == "Create")
+            {
+                _theLineItem.OrderNumber = OrderNumber;
+                _theLineItem.Name = Name;
+                _theLineItem.Quantity = Quantity;
+                _theLineItem.Notes = Notes;
+                _theLineItem.Sku = Sku;
+                _theLineItem.Shipping = String.IsNullOrWhiteSpace(Shipping) ? _theLineItem.Shipping : Shipping;
 
-            var prams = new DialogParameters { { "MyLineItem", _theLineItem } };
+                var prams = new DialogParameters { { "MyLineItem", _theLineItem } };
 
-            RequestClose.Invoke(new DialogResult(ButtonResult.OK, prams));
+                RequestClose.Invoke(new DialogResult(ButtonResult.OK, prams));
+            }
+            else
+            {
+                RequestClose.Invoke(new DialogResult(ButtonResult.Cancel));
+            }
         }
 
         public event Action<IDialogResult> RequestClose;
