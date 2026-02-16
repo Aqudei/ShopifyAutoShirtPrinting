@@ -35,7 +35,7 @@
     <SuiteName>Tools</SuiteName>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>18</ApplicationRevision>
+    <ApplicationRevision>19</ApplicationRevision>
     <ApplicationVersion>18.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -565,6 +565,7 @@
     <Compile Include="Converters\GenericBooleanConverter.cs" />
     <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\MessageTypeToColorConverter.cs" />
+    <Compile Include="Converters\PercentConverter.cs" />
     <Compile Include="Helpers\DirectoryHelper.cs" />
     <Compile Include="Helpers\PrintHelpers.cs" />
     <Compile Include="Models\DisplayMessage.cs" />
@@ -574,6 +575,7 @@
     <Compile Include="Models\Shipment.cs" />
     <Compile Include="ViewModels\ArchivedShipmentsViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\EditTextDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\UpdateTagsDialogViewModel.cs" />
     <Compile Include="ViewModels\LineItemViewModel.cs" />
     <Compile Include="ViewModels\ArchivedViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\LoginDialogViewModel.cs" />
@@ -593,6 +595,9 @@
     </Compile>
     <Compile Include="Views\Dialogs\LoginDialog.xaml.cs">
       <DependentUpon>LoginDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialogs\UpdateTagsDialog.xaml.cs">
+      <DependentUpon>UpdateTagsDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Products.xaml.cs">
       <DependentUpon>Products.xaml</DependentUpon>
@@ -640,6 +645,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialogs\QuantityChangerDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialogs\UpdateTagsDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

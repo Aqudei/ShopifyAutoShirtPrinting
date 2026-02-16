@@ -29,15 +29,11 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
         public string Message
         {
-            get { return _message; }
-            set { SetProperty(ref _message, value); }
+            get => _message; set => SetProperty(ref _message, value);
         }
 
 
-        public DelegateCommand<string> DialogCommand
-        {
-            get { return _dialogCommand ??= new DelegateCommand<string>(HandleDialogCommand); }
-        }
+        public DelegateCommand<string> DialogCommand => _dialogCommand ??= new DelegateCommand<string>(HandleDialogCommand);
 
         private void HandleDialogCommand(string cmd)
         {

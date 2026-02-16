@@ -1,6 +1,8 @@
-﻿using MahApps.Metro.Controls.Dialogs;
+﻿using Common.Models;
+using MahApps.Metro.Controls.Dialogs;
 using Prism.Services.Dialogs;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ShopifyEasyShirtPrinting.Extensions
@@ -38,6 +40,13 @@ namespace ShopifyEasyShirtPrinting.Extensions
         public static async Task ShowExceptionErrorAsync(this IDialogCoordinator dialogCoordinator, object context, Exception exception)
         {
             await dialogCoordinator.ShowMessageAsync(context, "Caught Exception", $"{exception.Message}\n\n{exception.StackTrace}");
+        }
+
+
+        public static void ShowUpdateTagsConfirmationDialog(this IDialogService dialogService, string newTag, IEnumerable<LineItemViewModel> lineItems, Action<IDialogResult> callback)
+        {
+            var @params = new DialogParameters { { "Items", lineItems }, { "NewTag", newTag } };
+            dialogService.ShowDialog("UpdateTagsDialog", @params, callback);
         }
     }
 }

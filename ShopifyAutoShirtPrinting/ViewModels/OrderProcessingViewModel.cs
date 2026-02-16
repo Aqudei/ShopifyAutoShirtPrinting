@@ -166,28 +166,49 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private async void HandleApplyTag(OrderStatus? tag)
     {
-        if(tag==null)
+        if (tag == null)
         {
+            await _dialogCoordinator.ShowMessageAsync(this, "Update Tag/s Error", "Tag not specified!");
             return;
         }
 
         var selectedItems = _lineItems.Where(l => l.IsSelected).ToArray();
-
-        var sb = new StringBuilder();
-        foreach (var item in selectedItems)
+        if (selectedItems.Length == 0)
         {
-            sb.AppendLine($"#{item.OrderNumber} - {item.Name}");
+            await _dialogCoordinator.ShowMessageAsync(this, "Update Tag/s Error", "Please select/check items to update tags.");
+            return;
         }
 
-        var dialog = await _dialogCoordinator.ShowMessageAsync(this, "Update tags confirmation", $"Are you sure you want to update the tags of the following items?\n\n{sb}", MessageDialogStyle.AffirmativeAndNegative);
-        if (dialog == MessageDialogResult.Affirmative)
+        _dialogService.ShowUpdateTagsConfirmationDialog(OrderStatusNames[tag.Value], selectedItems, r =>
         {
-            foreach (var selectedItem in selectedItems)
+            if (r.Result == ButtonResult.OK)
             {
-                await ApplyTagForLineItem(selectedItem, tag.Value);
-                await _dispatcher.InvokeAsync(() => selectedItem.IsSelected = false);
+                Task.Run(async () =>
+                {
+                    foreach (var selectedItem in selectedItems)
+                    {
+                        await ApplyTagForLineItem(selectedItem, tag.Value);
+                        await _dispatcher.InvokeAsync(() => selectedItem.IsSelected = false);
+                    }
+                });
             }
-        }
+        });
+
+        //var sb = new StringBuilder();
+        //foreach (var item in selectedItems)
+        //{
+        //    sb.AppendLine($"#{item.OrderNumber} - {item.Name}");
+        //}
+
+        //var dialog = await _dialogCoordinator.ShowMessageAsync(this, "Update tags confirmation", $"Are you sure you want to update the tags of the following items?\n\n{sb}", MessageDialogStyle.AffirmativeAndNegative);
+        //if (dialog == MessageDialogResult.Affirmative)
+        //{
+        //    foreach (var selectedItem in selectedItems)
+        //    {
+        //        await ApplyTagForLineItem(selectedItem, tag.Value);
+        //        await _dispatcher.InvokeAsync(() => selectedItem.IsSelected = false);
+        //    }
+        //}
     }
 
     private async Task ApplyTagForLineItem(LineItemViewModel myLineItem, OrderStatus tag)

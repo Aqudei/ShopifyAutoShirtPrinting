@@ -40,7 +40,7 @@ namespace ShopifyEasyShirtPrinting
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-           
+
             try
             {
 
@@ -50,6 +50,7 @@ namespace ShopifyEasyShirtPrinting
                 containerRegistry.RegisterDialog<EditTextDialog, EditTextDialogViewModel>();
                 containerRegistry.RegisterDialog<HarmonizationDialog, HarmonizationDialogViewModel>();
                 containerRegistry.RegisterDialog<Views.Dialogs.LoginDialog, LoginDialogViewModel>();
+                containerRegistry.RegisterDialog<Views.Dialogs.UpdateTagsDialog, UpdateTagsDialogViewModel>();
                 containerRegistry.RegisterDialogWindow<MetroDialogWindow>();
                 containerRegistry.Register<MyPrintService>();
                 containerRegistry.Register<BinService>();
