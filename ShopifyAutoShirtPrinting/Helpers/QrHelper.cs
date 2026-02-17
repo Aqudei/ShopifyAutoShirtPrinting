@@ -84,12 +84,12 @@ namespace ShopifyEasyShirtPrinting.Helpers
 
 
         public Bitmap DrawQrTagInfo(
-    string text,
-    Bitmap refImage,
-    string orderNumber,
-    bool hasNotes,
-    string sku,
-    bool? hasBackPrint)
+            string text,
+            Bitmap refImage,
+            string orderNumber,
+            bool hasNotes,
+            string sku,
+            bool? hasBackPrint)
         {
             var paperW = Properties.Settings.Default.PaperWidth;
             var paperH = Properties.Settings.Default.PaperHeight;
@@ -167,7 +167,7 @@ namespace ShopifyEasyShirtPrinting.Helpers
             }
 
             // Back print icon
-            if (hasBackPrint == true)
+            if (hasBackPrint.HasValue && hasBackPrint.Value)
                 DrawIcon(Properties.Resources.equals_icon);
 
             if (string.IsNullOrWhiteSpace(sku))
