@@ -841,6 +841,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="Resources\half-circle.png" />
+    <Resource Include="Resources\R.png" />
+    <Resource Include="Resources\X.png" />
     <Resource Include="Resources\section_sign.png" />
     <Resource Include="Resources\padlock-login3.png" />
     <Resource Include="Resources\padlock-login.jpg" />

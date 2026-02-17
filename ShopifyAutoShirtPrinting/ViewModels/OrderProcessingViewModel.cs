@@ -366,7 +366,8 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         var qrHelper = new QrHelper();
 
         using var qrImage = qrHelper.GenerateBitmapQr(qrDataText);
-        using var textImage = qrHelper.DrawQrTagInfo(lineItem.Name, qrImage, lineItem.OrderNumber, hasNotes, color, hasBackPrint, isDtf);
+        // using var textImage = qrHelper.DrawQrTagInfo(lineItem.Name, qrImage, lineItem.OrderNumber, hasNotes, color, hasBackPrint, isDtf);
+        using var textImage = qrHelper.DrawQrTagInfo(lineItem.Name, qrImage, lineItem.OrderNumber, hasNotes, lineItem.Sku?.ToUpper() ?? "", hasBackPrint);
         var combinedImage = qrHelper.CombineImage(qrImage, textImage);
 
         return combinedImage;

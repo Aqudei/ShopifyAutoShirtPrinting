@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ZXing.Common;
 using ZXing;
-using System.Windows.Shapes;
-using System.Linq.Expressions;
+using ZXing.Common;
 
 namespace ShopifyEasyShirtPrinting.Helpers
 {
@@ -55,7 +50,7 @@ namespace ShopifyEasyShirtPrinting.Helpers
             // Create a graphics object from the result bitmap
             using (var graphics = Graphics.FromImage(result))
             {
-                graphics.Clear(Color.White);
+                graphics.Clear(System.Drawing.Color.White);
                 // Draw the first bitmap on the left side of the result bitmap
                 graphics.DrawImage(bmp1, 0, 0);
                 graphics.DrawImage(bmp2, bmp1.Width, 0);
@@ -87,6 +82,108 @@ namespace ShopifyEasyShirtPrinting.Helpers
             return qrCode;
         }
 
+
+        public Bitmap DrawQrTagInfo(
+    string text,
+    Bitmap refImage,
+    string orderNumber,
+    bool hasNotes,
+    string sku,
+    bool? hasBackPrint)
+        {
+            var paperW = Properties.Settings.Default.PaperWidth;
+            var paperH = Properties.Settings.Default.PaperHeight;
+            var aspectRatio = paperW / paperH;
+
+            int width = (int)(aspectRatio * refImage.Height) - refImage.Width;
+            int height = refImage.Height;
+
+            var result = new Bitmap(width, height);
+
+            using var graphics = Graphics.FromImage(result);
+            using var mainFont = new Font("Microsoft Sans Serif", Properties.Settings.Default.FontSize, FontStyle.Bold);
+            using var tagFont = new Font("Arial", Properties.Settings.Default.FontSize + 4, FontStyle.Bold);
+            using var pen = new Pen(Brushes.Black, 2);
+
+            var brush = Brushes.Black;
+
+            graphics.Clear(Color.White);
+
+            float nextLineY;
+
+            // ---------- TEXT DRAWING ----------
+            var textSize = graphics.MeasureString(text, mainFont);
+
+            if (textSize.Width > width)
+            {
+                var lines = SplitTextForWordWrap(graphics, text, mainFont, width);
+                float totalHeight = graphics.MeasureString(text, mainFont, width).Height;
+                float y = (height - totalHeight) / 2;
+
+                foreach (var line in lines)
+                {
+                    var lineSize = graphics.MeasureString(line, mainFont);
+                    float x = (width - lineSize.Width) / 2;
+                    graphics.DrawString(line, mainFont, brush, x, y);
+                    y += lineSize.Height;
+                }
+
+                nextLineY = y;
+            }
+            else
+            {
+                float x = (width - textSize.Width) / 2;
+                float y = (height - textSize.Height) / 2;
+
+                graphics.DrawString(text, mainFont, brush, x, y);
+                nextLineY = y + textSize.Height;
+            }
+
+            // ---------- ORDER TAG ----------
+            string asterisk = hasNotes ? "*" : "";
+            string tagText = $"#{orderNumber} {asterisk}".Trim();
+            graphics.DrawString(tagText, tagFont, brush, new RectangleF(0, 20, width, height));
+
+            // ---------- ICONS ----------
+            const int ICON_SIZE = 45;
+            const int PADDING = 5;
+            int offsetX = width - ICON_SIZE - 20;
+            nextLineY += 16;
+
+            void DrawIcon(Image img)
+            {
+                graphics.DrawImage(img, offsetX, nextLineY, ICON_SIZE, ICON_SIZE);
+                offsetX -= ICON_SIZE + PADDING;
+            }
+
+            void DrawCircle(bool filled)
+            {
+                if (filled)
+                    graphics.FillEllipse(brush, offsetX, nextLineY, ICON_SIZE, ICON_SIZE);
+                else
+                    graphics.DrawEllipse(pen, offsetX, nextLineY, ICON_SIZE, ICON_SIZE);
+
+                offsetX -= ICON_SIZE + PADDING;
+            }
+
+            // Back print icon
+            if (hasBackPrint == true)
+                DrawIcon(Properties.Resources.equals_icon);
+
+            if (string.IsNullOrWhiteSpace(sku))
+                return result;
+
+            // SKU icons
+            if (sku.EndsWith("-LT")) DrawCircle(false);
+            else if (sku.EndsWith("-BL")) DrawCircle(true);
+            else if (sku.EndsWith("-DK")) DrawIcon(Properties.Resources.half_circle);
+            else if (sku.EndsWith("-DTF")) DrawIcon(Properties.Resources.X);
+            else if (sku.EndsWith("-RDY")) DrawIcon(Properties.Resources.R);
+
+            return result;
+        }
+
+
         public Bitmap DrawQrTagInfo(string text, Bitmap refImage, string orderNumber, bool hasNotes, bool? color, bool? hasBackPrint = false, bool isDtf = false)
         {
             var aspectRatio = Properties.Settings.Default.PaperWidth / Properties.Settings.Default.PaperHeight;
@@ -100,10 +197,10 @@ namespace ShopifyEasyShirtPrinting.Helpers
             // Create a graphics object from the result bitmap
             using var graphics = Graphics.FromImage(textImage);
 
-            graphics.Clear(Color.White);
+            graphics.Clear(System.Drawing.Color.White);
             // Create a new font and brush for the text
 
-            var brush = Brushes.Black;
+            var brush = System.Drawing.Brushes.Black;
 
             // Measure the size of the text and check if it exceeds the width of the image
             var textSize = graphics.MeasureString(text, font);
@@ -145,12 +242,12 @@ namespace ShopifyEasyShirtPrinting.Helpers
             {
                 asterisk = "*";
             }
-            var tagFont = new Font(new FontFamily("Arial"), Properties.Settings.Default.FontSize + 4, FontStyle.Bold);
+            var tagFont = new Font(new System.Drawing.FontFamily("Arial"), Properties.Settings.Default.FontSize + 4, FontStyle.Bold);
             graphics.DrawString($"#{orderNumber} {asterisk}".Trim(), tagFont, brush, new RectangleF(0, 20, width, height));
 
 
             var icon_size = 45; // width equals heigh for square image
-            var offset = width - icon_size - 20; 
+            var offset = width - icon_size - 20;
             nextLine += 16;
 
             if (color.HasValue)
@@ -162,7 +259,7 @@ namespace ShopifyEasyShirtPrinting.Helpers
                 }
                 else
                 {
-                    graphics.DrawEllipse(new Pen(brush, 2), offset, nextLine, icon_size, icon_size);
+                    graphics.DrawEllipse(new System.Drawing.Pen(brush, 2), offset, nextLine, icon_size, icon_size);
                     offset = offset - icon_size - 5;
                 }
             }
