@@ -11,5 +11,7 @@ namespace ShopifyEasyShirtPrinting.Views.Dialogs
         {
             InitializeComponent();
         }
+
+  
     }
 }
