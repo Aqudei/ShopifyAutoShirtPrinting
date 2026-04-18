@@ -812,9 +812,10 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
                                 case SCAN_MODE_FLAG_ISSUE:
                                     await ApplyTagForLineItem(lineItemVm, OrderStatus.IssueNeedsResolving);
                                     break;
-                                default:
+                                case SCAN_MODE_PROCESSING:
                                     await ProcessItemForPrintingAsync(lineItemVm);
                                     break;
+
                             }
                         }
                         catch (Exception exception)

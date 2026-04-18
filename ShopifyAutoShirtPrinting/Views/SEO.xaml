@@ -1,0 +1,77 @@
+﻿<UserControl x:Class="ShopifyEasyShirtPrinting.Views.SEO"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ShopifyEasyShirtPrinting.Views"
+             xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <DataGrid ItemsSource="{Binding SEOPages}"
+                  FontSize="16"
+                  AlternationCount="2"
+                  AutoGenerateColumns="False">
+
+            <DataGrid.RowStyle>
+
+                <Style TargetType="DataGridRow">
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+
+                    <Style.Triggers>
+
+                        <!-- Alternating row color -->
+                        <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                            <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent3}"/>
+                        </Trigger>
+
+                        <!-- Hover -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent2}"/>
+                        </Trigger>
+
+                        <!-- Selected -->
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent}"/>
+                            <Setter Property="Foreground" Value="White"/>
+                        </Trigger>
+
+                    </Style.Triggers>
+                </Style>
+
+            </DataGrid.RowStyle>
+            
+            
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Page Title" Binding="{Binding PageTitle}" />
+                <DataGridTextColumn Header="Page Type" Binding="{Binding PageType}" />
+                <DataGridTextColumn Header="Handle" Binding="{Binding Handle}" />
+                <DataGridTextColumn Header="Target Keyword" Binding="{Binding TargetKeyword}" />
+                <DataGridTextColumn Header="Meta Description" 
+                                    Width="600"
+                                    Binding="{Binding MetaDescription}" >
+                    <!-- Display mode -->
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextWrapping" Value="Wrap"/>
+                            <Setter Property="TextTrimming" Value="None"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="SEO Title" 
+                                    Width="400"
+                                    Binding="{Binding SEOTitle}" >
+                    <!-- Display mode -->
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextWrapping" Value="Wrap"/>
+                            <Setter Property="TextTrimming" Value="None"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="URL" Binding="{Binding Url}" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

@@ -4,6 +4,7 @@ using NLog;
 using RestSharp;
 using RestSharp.Authenticators;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -883,6 +884,27 @@ namespace Common.Api
             catch (Exception)
             {
                 return Enumerable.Empty<string>();
+            }
+        }
+
+        public async Task<IEnumerable<SEOPage>> ListSEOPagesAsync()
+        {
+            try
+            {
+                var request = new RestRequest("/api/seo/opportunities/");
+                var response = await _client.ExecuteGetAsync<IEnumerable<SEOPage>>(request);
+                if (response.IsSuccessful)
+                {
+                    return response.Data;
+                }
+
+
+                return Enumerable.Empty<SEOPage>();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                return Enumerable.Empty<SEOPage>();
             }
         }
 

@@ -104,6 +104,7 @@
     <Compile Include="Models\MetaProp.cs" />
     <Compile Include="Models\PackagingType.cs" />
     <Compile Include="Models\PostageProduct.cs" />
+    <Compile Include="Models\SEOPage.cs" />
     <Compile Include="Models\SessionVariables.cs" />
     <Compile Include="Models\IdArray.cs" />
     <Compile Include="Models\Log.cs" />

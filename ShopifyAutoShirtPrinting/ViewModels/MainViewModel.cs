@@ -67,16 +67,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         public MainViewModel(SessionVariables sessionVariables, IMessageBus messageBus)
         {
-            //Menu.Add(new MenuItem
-            //{
-            //    Label = "LKC Orders",
-            //    NavigationPath = "OrderProcessingView",
-            //    NavigationType = typeof(OrderProcessingView),
-            //    Icon = new PackIconFontAwesome
-            //    {
-            //        Kind = PackIconFontAwesomeKind.FirstOrderAltBrands
-            //    }
-            //});
 
             Menu.Add(new MenuItem
             {
@@ -152,6 +142,17 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 Icon = new PackIconMaterial
                 {
                     Kind = PackIconMaterialKind.CodeString
+                }
+            });
+
+            Menu.Add(new MenuItem
+            {
+                Label = "SEO",
+                NavigationPath = "SEO",
+                NavigationType = typeof(SEO),
+                Icon = new PackIconLucide
+                {
+                    Kind = PackIconLucideKind.Search
                 }
             });
 

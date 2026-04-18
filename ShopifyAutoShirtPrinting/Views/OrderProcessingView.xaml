@@ -7,6 +7,8 @@
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:converters="clr-namespace:ShopifyEasyShirtPrinting.Converters"
+             xmlns:behaviors="clr-namespace:ShopifyEasyShirtPrinting.Behaviours"
+
              mah:DialogParticipation.Register="{Binding}"
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d"
@@ -423,10 +425,24 @@
                       Header="Variant Image"
                       Grid.Row="0"
                       Margin="4,4,4,4">
-                <Image Margin="10"
+
+                <Border BorderBrush="Gray" BorderThickness="1" Margin="10">
+
+                    <Image Margin="10"
                        Height="256"
                        Source="{Binding CurrentImage, Mode=OneWay, TargetNullValue={StaticResource LoaderImage}}"
                        Stretch="Uniform" />
+                </Border>
+
+
+                <!--<Border BorderBrush="Gray" BorderThickness="1" Margin="10">
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                  VerticalScrollBarVisibility="Auto">
+                        <Image Source="{Binding CurrentImage}"
+                               Stretch="Uniform"
+                               behaviors:ImageZoomPanBehavior.EnableZoomPan="False"/>
+                    </ScrollViewer>
+                </Border>-->
             </GroupBox>
 
             <Grid Margin="4,4,4,4" Grid.Row="1">

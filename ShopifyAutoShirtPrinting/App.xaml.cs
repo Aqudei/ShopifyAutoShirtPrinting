@@ -77,6 +77,7 @@ namespace ShopifyEasyShirtPrinting
                 containerRegistry.RegisterForNavigation<ArchivedShipmentsView>();
                 containerRegistry.RegisterForNavigation<TasksView>();
                 containerRegistry.RegisterForNavigation<Harmonization>();
+                containerRegistry.RegisterForNavigation<SEO>();
 
                 containerRegistry.RegisterInstance<IMessageBus>(new DummyMessageBus());
 
