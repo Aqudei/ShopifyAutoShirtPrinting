@@ -1,5 +1,6 @@
 ﻿using Common.Api;
 using Common.Models;
+using Common.Models.Seo;
 using Prism.Regions;
 using System;
 using System.Collections.Generic;

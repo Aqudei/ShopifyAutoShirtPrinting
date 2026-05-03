@@ -1,5 +1,6 @@
 ﻿using Common.Models;
 using Common.Models.Harmonisation;
+using Common.Models.Seo;
 using NLog;
 using RestSharp;
 using RestSharp.Authenticators;
