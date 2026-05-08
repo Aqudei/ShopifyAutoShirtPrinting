@@ -26,7 +26,7 @@ namespace Common.Models.Seo
     public class SEOAudit
     {
         [JsonPropertyName("page")]
-        public int Page { get; set; }
+        public int PageId { get; set; }
 
         [JsonPropertyName("score")]
         public float Score { get; set; }
@@ -38,6 +38,6 @@ namespace Common.Models.Seo
         public DateTime CreatedAt { get; set; }
 
         [JsonPropertyName("breakdown")]
-        public ScoreBreakdown[]? Breakdowns { get; set; }
+        public ScoreBreakdown[]? Breakdown { get; set; }
     }
 }

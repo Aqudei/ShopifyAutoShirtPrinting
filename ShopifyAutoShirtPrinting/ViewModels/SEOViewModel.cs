@@ -1,6 +1,7 @@
 ﻿using Common.Api;
 using Common.Models;
 using Common.Models.Seo;
+using Prism.Commands;
 using Prism.Regions;
 using System;
 using System.Collections.Generic;
@@ -51,6 +52,18 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         public void OnNavigatedFrom(NavigationContext navigationContext)
         {
+        }
+
+        private DelegateCommand<SEOPage>  _rowDoubleClickCommand;
+
+        public DelegateCommand<SEOPage> RowDoubleClickCommand
+        {
+            get { return _rowDoubleClickCommand ??= new DelegateCommand<SEOPage>(OnRowDoubleClick); }
+        }
+
+        private void OnRowDoubleClick(SEOPage seoPage)
+        {
+
         }
     }
 }

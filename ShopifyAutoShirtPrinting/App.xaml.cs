@@ -9,11 +9,8 @@ using Prism.Events;
 using Prism.Ioc;
 using Prism.Regions;
 using ShopifyEasyShirtPrinting.Messaging;
-using ShopifyEasyShirtPrinting.Models;
 using ShopifyEasyShirtPrinting.Properties;
 using ShopifyEasyShirtPrinting.Services;
-using ShopifyEasyShirtPrinting.Services.ShipStation;
-using ShopifyEasyShirtPrinting.ViewModels;
 using ShopifyEasyShirtPrinting.ViewModels.Dialogs;
 using ShopifyEasyShirtPrinting.ViewModels.Tools;
 using ShopifyEasyShirtPrinting.Views;
@@ -25,6 +22,7 @@ using System.Windows;
 using DotNetEnv;
 using ControlzEx.Theming;
 using System.Linq;
+using ShopifyEasyShirtPrinting.Mapping;
 
 namespace ShopifyEasyShirtPrinting
 {
@@ -81,34 +79,12 @@ namespace ShopifyEasyShirtPrinting
 
                 containerRegistry.RegisterInstance<IMessageBus>(new DummyMessageBus());
 
-                var config = new MapperConfiguration(cfg =>
+                var mapperConfig = new MapperConfiguration(cfg =>
                 {
-                    cfg.CreateMap<MyLineItem, MyLineItem>();
-                    cfg.CreateMap<MyLineItem, LineItemViewModel>()
-                    .ReverseMap();
-                    cfg.CreateMap<LineItemViewModel, LineItemViewModel>();
-                    cfg.CreateMap<MyLineItem, CrudDialogViewModel>()
-                    .ReverseMap();
-                    cfg.CreateMap<OrderInfo, OrderInfo>();
-                    cfg.CreateMap<Log, Log>();
-                    cfg.CreateMap<BinViewModel, Bin>()
-                    .ReverseMap();
-
-                    cfg.CreateMap<Settings, SettingsViewModel>()
-                    .ReverseMap();
-
-                    cfg.CreateMap<LoginDialogViewModel.SessionInfo, SessionVariables>();
-                    cfg.CreateMap<LoginDialogViewModel.LoginResultBody, SessionVariables>();
-                    cfg.CreateMap<Common.Models.Shipment, LabelPrintingDialogViewModel>();
-
-                    cfg.CreateMap<LabelPrintingDialogViewModel, CreateShipmentRequestBody>();
-                    cfg.CreateMap<Common.Models.Shipment, Models.Shipment>().ReverseMap();
-                    cfg.CreateMap<Common.Models.Harmonisation.HSN, Models.Harmonisation.HSN>().ReverseMap();
-
-
+                    cfg.AddProfile<TLKCMappingProfile>();
                 });
 
-                containerRegistry.RegisterInstance(config.CreateMapper());
+                containerRegistry.RegisterInstance(mapperConfig.CreateMapper());
                 containerRegistry.RegisterDialog<LabelPrintingDialog, LabelPrintingDialogViewModel>();
                 containerRegistry.RegisterDialog<AfterScanDialog, AfterScanDialogViewModel>();
                 containerRegistry.RegisterDialog<QuantityChangerDialog, QuantityChangerDialogViewModel>();

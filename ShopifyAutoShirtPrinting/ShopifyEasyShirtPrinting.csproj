@@ -549,11 +549,11 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="zxing, Version=0.16.9.0, Culture=neutral, PublicKeyToken=4e88037ac681fe60, processorArchitecture=MSIL">
-      <HintPath>..\packages\ZXing.Net.0.16.9\lib\net47\zxing.dll</HintPath>
+    <Reference Include="zxing, Version=0.16.11.0, Culture=neutral, PublicKeyToken=4e88037ac681fe60, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZXing.Net.0.16.11\lib\net47\zxing.dll</HintPath>
     </Reference>
-    <Reference Include="zxing.presentation, Version=0.16.9.0, Culture=neutral, PublicKeyToken=4e88037ac681fe60, processorArchitecture=MSIL">
-      <HintPath>..\packages\ZXing.Net.0.16.9\lib\net47\zxing.presentation.dll</HintPath>
+    <Reference Include="zxing.presentation, Version=0.16.11.0, Culture=neutral, PublicKeyToken=4e88037ac681fe60, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZXing.Net.0.16.11\lib\net47\zxing.presentation.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -569,10 +569,12 @@
     <Compile Include="Converters\PercentConverter.cs" />
     <Compile Include="Helpers\DirectoryHelper.cs" />
     <Compile Include="Helpers\PrintHelpers.cs" />
+    <Compile Include="Mapping\TLKCMappingProfile.cs" />
     <Compile Include="Models\DisplayMessage.cs" />
     <Compile Include="Models\Harmonisation\HSN.cs" />
     <Compile Include="Models\ImageItem.cs" />
     <Compile Include="Models\OrderConstants.cs" />
+    <Compile Include="Models\Seo\SEOPage.cs" />
     <Compile Include="Models\Shipment.cs" />
     <Compile Include="ViewModels\ArchivedShipmentsViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\EditTextDialogViewModel.cs" />
