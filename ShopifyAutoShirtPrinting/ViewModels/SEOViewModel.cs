@@ -1,8 +1,12 @@
-﻿using Common.Api;
+﻿using AutoMapper;
+using Common.Api;
 using Common.Models;
 using Common.Models.Seo;
+using Netco.Extensions;
 using Prism.Commands;
 using Prism.Regions;
+using Prism.Services.Dialogs;
+using ShopifyEasyShirtPrinting.Models.Seo;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -16,27 +20,43 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 {
     internal class SEOViewModel : PageBase, INavigationAware
     {
-        private ObservableCollection<SEOPage> _seoPages = new();
+        private ObservableCollection<Models.Seo.SEOPage> _seoPages = new();
         public ICollectionView SEOPages { get; set; }
 
         public override string Title => "SEO";
 
         private readonly ApiClient _client;
+        private readonly IMapper _mapper;
+        private readonly IDialogService _dialogService;
 
-        public SEOViewModel(ApiClient client)
+        public SEOViewModel(ApiClient client, IMapper mapper, IDialogService dialogService)
         {
+
             SEOPages = CollectionViewSource.GetDefaultView(_seoPages);
             _client = client;
+            this._mapper = mapper;
+            this._dialogService = dialogService;
         }
 
 
         public async void FetchSEOPages()
         {
             var seoPages = await _client.ListSEOPagesAsync();
+            var audits = await _client.ListSEOAuditAsync();
+
             await _dispatcher.InvokeAsync(() =>
             {
                 _seoPages.Clear();
-                _seoPages.AddRange(seoPages);
+                var mappedPages = seoPages.Select(page => _mapper.Map<Models.Seo.SEOPage>(page)).ToList();
+                foreach (var page in mappedPages)
+                {
+                    var pageAudit = audits.FirstOrDefault(audit => audit.PageId == page.PageId);
+
+                    if (pageAudit != null)
+                        _mapper.Map(pageAudit, page);
+                }
+
+                _seoPages.AddRange(mappedPages);
             });
         }
 
@@ -54,16 +74,32 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         {
         }
 
-        private DelegateCommand<SEOPage>  _rowDoubleClickCommand;
+        private DelegateCommand<Models.Seo.SEOPage> _rowDoubleClickCommand;
 
-        public DelegateCommand<SEOPage> RowDoubleClickCommand
+        public DelegateCommand<Models.Seo.SEOPage> RowDoubleClickCommand
         {
-            get { return _rowDoubleClickCommand ??= new DelegateCommand<SEOPage>(OnRowDoubleClick); }
+            get { return _rowDoubleClickCommand ??= new DelegateCommand<Models.Seo.SEOPage>(OnRowDoubleClick); }
         }
 
-        private void OnRowDoubleClick(SEOPage seoPage)
-        {
+        private DelegateCommand<Models.Seo.SEOPage> _showScoreCardCommand;
 
+        public DelegateCommand<Models.Seo.SEOPage> ShowScoreCardCommand
+        {
+            get { return _showScoreCardCommand ??= new DelegateCommand<Models.Seo.SEOPage>(OnShowScoreCard); }
+        }
+
+        private void OnShowScoreCard(Models.Seo.SEOPage page)
+        {
+            var p = new DialogParameters { { "breakdown", page.Breakdown } };
+            _dialogService.ShowDialog("ScoreBreakdownView", p, r =>
+            {
+
+            });
+        }
+
+        private void OnRowDoubleClick(Models.Seo.SEOPage seoPage)
+        {
+            OnShowScoreCard(seoPage);
         }
     }
 }

@@ -909,6 +909,27 @@ namespace Common.Api
             }
         }
 
+        public async Task<IEnumerable<SEOAudit>> ListSEOAuditAsync()
+        {
+            try
+            {
+                var request = new RestRequest("/api/seo/audits/");
+                var response = await _client.ExecuteGetAsync<IEnumerable<SEOAudit>>(request);
+                if (response.IsSuccessful)
+                {
+                    return response.Data;
+                }
+
+
+                return Enumerable.Empty<SEOAudit>();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                return Enumerable.Empty<SEOAudit>();
+            }
+        }
+
         #endregion
     }
 }

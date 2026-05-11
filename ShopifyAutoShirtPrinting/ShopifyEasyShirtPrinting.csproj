@@ -578,6 +578,7 @@
     <Compile Include="Models\Shipment.cs" />
     <Compile Include="ViewModels\ArchivedShipmentsViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\EditTextDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\ScoreBreakdownViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\UpdateTagsDialogViewModel.cs" />
     <Compile Include="ViewModels\LineItemViewModel.cs" />
     <Compile Include="ViewModels\ArchivedViewModel.cs" />
@@ -599,6 +600,9 @@
     </Compile>
     <Compile Include="Views\Dialogs\LoginDialog.xaml.cs">
       <DependentUpon>LoginDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialogs\ScoreBreakdownView.xaml.cs">
+      <DependentUpon>ScoreBreakdownView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialogs\UpdateTagsDialog.xaml.cs">
       <DependentUpon>UpdateTagsDialog.xaml</DependentUpon>
@@ -652,6 +656,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialogs\QuantityChangerDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialogs\ScoreBreakdownView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

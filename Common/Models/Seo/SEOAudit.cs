@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Web.Configuration;
 
 namespace Common.Models.Seo
 {
@@ -39,5 +40,8 @@ namespace Common.Models.Seo
 
         [JsonPropertyName("breakdown")]
         public ScoreBreakdown[]? Breakdown { get; set; }
+
+        [JsonPropertyName("priority")]
+        public string? Priority { get; set; }
     }
 }

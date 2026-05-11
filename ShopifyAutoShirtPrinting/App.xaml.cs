@@ -49,6 +49,7 @@ namespace ShopifyEasyShirtPrinting
                 containerRegistry.RegisterDialog<HarmonizationDialog, HarmonizationDialogViewModel>();
                 containerRegistry.RegisterDialog<Views.Dialogs.LoginDialog, LoginDialogViewModel>();
                 containerRegistry.RegisterDialog<Views.Dialogs.UpdateTagsDialog, UpdateTagsDialogViewModel>();
+                containerRegistry.RegisterDialog<Views.Dialogs.ScoreBreakdownView, ScoreBreakdownViewModel>();
                 containerRegistry.RegisterDialogWindow<MetroDialogWindow>();
                 containerRegistry.Register<MyPrintService>();
                 containerRegistry.Register<BinService>();

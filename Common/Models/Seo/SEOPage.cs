@@ -10,6 +10,8 @@ namespace Common.Models.Seo
 {
     public class SEOPage
     {
+        [JsonPropertyName("id")]
+        public int PageId { get; set; }
         [JsonPropertyName("store")]
         public int Store { get; set; }
 
@@ -50,14 +52,7 @@ namespace Common.Models.Seo
         [JsonPropertyName("image_url")]
         public string ImageUrl { get; set; }
 
-
         [JsonPropertyName("image_alt_text")]
         public string ImageAltText { get; set; }
-
-        [JsonPropertyName("priority")]
-        public string Priority { get; set; }
-
-        [JsonPropertyName("reason_flagged")]
-        public List<string> ReasonFlagged { get; set; }
     }
 }
