@@ -12,7 +12,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs;
 
@@ -363,7 +365,7 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
             LineItems.Clear();
             OrderNumber = orderNumber;
             StoreId = storeId;
-            Task.Run(LoadData);
+            _ = LoadDataAsync();
         }
     }
 
@@ -381,43 +383,66 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
 
     public ObservableCollection<PostageProduct> Postages { get; set; } = new();
 
-    private async Task LoadData()
+    private async Task LoadDataAsync()
     {
-        var orderNumberParams = new Dictionary<string, string>() { { "OrderNumber", $"{OrderNumber}" } };
-        var lineItems = await _apiClient.ListItemsAsync(orderNumberParams, StoreId);
-        var shipment = await _apiClient.GetShipmentByAsync(orderNumberParams, StoreId);
-        var postages = await _apiClient.ListPostageProductsAsync();
-        var packaging = await _apiClient.ListPackagingTypesAsync();
-
-        if (lineItems != null && lineItems.Any())
+        try
         {
-            var lineItems0 = lineItems.FirstOrDefault();
-            var shippingLine = lineItems0.Shipping;
+            IsBusy = true;
 
-            var customerName = lineItems.Where(l => !string.IsNullOrWhiteSpace(l.Customer)).FirstOrDefault()?.Customer;
-            var customerEmail = lineItems.Where(l => !string.IsNullOrWhiteSpace(l.CustomerEmail)).FirstOrDefault()
-                ?.CustomerEmail;
+            await Task.Delay(10000);
 
-            await _dispatcher.InvokeAsync(() =>
+            var orderNumberParams = new Dictionary<string, string>() { { "OrderNumber", $"{OrderNumber}" } };
+            var lineItemsTask = _apiClient.ListItemsAsync(orderNumberParams, StoreId);
+            var shipmentTask = _apiClient.GetShipmentByAsync(orderNumberParams, StoreId);
+            var postagesTask = _apiClient.ListPostageProductsAsync();
+            var packagingTask = _apiClient.ListPackagingTypesAsync();
+
+            await Task.WhenAll(lineItemsTask, shipmentTask, postagesTask, packagingTask);
+
+            var lineItems = await lineItemsTask;
+            var shipment = await shipmentTask;
+            var postages = await postagesTask;
+            var packaging = await packagingTask;
+
+            if (lineItems != null && lineItems.Any())
             {
-                _mapper.Map(shipment, this);
+                var lineItems0 = lineItems.FirstOrDefault();
+                var shippingLine = lineItems0.Shipping;
 
-                LineItems.AddRange(lineItems);
-                BinNumber = lineItems.FirstOrDefault()?.BinNumber;
-                Notes = lineItems.FirstOrDefault()?.Notes;
-                CustomerName = customerName;
-                CustomerEmail = customerEmail;
+                var customerName = lineItems.Where(l => !string.IsNullOrWhiteSpace(l.Customer)).FirstOrDefault()?.Customer;
+                var customerEmail = lineItems.Where(l => !string.IsNullOrWhiteSpace(l.CustomerEmail)).FirstOrDefault()
+                    ?.CustomerEmail;
 
-                Postages.AddRange(postages);
-                PackagingTypes.AddRange(packaging);
+                await _dispatcher.InvokeAsync(() =>
+                {
+                    _mapper.Map(shipment, this);
 
-                TotalWeight = shipment.TotalWeight > 0 ? shipment.TotalWeight : lineItems.Sum(l => l.Grams);
+                    LineItems.AddRange(lineItems);
+                    BinNumber = lineItems.FirstOrDefault()?.BinNumber;
+                    Notes = lineItems.FirstOrDefault()?.Notes;
+                    CustomerName = customerName;
+                    CustomerEmail = customerEmail;
 
-                SelectedPostage = Postages.FirstOrDefault(p =>
-                    p.PostageShippings.Select(pp => pp.Shipping?.ToLower()).Contains(shippingLine.ToLower()));
-                SelectedPackagingType = PackagingTypes.FirstOrDefault(pk => pk.Code == PackageType) ?? PackagingTypes.FirstOrDefault(p => p.Code == "SAT") ?? PackagingTypes.FirstOrDefault();
-            });
+                    Postages.AddRange(postages);
+                    PackagingTypes.AddRange(packaging);
+
+                    TotalWeight = shipment.TotalWeight > 0 ? shipment.TotalWeight : lineItems.Sum(l => l.Grams);
+
+                    SelectedPostage = Postages.FirstOrDefault(p =>
+                        p.PostageShippings.Select(pp => pp.Shipping?.ToLower()).Contains(shippingLine.ToLower()));
+                    SelectedPackagingType = PackagingTypes.FirstOrDefault(pk => pk.Code == PackageType) ?? PackagingTypes.FirstOrDefault(p => p.Code == "SAT") ?? PackagingTypes.FirstOrDefault();
+                });
+            }
         }
+        catch (Exception ex)
+        {
+            Logger.Error(ex, "Error @LoadDataAsync");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+
     }
 
     public IEnumerable GetErrors(string propertyName)
