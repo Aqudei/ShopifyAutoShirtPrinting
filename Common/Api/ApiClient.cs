@@ -95,7 +95,7 @@ namespace Common.Api
                 return response.Data.Results.ToArray();
             }
 
-            throw new Exception(response.Content ?? response.ErrorMessage);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
         public async Task<MyLineItem[]> FindArchivedItemAsync(string searchText)
@@ -109,7 +109,7 @@ namespace Common.Api
                 return response.Data;
             }
 
-            throw new Exception(response.Content ?? response.ErrorMessage);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
         private void WriteToFile(string content)
@@ -143,7 +143,7 @@ namespace Common.Api
                 return response.Data;
             }
 
-            throw new Exception(response.Content ?? response.ErrorMessage);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
 
@@ -157,7 +157,7 @@ namespace Common.Api
                 return response.Data;
             }
 
-            throw new Exception(response.Content ?? response.ErrorMessage);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
         public async Task<MyLineItem> UpdateLineItemStatusAsync(int id, string status)
@@ -170,7 +170,7 @@ namespace Common.Api
                 return response.Data;
             }
 
-            throw new Exception(response.Content ?? response.ErrorMessage);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
         public async Task<Log> AddNewLogAsync(Log log)
@@ -184,7 +184,7 @@ namespace Common.Api
                 return response.Data;
             }
 
-            throw new Exception(response.Content ?? response.ErrorMessage);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
         public async Task<Log[]> ListLogsAsync(long myLineItemId)
@@ -222,7 +222,7 @@ namespace Common.Api
                 return null;
             }
 
-            throw new Exception(response.Content ?? response.ErrorMessage);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
         public async Task<MyLineItem> GetLineItemByDatabaseIdAsync(long lineItemDatabaseId)
@@ -234,7 +234,7 @@ namespace Common.Api
                 return response.Data.FirstOrDefault();
             }
 
-            throw new Exception(response.Content ?? response.ErrorMessage);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
         public async Task<OrderInfo> GetOrderOrderByAsync(Dictionary<string, string> parameters)
@@ -252,7 +252,7 @@ namespace Common.Api
                     return response.Data.FirstOrDefault();
                 }
 
-                throw new Exception(response.Content ?? response.ErrorMessage);
+                throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
 
             }
 
@@ -277,7 +277,7 @@ namespace Common.Api
                 return response.Data;
             }
 
-            throw new Exception(response.Content ?? response.ErrorMessage);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
         public async Task<OrderInfo> AddOrderInfo(OrderInfo orderInfo)
@@ -291,7 +291,7 @@ namespace Common.Api
                 return response.Data;
             }
 
-            throw new Exception(response.Content ?? response.ErrorMessage);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
         public async Task<OrderInfo> UpdateOrderInfo(OrderInfo orderInfo)
@@ -305,7 +305,7 @@ namespace Common.Api
                 return response.Data;
             }
 
-            throw new Exception(response.Content ?? response.ErrorMessage);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
 
         }
 
@@ -319,7 +319,7 @@ namespace Common.Api
                 return response.Data;
             }
 
-            throw new Exception(response.Content ?? response.ErrorMessage);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
         public async Task<Bin[]> FindBinsAsync(Dictionary<string, string> queryParams = null)
@@ -338,7 +338,7 @@ namespace Common.Api
                 return response.Data;
             }
 
-            throw new Exception(response.Content ?? response.ErrorMessage);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
 
@@ -388,7 +388,7 @@ namespace Common.Api
                 return response.Data;
             }
 
-            throw new Exception(response.Content ?? response.ErrorMessage);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
         public async Task<MyLineItem> CreateLineItemForStoreAsync(Store store, MyLineItem myLineItem)
@@ -404,7 +404,7 @@ namespace Common.Api
                 return response.Data;
             }
 
-            throw new Exception(response.ErrorMessage ?? response.Content);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
         public async Task<MyLineItem[]> ListLineItemsByIdAsync(int[] ids)
@@ -416,7 +416,7 @@ namespace Common.Api
             {
                 return response.Data;
             }
-            throw new Exception(response.ErrorMessage ?? response.Content);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
         public async Task<Bin> UpdateBinAsync(Bin bin)
@@ -430,7 +430,7 @@ namespace Common.Api
                 return response.Data;
             }
 
-            throw new Exception(response.ErrorMessage ?? response.Content);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
         public async Task<ItemProcessingResponse> UndoPrintAsync(long lineItemDbId)
@@ -443,7 +443,7 @@ namespace Common.Api
                 return response.Data;
             }
 
-            throw new Exception(response.ErrorMessage ?? response.Content);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
         public async Task<Variant[]> ListVariantsAsync(string search)
@@ -463,7 +463,7 @@ namespace Common.Api
                 return response.Data;
             }
 
-            throw new Exception(response.ErrorMessage ?? response.Content);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
         public async Task<Variant[]> FetchProductVariantsAsync(int productId)
@@ -478,7 +478,7 @@ namespace Common.Api
                 return response.Data;
             }
 
-            throw new Exception(response.ErrorMessage ?? response.Content);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
         public async Task<PrintRequest[]> FetchPrintRequests()
@@ -499,7 +499,7 @@ namespace Common.Api
                 return null;
             }
 
-            throw new Exception(response.ErrorMessage ?? response.Content);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
 
@@ -521,7 +521,7 @@ namespace Common.Api
                 return response.Data;
             }
 
-            throw new Exception(response.ErrorMessage ?? response.Content);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
         public async Task RestoreItemsAsync(IEnumerable<MyLineItem> enumerable)
@@ -556,7 +556,7 @@ namespace Common.Api
                 return response.Data;
             }
 
-            throw new Exception(response.ErrorMessage ?? response.Content);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
         public async Task<PaginatedResult<Product>> ListProductsAsync(Dictionary<string, string> reqParams = null)
@@ -579,7 +579,7 @@ namespace Common.Api
                 return response.Data;
             }
 
-            throw new Exception(response.ErrorMessage ?? response.Content);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
         public async Task<Variant> FindVariant(long? variantId)
@@ -616,7 +616,7 @@ namespace Common.Api
 
             if (response.StatusCode != HttpStatusCode.Created)
             {
-                var errorMessage = response.ErrorMessage ?? response.Content;
+                var errorMessage = $"{response.ErrorMessage}\n\nContent:\n{response.Content}";
                 Logger.Error(errorMessage);
                 throw new Exception(errorMessage);
             }
@@ -656,7 +656,7 @@ namespace Common.Api
             if (response.StatusCode == HttpStatusCode.OK)
                 return;
 
-            throw new Exception(response.ErrorMessage ?? response.Content);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
 
         }
         public async Task SetBackPrintAsync(string sku)
@@ -668,7 +668,7 @@ namespace Common.Api
             if (response.StatusCode == HttpStatusCode.OK)
                 return;
 
-            throw new Exception(response.ErrorMessage ?? response.Content);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
         #region ShippingEndpoints
@@ -738,7 +738,7 @@ namespace Common.Api
                 return response.Data;
             }
 
-            throw new Exception(response.Content ?? response.ErrorMessage);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
         public async Task<Shipment> GetShipmentByAsync(Dictionary<string, string> getParameters, int storeId = 0)
@@ -761,7 +761,7 @@ namespace Common.Api
                     return response.Data.First();
                 }
 
-                throw new Exception(response.Content ?? response.ErrorMessage);
+                throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
 
             }
 
@@ -791,7 +791,7 @@ namespace Common.Api
                 return response.Data;
             }
 
-            throw new Exception(response.Content ?? response.ErrorMessage);
+            throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
         }
 
         public async Task SaveHSNAsync(HSN hsn)

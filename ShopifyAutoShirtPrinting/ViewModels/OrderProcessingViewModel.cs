@@ -493,7 +493,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private void _messageBus_ItemsAdded(object sender, int[] ids)
     {
-        Task.Run(() => HandleItemsAddedTaskAsync(ids));
+        _ = HandleItemsAddedTaskAsync(ids);
     }
 
     private async Task HandleItemsAddedTaskAsync(int[] ids)
@@ -524,7 +524,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
         catch (Exception e)
         {
-            Logger.Error(e);
+            Logger.Error(e, "Error @ HandleItemsAddedTaskAsync()");
         }
     }
 
@@ -540,7 +540,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private void _messageBus_ItemsUpdated(object sender, int[] ids)
     {
-        Task.Run(() => HandleItemsUpdatedTaskAsync(ids));
+        _ = HandleItemsUpdatedTaskAsync(ids);
     }
 
     private async Task HandleItemsUpdatedTaskAsync(int[] ids)

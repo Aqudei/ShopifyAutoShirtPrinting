@@ -41,84 +41,78 @@ namespace ShopifyEasyShirtPrinting.Messaging
                 //HostName = Properties.Settings.Default.ServerHost,                
                 HostName = _sessionVariables.BroadcastHost,
                 UserName = _sessionVariables.BroadcastUsername,
-                Password = _sessionVariables.BroadcastPassword
+                Password = _sessionVariables.BroadcastPassword,
+                DispatchConsumersAsync = true
             };
+
             _connection = factory.CreateConnection();
             _channel = _connection.CreateModel();
+            
             _channel.ExchangeDeclare(exchange_name, ExchangeType.Fanout);
+            
             var queueName = _channel.QueueDeclare().QueueName;
             _channel.QueueBind(queue: queueName,
                               exchange: exchange_name,
                               routingKey: string.Empty);
 
-            var consumer = new EventingBasicConsumer(_channel);
-            consumer.Received += (channel, eventArg) =>
+            var consumer = new AsyncEventingBasicConsumer(_channel);
+            consumer.Received += async (channel, eventArg) =>
             {
                 var body = eventArg.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
-                Debug.WriteLine($" [x] Received {message}");
+                Debug.WriteLine($" [x] Received {eventArg.RoutingKey}: {message}");
 
-                switch (eventArg.RoutingKey)
+                try
                 {
-                    case "items.updated":
-                        {
-                            var lineItemsIds = JsonConvert.DeserializeObject<int[]>(message);
-                            ItemsUpdated?.Invoke(this, lineItemsIds);
-                            break;
-                        }
-                    case "items.added":
-                        {
-                            var lineItemsIds = JsonConvert.DeserializeObject<int[]>(message);
-                            ItemsAdded?.Invoke(this, lineItemsIds);
-                            break;
-                        }
-                    case "bins.destroyed":
-                        {
-                            var binNumbers = JsonConvert.DeserializeObject<int[]>(message);
-                            BinsDestroyed?.Invoke(this, binNumbers);
-                            break;
-                        }
-                    case "bins.updated":
-                        {
-                            var binNumbers = JsonConvert.DeserializeObject<int[]>(message);
-                            BinsUpdated?.Invoke(this, binNumbers);
-                            break;
-                        }
-                    case "items.archived":
-                        {
-                            var lineItemsIds = JsonConvert.DeserializeObject<int[]>(message);
-                            ItemsArchived?.Invoke(this, lineItemsIds);
-                            break;
-                        }
-                    case "database.reset":
-                        {
-                            DatabaseReset?.Invoke(this, null);
-                            break;
-                        }
-                    case "shipments.updated":
-                        {
-                            var shipmentIds = JsonConvert.DeserializeObject<int[]>(message);
-                            ShipmentsUpdated?.Invoke(this, shipmentIds);
-                            break;
-                        }
-                    case "shipments.voided":
-                        {
-                            var shipmentIds = JsonConvert.DeserializeObject<int[]>(message);
-                            ShipmentsVoided?.Invoke(this, shipmentIds);
-                            break;
-                        }
-                    default:
-                        break;
+                    ProcessMessage(eventArg.RoutingKey, message);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error processing message: {ex.Message}");
                 }
 
-
+                await Task.CompletedTask;
             };
 
             _channel.BasicConsume(queue: queueName,
                                  autoAck: true,
                                  consumer: consumer);
-            
         }
+
+        private void ProcessMessage(string routingKey, string message)
+        {
+            switch (routingKey)
+            {
+                case "items.updated":
+                    ItemsUpdated?.Invoke(this, JsonConvert.DeserializeObject<int[]>(message));
+                    break;
+                case "items.added":
+                    ItemsAdded?.Invoke(this, JsonConvert.DeserializeObject<int[]>(message));
+                    break;
+                case "bins.destroyed":
+                    BinsDestroyed?.Invoke(this, JsonConvert.DeserializeObject<int[]>(message));
+                    break;
+                case "bins.updated":
+                    BinsUpdated?.Invoke(this, JsonConvert.DeserializeObject<int[]>(message));
+                    break;
+                case "items.archived":
+                    ItemsArchived?.Invoke(this, JsonConvert.DeserializeObject<int[]>(message));
+                    break;
+                case "database.reset":
+                    DatabaseReset?.Invoke(this, EventArgs.Empty);
+                    break;
+                case "shipments.updated":
+                    ShipmentsUpdated?.Invoke(this, JsonConvert.DeserializeObject<int[]>(message));
+                    break;
+                case "shipments.voided":
+                    ShipmentsVoided?.Invoke(this, JsonConvert.DeserializeObject<int[]>(message));
+                    break;
+                default:
+                    Debug.WriteLine($"Unhandled routing key: {routingKey}");
+                    break;
+            }
+        }
+
 
         protected virtual void Dispose(bool disposing)
         {
