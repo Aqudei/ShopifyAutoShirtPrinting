@@ -240,13 +240,13 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
         set => SetProperty(ref _isBusy, value);
     }
 
-    private async Task<bool> HandleAusPostLabelPrinting(CreateShipmentRequestBody createShipmentBody)
+    private async Task<bool> HandleAusPostLabelPrintingAsync(CreateShipmentRequestBody createShipmentBody)
     {
         await _dispatcher.BeginInvoke(ShipmentErrors.Clear);
 
         try
         {
-            await _dispatcher.BeginInvoke(() => IsBusy = true);
+            IsBusy = true;
 
             var shipmentInfo = await _apiClient.CreateShipmentAsync(createShipmentBody, StoreId);
 
@@ -300,7 +300,7 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
         }
         finally
         {
-            await _dispatcher.BeginInvoke(() => IsBusy = false);
+            IsBusy = false;
         }
     }
 
@@ -323,7 +323,8 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
             if (HasErrors)
                 return;
 
-            var retry = await Task.Run(() => HandleAusPostLabelPrinting(shipment));
+            var retry = await  HandleAusPostLabelPrintingAsync(shipment);
+
             if (!retry)
             {
                 var dlgParams = new DialogParameters { { "auspost", true } };
@@ -388,8 +389,6 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
         try
         {
             IsBusy = true;
-
-            await Task.Delay(10000);
 
             var orderNumberParams = new Dictionary<string, string>() { { "OrderNumber", $"{OrderNumber}" } };
             var lineItemsTask = _apiClient.ListItemsAsync(orderNumberParams, StoreId);
