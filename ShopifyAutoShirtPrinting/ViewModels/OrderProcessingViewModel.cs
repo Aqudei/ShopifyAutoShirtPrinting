@@ -463,21 +463,23 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     }
     private void _messageBus_ItemsArchived(object sender, int[] archivedItemsId)
     {
-        Task.Run(() => HandleOnItemsArchivedTaskAsync(archivedItemsId));
+        _ = HandleOnItemsArchivedTaskAsync(archivedItemsId);
     }
 
     private async Task HandleOnItemsArchivedTaskAsync(int[] archivedItemsId)
     {
         try
         {
-            var archivedIdsSet = new HashSet<int>(archivedItemsId);
-            var itemsToRemove = _lineItems.Where(x => archivedIdsSet.Contains(x.Id)).ToList();
-
-            if (itemsToRemove.Count == 0)
+            if (archivedItemsId == null || archivedItemsId.Length == 0)
                 return;
 
+            var archivedIdsSet = new HashSet<int>(archivedItemsId);
+
+            // CRITICAL: We must read _lineItems on the UI Thread to prevent race conditions
             await _dispatcher.InvokeAsync(() =>
             {
+                var itemsToRemove = _lineItems.Where(x => archivedIdsSet.Contains(x.Id)).ToList();
+
                 foreach (var item in itemsToRemove)
                 {
                     item.PropertyChanged -= LineItem_PropertyChanged;
@@ -498,36 +500,49 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private async Task HandleItemsAddedTaskAsync(int[] ids)
     {
-        Debug.WriteLine($"@_messageBus_ItemsAdded() -> {ids}");
+        Debug.WriteLine($"@_messageBus_ItemsAdded() -> {string.Join(", ", ids)}");
 
         try
         {
-            var existingIds = _lineItems.Select(x => x.Id).ToHashSet();
-            var items = await _apiClient.ListLineItemsByIdAsync(ids);
+            if (ids == null || ids.Length == 0)
+                return;
 
+            // CRITICAL: Read existing IDs on the UI Thread
+            var existingIds = await _dispatcher.InvokeAsync(() => _lineItems.Select(x => x.Id).ToHashSet());
+
+            // Fetch new data from API on background thread
+            var items = await _apiClient.ListLineItemsByIdAsync(ids);
+            if (items == null) return;
+
+            // Map data on background thread to keep UI snappy
             var toAdd = items
                 .Select(_mapper.Map<LineItemViewModel>)
                 .Where(item => !existingIds.Contains(item.Id))
                 .ToList();
 
-            foreach (var item in toAdd)
-            {
-                item.PropertyChanged += LineItem_PropertyChanged;
-            }
-
             if (toAdd.Count > 0)
             {
-                await _dispatcher.InvokeAsync(() => _lineItems.AddRange(toAdd));
-            }
+                // Subscribe and Add completely inside the UI thread context
+                await _dispatcher.InvokeAsync(async () =>
+                {
+                    foreach (var item in toAdd)
+                    {
+                        item.PropertyChanged += LineItem_PropertyChanged;
+                    }
 
-            await UpdateDisplayAsync();
+                    // If _lineItems is a standard ObservableCollection, it doesn't support AddRange natively.
+                    // Assuming it's a custom collection that does. Otherwise, use a foreach loop here.
+                    _lineItems.AddRange(toAdd);
+
+                    await UpdateDisplayAsync();
+                });
+            }
         }
         catch (Exception e)
         {
             Logger.Error(e, "Error @ HandleItemsAddedTaskAsync()");
         }
     }
-
 
     private async Task UpdateDisplayAsync()
     {
@@ -545,35 +560,35 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private async Task HandleItemsUpdatedTaskAsync(int[] ids)
     {
-        Debug.WriteLine($"@_messageBus_ItemsUpdated() -> {ids}");
+        Debug.WriteLine($"@_messageBus_ItemsUpdated() -> {string.Join(", ", ids)}");
 
         try
         {
-            var itemMap = _lineItems.ToDictionary(x => x.Id);
+            if (ids == null || ids.Length == 0)
+                return;
+
+            // CRITICAL: Copy the mapping metadata safely from the UI thread before calling the API
+            var itemMap = await _dispatcher.InvokeAsync(() => _lineItems.ToDictionary(x => x.Id));
+
+            // This long network call happens safely on the background thread
             var items = await _apiClient.ListLineItemsByIdAsync(ids);
 
-            var updates = new List<Action>();
+            if (items == null) return;
 
-            foreach (var item in items)
+            // Apply updates back on the UI thread
+            await _dispatcher.InvokeAsync(() =>
             {
-                if (itemMap.TryGetValue(item.Id, out var lineItemVm))
+                foreach (var item in items)
                 {
-                    updates.Add(() => _mapper.Map(item, lineItemVm));
-                }
-            }
-
-            if (updates.Count > 0)
-            {
-                await _dispatcher.InvokeAsync(() =>
-                {
-                    foreach (var update in updates)
+                    if (itemMap.TryGetValue(item.Id, out var lineItemVm))
                     {
-                        update();
+                        _mapper.Map(item, lineItemVm);
                     }
-                });
-            }
+                }
+            });
 
-            await UpdateDisplayAsync();
+            // Ensure UI-bound displays are updated safely
+            await _dispatcher.InvokeAsync(async () => await UpdateDisplayAsync());
         }
         catch (Exception e)
         {
