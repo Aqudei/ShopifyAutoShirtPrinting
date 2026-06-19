@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿#nullable enable
+
+using AutoMapper;
 using Common.Api;
 using Common.Models;
 using ControlzEx.Standard;
@@ -45,7 +47,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
-    private readonly ObservableCollection<LineItemViewModel> _lineItems = [];
+    private readonly ObservableCollection<LineItemViewModel> _lineItems = new();
     public ICollectionView LineItemsView { get; }
     public override string Title => "Order Items";
     private string _currentImage;
@@ -287,7 +289,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     {
         get
         {
-            return _lineItems.Where(l => l.IsSelected).Count();
+            return _lineItems.Count(l => l.IsSelected);
         }
     }
 

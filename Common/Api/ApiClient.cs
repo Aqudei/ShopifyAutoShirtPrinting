@@ -758,7 +758,7 @@ namespace Common.Api
                 var response = await _client.ExecuteGetAsync<IEnumerable<Shipment>>(request);
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    return response.Data.First();
+                    return response.Data.FirstOrDefault();
                 }
 
                 throw new Exception($"{response.ErrorMessage}\n\nContent:\n{response.Content}");
