@@ -3,13 +3,12 @@ using Common.Api;
 using Common.Models;
 using DryIoc;
 using LiteDB;
-using Netco.Extensions;
 using NLog;
 using Prism.Commands;
+using Prism.Dialogs;
 using Prism.DryIoc;
 using Prism.Ioc;
 using Prism.Mvvm;
-using Prism.Services.Dialogs;
 using RestSharp;
 using ShopifyEasyShirtPrinting.Messaging;
 using ShopifyEasyShirtPrinting.Models;
@@ -42,8 +41,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             [JsonPropertyName("refresh")]
             public string RefreshToken { get; set; }
         }
-
-
 
         public class SessionInfo
         {
@@ -97,7 +94,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
         public string Title => "Login";
 
-        public event Action<IDialogResult> RequestClose;
 
         public bool CanCloseDialog()
         {
@@ -148,6 +144,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
         private DelegateCommand _deleteServerCommand;
         private string _selectedServer;
+        private DialogCloseListener _requestClose;
 
         public DelegateCommand DeleteServerCommand
         {
@@ -189,7 +186,10 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         {
             using (var db = new LiteDatabase(_dbPath))
             {
-                db.GetCollection<Server>().FindAll().ForEach(Servers.Add);
+                foreach (var item in db.GetCollection<Server>().FindAll())
+                {
+                    Servers.Add(item);
+                }
             }
 
             var defaultServerUrl = "https://workflows.louiestshirtprinting.co";
@@ -213,6 +213,9 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         public string UserName { get => _userName; set => SetProperty(ref _userName, value); }
 
         public DelegateCommand LoginCommand { get => loginCommand ??= new DelegateCommand(OnLogin); }
+
+        DialogCloseListener IDialogAware.RequestClose => _requestClose;
+
         public static string ConvertToUnsecureString(SecureString secureString)
         {
             if (secureString == null)
@@ -287,8 +290,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
                     return;
                 }
 
-
-
                 await _dispatcher.InvokeAsync(() => Message = new DisplayMessage("Logging you in..."));
                 using (var db = new LiteDatabase(_dbPath))
                 {
@@ -331,7 +332,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
                     // await _dispatcher.InvokeAsync(() => Message = "Setting up Browser integration....");
                     // await SetupShipStationBrowser();
 
-                    RequestClose?.Invoke(new DialogResult(ButtonResult.OK));
+                    _requestClose.Invoke(new DialogResult(ButtonResult.OK));
                 }
             }
             finally
@@ -343,6 +344,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         private void SetupMessageBus()
         {
             _container.RegisterSingleton<IMessageBus, MessageBus>();
+            _ = _container.Resolve<MessageBus>().StartConnectionAsync();
             Debug.WriteLine("Bus Registered!");
         }
     }

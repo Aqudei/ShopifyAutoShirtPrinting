@@ -2,10 +2,9 @@
 using Common.Api;
 using Common.Models;
 using Common.Models.Seo;
-using Netco.Extensions;
 using Prism.Commands;
-using Prism.Regions;
-using Prism.Services.Dialogs;
+using Prism.Dialogs;
+using Prism.Navigation.Regions;
 using ShopifyEasyShirtPrinting.Models.Seo;
 using System;
 using System.Collections.Generic;

@@ -1,5 +1,4 @@
 ﻿using Common.Models;
-using Prism.Services.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

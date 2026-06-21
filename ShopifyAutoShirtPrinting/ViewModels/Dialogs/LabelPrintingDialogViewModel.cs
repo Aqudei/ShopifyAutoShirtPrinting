@@ -3,7 +3,7 @@ using Common.Api;
 using Common.Models;
 using DryIoc;
 using Prism.Commands;
-using Prism.Services.Dialogs;
+using Prism.Dialogs;
 using ShopifyEasyShirtPrinting.Helpers;
 using System;
 using System.Collections;
@@ -21,6 +21,12 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs;
 public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataErrorInfo
 {
     private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+
+
+    private DialogCloseListener _requestClose;
+
+    // Explicit implementation allowing Prism to set the listener dynamically
+    DialogCloseListener IDialogAware.RequestClose => _requestClose;
 
     public string Message
     {
@@ -309,7 +315,8 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
     {
         if (cmd.ToUpper() == "YES")
         {
-            RequestClose?.Invoke(new DialogResult(ButtonResult.Yes));
+
+            // RequestClose?.Invoke(new DialogResult(ButtonResult.Yes));
         }
         else if (cmd.ToUpper() == "AUSPOST")
         {
@@ -323,17 +330,17 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
             if (HasErrors)
                 return;
 
-            var retry = await  HandleAusPostLabelPrintingAsync(shipment);
+            var retry = await HandleAusPostLabelPrintingAsync(shipment);
 
             if (!retry)
             {
                 var dlgParams = new DialogParameters { { "auspost", true } };
-                RequestClose?.Invoke(new DialogResult(ButtonResult.Yes, dlgParams));
+                _requestClose.Invoke(dlgParams, ButtonResult.Yes);
             }
         }
         else
         {
-            RequestClose?.Invoke(new DialogResult(ButtonResult.No));
+            _requestClose.Invoke(new DialogResult(ButtonResult.No));
         }
     }
 
@@ -481,6 +488,6 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
 
     public ObservableCollection<FieldDetail> ShipmentErrors { get; set; } = new();
 
-    public event Action<IDialogResult> RequestClose;
+
     public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 }

@@ -1,13 +1,19 @@
 {
   "scenarioId": "dotnet-version-upgrade",
-  "operationId": "a252a177-cdb8-4b62-9c39-58a62ea52a45",
-  "description": "Upgrade .NET projects to newer .NET versions",
-  "startTime": "2026-06-19T13:45:16.7290401Z",
-  "lastUpdateTime": "2026-06-19T14:19:58.105289Z",
+  "operationId": "9adf217e-1cf9-434d-888b-72ad41ea6e8b",
+  "description": "Upgrade .NET projects to newer .NET versions, including guidance on current release status, support lifecycle (LTS/STS), and recommended upgrade targets.",
+  "startTime": "2026-06-21T05:35:01.9367234Z",
+  "lastUpdateTime": "2026-06-21T06:04:55.8745479Z",
   "properties": {
-    "UpgradeTargetFramework": "net10.0",
     "taskStates": {
-      "01-convert-common-to-sdk": "Completed"
+      "01-convert-libraries-and-tests-to-sdk-style": "InProgress",
+      "01.01-convert-common-to-sdk": "Completed",
+      "01.02-add-multitarget-and-package-updates": "Completed",
+      "02-migrate-wpf-app-to-sdk-style-and-tfm": "InProgress",
+      "02.01-scaffold-sdk-project": "Completed",
+      "02.02-convert-package-references": "Completed",
+      "02.03-fix-xaml-resources-and-manifest": "Failed",
+      "02.04-iterate-build-and-fix-api-issues": "Failed"
     }
   },
   "folderPath": ""

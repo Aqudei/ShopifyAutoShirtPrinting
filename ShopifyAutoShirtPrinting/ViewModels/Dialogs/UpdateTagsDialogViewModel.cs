@@ -1,7 +1,7 @@
 ﻿using Common.Models;
 using Prism.Commands;
+using Prism.Dialogs;
 using Prism.Mvvm;
-using Prism.Services.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,7 +17,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
         public string Title => "Confirm Update";
 
-        public event Action<IDialogResult> RequestClose;
 
         public bool CanCloseDialog() => true;
 
@@ -39,11 +38,15 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         }
 
         private DelegateCommand _okCommand;
+        private DialogCloseListener _requestClose;
 
         public DelegateCommand OkCommand => _okCommand ??= new DelegateCommand(OnOk);
+
+        DialogCloseListener IDialogAware.RequestClose => _requestClose;
+
         private void OnOk()
         {
-            RequestClose?.Invoke(new DialogResult(ButtonResult.OK));
+            _requestClose.Invoke(new DialogResult(ButtonResult.OK));
         }
     }
 }

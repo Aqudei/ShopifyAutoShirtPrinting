@@ -4,14 +4,13 @@ using AutoMapper;
 using Common.Api;
 using Common.Models;
 using ControlzEx.Standard;
-using ImTools;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using NLog;
 using Prism.Commands;
+using Prism.Dialogs;
 using Prism.Events;
-using Prism.Regions;
-using Prism.Services.Dialogs;
+using Prism.Navigation.Regions;
 using ShopifyEasyShirtPrinting.Extensions;
 using ShopifyEasyShirtPrinting.Helpers;
 using ShopifyEasyShirtPrinting.Messaging;
@@ -35,6 +34,7 @@ using System.Windows.Data;
 using System.Windows.Threading;
 using ZXing;
 using ZXing.Common;
+using ZXing.Windows.Compatibility;
 using static ShopifyEasyShirtPrinting.Models.OrderStatusDisplay;
 using Application = System.Windows.Application;
 using Path = System.IO.Path;
@@ -1407,7 +1407,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
     private bool _isFilterEnabled = true;
     private int _totalDisplayed;
     private int _totalItems;
-    private Store _store;
+    private Common.Models.Store _store;
 
     public DelegateCommand OpenQrScannerCommand
     {

@@ -6,6 +6,7 @@ using ShopifyEasyShirtPrinting.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Text;
 using System.Threading.Channels;
@@ -16,7 +17,7 @@ namespace ShopifyEasyShirtPrinting.Messaging
     public class MessageBus : IMessageBus
     {
         private IConnection _connection;
-        private IModel _channel;
+        private IChannel _channel;
         private bool disposedValue;
         private readonly SessionVariables _sessionVariables;
 
@@ -33,7 +34,10 @@ namespace ShopifyEasyShirtPrinting.Messaging
         public MessageBus(SessionVariables sessionVariables)
         {
             _sessionVariables = sessionVariables;
+        }
 
+        public async Task StartConnectionAsync()
+        {
             var exchange_name = _sessionVariables.BroadcastExchange;
 
             var factory = new ConnectionFactory
@@ -42,21 +46,21 @@ namespace ShopifyEasyShirtPrinting.Messaging
                 HostName = _sessionVariables.BroadcastHost,
                 UserName = _sessionVariables.BroadcastUsername,
                 Password = _sessionVariables.BroadcastPassword,
-                DispatchConsumersAsync = true
+                // DispatchConsumersAsync = true
             };
 
-            _connection = factory.CreateConnection();
-            _channel = _connection.CreateModel();
-            
-            _channel.ExchangeDeclare(exchange_name, ExchangeType.Fanout);
-            
-            var queueName = _channel.QueueDeclare().QueueName;
-            _channel.QueueBind(queue: queueName,
+            _connection = await factory.CreateConnectionAsync();
+            _channel = await _connection.CreateChannelAsync();
+
+            await _channel.ExchangeDeclareAsync(exchange_name, ExchangeType.Fanout);
+
+            var queueName = (await _channel.QueueDeclareAsync()).QueueName;
+            await _channel.QueueBindAsync(queue: queueName,
                               exchange: exchange_name,
                               routingKey: string.Empty);
 
             var consumer = new AsyncEventingBasicConsumer(_channel);
-            consumer.Received += async (channel, eventArg) =>
+            consumer.ReceivedAsync += async (channel, eventArg) =>
             {
                 var body = eventArg.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
@@ -74,7 +78,7 @@ namespace ShopifyEasyShirtPrinting.Messaging
                 await Task.CompletedTask;
             };
 
-            _channel.BasicConsume(queue: queueName,
+            await _channel.BasicConsumeAsync(queue: queueName,
                                  autoAck: true,
                                  consumer: consumer);
         }
@@ -114,16 +118,16 @@ namespace ShopifyEasyShirtPrinting.Messaging
         }
 
 
-        protected virtual void Dispose(bool disposing)
+        protected virtual async void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects)
-                    _channel.Close();
+                    await _channel.CloseAsync();
                     _channel.Dispose();
-                    _connection.Close();
+                    await _connection.CloseAsync();
                     _connection.Dispose();
                 }
 

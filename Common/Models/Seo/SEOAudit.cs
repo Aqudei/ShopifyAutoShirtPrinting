@@ -6,7 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+#if NETFRAMEWORK
 using System.Web.Configuration;
+#endif
 
 namespace Common.Models.Seo
 {

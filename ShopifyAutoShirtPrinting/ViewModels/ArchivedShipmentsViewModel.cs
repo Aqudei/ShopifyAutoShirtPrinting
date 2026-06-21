@@ -3,7 +3,7 @@ using Common.Api;
 using Common.Models;
 using MahApps.Metro.Controls.Dialogs;
 using Prism.Commands;
-using Prism.Regions;
+using Prism.Navigation.Regions;
 using ShopifyEasyShirtPrinting.Models;
 using System;
 using System.Collections.Generic;

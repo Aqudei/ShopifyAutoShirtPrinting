@@ -1,7 +1,8 @@
 ﻿using Common.Models;
 using MahApps.Metro.Controls;
-using Prism.Regions;
-using Prism.Services.Dialogs;
+using Prism.Dialogs;
+using Prism.Navigation;
+using Prism.Navigation.Regions;
 using ShopifyEasyShirtPrinting.ViewModels;
 using System.Linq;
 using System.Windows;

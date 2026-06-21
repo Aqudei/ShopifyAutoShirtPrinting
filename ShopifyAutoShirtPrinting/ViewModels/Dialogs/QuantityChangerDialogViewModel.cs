@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
 using Common.Models;
-using ImTools;
 using Prism.Commands;
+using Prism.Dialogs;
 using Prism.Mvvm;
-using Prism.Services.Dialogs;
 using ShopifyEasyShirtPrinting.Data;
 using ShopifyEasyShirtPrinting.Models;
 using System;
@@ -21,7 +20,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
     {
         public string Title => "Change Printed Quantity";
 
-        public event Action<IDialogResult> RequestClose;
         public MyLineItem LineItem { get; set; } = new();
         private DelegateCommand<string> _dialogCommand;
         private string _message;
@@ -34,6 +32,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
 
         public DelegateCommand<string> DialogCommand => _dialogCommand ??= new DelegateCommand<string>(HandleDialogCommand);
+
+        public DialogCloseListener RequestClose { get; }
 
         private void HandleDialogCommand(string cmd)
         {
@@ -50,12 +50,12 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
                     { "LineItem", LineItem  }
                 };
 
-                RequestClose?.Invoke(new DialogResult(ButtonResult.OK, data));
+                RequestClose.Invoke(data, ButtonResult.OK);
             }
 
             if (cmd.ToLower() == "close")
             {
-                RequestClose?.Invoke(new DialogResult(ButtonResult.Cancel));
+                RequestClose.Invoke(new DialogResult(ButtonResult.Cancel));
             }
         }
 

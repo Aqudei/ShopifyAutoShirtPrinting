@@ -6,7 +6,6 @@ using System.Linq.Expressions;
 
 namespace ShopifyEasyShirtPrinting.Data
 {
-
     // This file is ignored from compiling
     public abstract class LiteDbRepositoryBase<T> : IRepository<T> where T : EntityBase
     {
@@ -62,5 +61,23 @@ namespace ShopifyEasyShirtPrinting.Data
         {
             _collection.Update(item);
         }
+
+        public void AddRange(IEnumerable<T> entities)
+        {
+            throw new NotImplementedException();
+        }
+
+        public T Get(Expression<Func<T, bool>> predicate)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<T> All()
+        {
+            throw new NotImplementedException();
+        }
+        //===================
+
+
     }
 }

@@ -2,7 +2,7 @@
 
 using AutoMapper;
 using Common.Models.Seo;
-using Prism.Services.Dialogs;
+using Prism.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -21,11 +21,13 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
 
         private ObservableCollection<ScoreBreakdown> _scores = new();
+        private DialogCloseListener _requestClose;
+
         public ICollectionView ScoreBreakdowns { get; set; }
 
         public override string Title => "Score Breakdown";
 
-        public event Action<IDialogResult> RequestClose;
+        DialogCloseListener IDialogAware.RequestClose => _requestClose;
 
         public bool CanCloseDialog()
         {

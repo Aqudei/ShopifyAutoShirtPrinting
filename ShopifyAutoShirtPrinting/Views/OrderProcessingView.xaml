@@ -18,7 +18,7 @@
         <converters:DictionaryToVisibilityConverter x:Key="DictionaryToVisibilityConverter" />
 
         <BitmapImage x:Key="LoaderImage"
-                     UriSource="pack://application:,,,/ShopifyEasyShirtPrinting;component/Resources/unknwon.png" />
+                     UriSource="/Resources/unknwon.png" />
         <converters:StatusToColorConverter x:Key="StatusToColorConverter" />
     </UserControl.Resources>
     <Grid>
@@ -134,7 +134,7 @@
                     <StackPanel Orientation="Horizontal">
                         <Image Height="16"
                                VerticalAlignment="Center"
-                               Source="pack://application:,,,/ShopifyEasyShirtPrinting;component/Resources/uncheckall.png"/>
+                               Source="/Resources/uncheckall.png"/>
                         <TextBlock Width="60"
                                        Margin="4"
                                        VerticalAlignment="Center"
@@ -149,7 +149,7 @@
                         CommandParameter="{Binding SelectedItems, ElementName=OrdersDataGrid}">
                     <StackPanel Orientation="Horizontal">
                         <Image Height="16"
-                               Source="pack://application:,,,/ShopifyEasyShirtPrinting;component/Resources/check-all.png" />
+                               Source="/Resources/check-all.png" />
                         <TextBlock VerticalAlignment="Center"
                                    TextWrapping="Wrap"
                                    Margin="4">
@@ -165,7 +165,7 @@
                         CommandParameter="{Binding SelectedItems, ElementName=OrdersDataGrid}">
                     <StackPanel Orientation="Horizontal">
                         <Image Height="16"
-                               Source="pack://application:,,,/ShopifyEasyShirtPrinting;component/Resources/uncheck2.png" />
+                               Source="/Resources/uncheck2.png" />
                         <TextBlock VerticalAlignment="Center"
                                    TextWrapping="Wrap"
                                    Margin="4">
@@ -469,7 +469,7 @@
                         Command="{Binding BrowseQrCommand}"
                         Margin="4">
                     <Button.Content>
-                        <Image Source="pack://application:,,,/ShopifyEasyShirtPrinting;component/Resources/1507683.png"
+                        <Image Source="/Resources/1507683.png"
                                Width="25" />
                     </Button.Content>
                 </Button>

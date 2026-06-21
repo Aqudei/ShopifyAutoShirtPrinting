@@ -1,13 +1,18 @@
 ﻿using AutoMapper;
 using Common.Api;
 using Common.Models;
+using ControlzEx.Theming;
+using DotNetEnv;
 using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using NLog;
 using OfficeOpenXml;
 using Prism.DryIoc;
 using Prism.Events;
 using Prism.Ioc;
-using Prism.Regions;
+using Prism.Navigation.Regions;
+using ShopifyEasyShirtPrinting.Mapping;
 using ShopifyEasyShirtPrinting.Messaging;
 using ShopifyEasyShirtPrinting.Properties;
 using ShopifyEasyShirtPrinting.Services;
@@ -18,11 +23,8 @@ using ShopifyEasyShirtPrinting.Views.Dialogs;
 using ShopifyEasyShirtPrinting.Views.Tools;
 using System;
 using System.IO;
-using System.Windows;
-using DotNetEnv;
-using ControlzEx.Theming;
 using System.Linq;
-using ShopifyEasyShirtPrinting.Mapping;
+using System.Windows;
 
 namespace ShopifyEasyShirtPrinting
 {
@@ -83,7 +85,8 @@ namespace ShopifyEasyShirtPrinting
                 var mapperConfig = new MapperConfiguration(cfg =>
                 {
                     cfg.AddProfile<TLKCMappingProfile>();
-                });
+                }, NullLoggerFactory.Instance);
+
 
                 containerRegistry.RegisterInstance(mapperConfig.CreateMapper());
                 containerRegistry.RegisterDialog<LabelPrintingDialog, LabelPrintingDialogViewModel>();
@@ -132,7 +135,7 @@ namespace ShopifyEasyShirtPrinting
         {
             Env.Load();
 
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // Required for EPPlus 5 and above
+            ExcelPackage.License.SetNonCommercialPersonal("AE Cortez");
 
             Logger.Debug("Program Started!");
 

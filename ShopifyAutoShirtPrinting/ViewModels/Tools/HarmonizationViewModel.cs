@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
 using Common.Api;
 using Common.Models.Harmonisation;
-using ImTools;
 using NLog;
 using OfficeOpenXml;
 using Prism.Commands;
-using Prism.Regions;
-using Prism.Services.Dialogs;
+using Prism.Dialogs;
+using Prism.Navigation.Regions;
 using ShopifyEasyShirtPrinting.Views.Tools;
 using System;
 using System.Collections.Generic;

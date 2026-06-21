@@ -1,8 +1,4 @@
 ﻿using Common.Models;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
-using SeleniumExtras.WaitHelpers;
 using ShopifyEasyShirtPrinting.Helpers;
 using ShopifyEasyShirtPrinting.Services.ShipStation;
 using System;
@@ -18,8 +14,8 @@ namespace ShopifyEasyShirtPrinting.Services
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
-        private readonly IWebDriver _driver;
-        private readonly SSApi2 _apiClient;
+        // private readonly IWebDriver _driver;
+        // private readonly SSApi2 _apiClient;
         private readonly string _username;
         private readonly string _password;
         private readonly SessionVariables _sessionVariables;
@@ -44,36 +40,6 @@ namespace ShopifyEasyShirtPrinting.Services
             // Name of the specific profile you want to use (e.g., "Default" or "Profile 1")
             var profileName = "Default";
             // Setup Chrome options to use a specific profile
-            var chromeOptions = new ChromeOptions();
-            chromeOptions.AddArgument($"user-data-dir={userDataDir}");
-            chromeOptions.AddArgument($"profile-directory={profileName}");
-            chromeOptions.BinaryLocation = "C:\\chrome-win64\\chrome.exe";
-
-            _driver = new ChromeDriver(chromeOptions);
-            _apiClient = new SSApi2();
-
-            _driver.Manage().Window.Maximize();
-        }
-
-        public void DoLogin()
-        {
-            try
-            {
-                // Check if already logged in via URL redirection
-                _driver.Navigate().GoToUrl(LoginUrl);
-
-                var wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(20));
-                if (wait.Until(ExpectedConditions.UrlContains("ship12.shipstation.com/orders/awaiting-shipment")))
-                {
-                    _apiClient.InitCookies(_driver); // Initialize cookies after successful login
-                    LoginCompleted = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"URL check Timeout: {ex.Message}\n\n{ex.StackTrace}");
-                LoginCompleted = false;
-            }
         }
 
         public async Task<bool> NavigateToOrderAsync(string orderNumber)

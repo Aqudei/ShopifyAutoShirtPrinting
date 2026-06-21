@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using ZXing;
 using ZXing.Common;
+using ZXing.Windows.Compatibility;
 
 namespace ShopifyEasyShirtPrinting.Helpers
 {
@@ -166,6 +167,7 @@ namespace ShopifyEasyShirtPrinting.Helpers
                 offsetX -= ICON_SIZE + PADDING;
             }
 
+            
             // Back print icon
             if (hasBackPrint.HasValue && hasBackPrint.Value)
                 DrawIcon(Properties.Resources.equals_icon);

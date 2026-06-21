@@ -1,13 +1,12 @@
 ﻿using AutoMapper;
 using Common.Api;
 using Common.Models;
-using ImTools;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Prism.Commands;
+using Prism.Dialogs;
 using Prism.Events;
-using Prism.Regions;
-using Prism.Services.Dialogs;
+using Prism.Navigation.Regions;
 using ShopifyEasyShirtPrinting.Extensions;
 using ShopifyEasyShirtPrinting.Helpers;
 using ShopifyEasyShirtPrinting.Messaging;
@@ -30,6 +29,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using ZXing;
 using ZXing.Common;
+using ZXing.Windows.Compatibility;
 using Application = System.Windows.Application;
 using Path = System.IO.Path;
 using PrintDocument = System.Drawing.Printing.PrintDocument;
@@ -858,7 +858,7 @@ public class ArchivedViewModel : PageBase, INavigationAware
     {
         try
         {
-            var searchResult = (await _apiClient.FindArchivedItemAsync(SearchText)).Map(_mapper.Map<LineItemViewModel>);
+            var searchResult = (await _apiClient.FindArchivedItemAsync(SearchText)).Select(_mapper.Map<LineItemViewModel>).ToArray();
             foreach (var item in searchResult)
             {
                 if (_lineItems.Any(x => x.Id == item.Id))

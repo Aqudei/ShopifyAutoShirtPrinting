@@ -2,8 +2,8 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Prism.Commands;
+using Prism.Dialogs;
 using Prism.Mvvm;
-using Prism.Services.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using ZXing;
 using ZXing.Common;
-
+using ZXing.Windows.Compatibility;
 namespace ShopifyEasyShirtPrinting.ViewModels
 {
     internal class PrintQrViewModel : BindableBase, IDialogAware
@@ -175,9 +175,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         public string Title => "MyPrint QR Codes";
 
-#pragma warning disable CS0067 // The event 'PrintQrViewModel.RequestClose' is never used
-        public event Action<IDialogResult> RequestClose;
-#pragma warning restore CS0067 // The event 'PrintQrViewModel.RequestClose' is never used
+        DialogCloseListener IDialogAware.RequestClose { get; }
+
 
         public PrintQrViewModel(IDialogCoordinator dialogCoordinator)
         {

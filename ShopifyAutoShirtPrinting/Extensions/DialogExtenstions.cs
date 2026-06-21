@@ -1,6 +1,6 @@
 ﻿using Common.Models;
 using MahApps.Metro.Controls.Dialogs;
-using Prism.Services.Dialogs;
+using Prism.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

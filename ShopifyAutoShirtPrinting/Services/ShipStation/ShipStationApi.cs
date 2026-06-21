@@ -14,8 +14,8 @@ namespace ShopifyEasyShirtPrinting.Services.ShipStation
     public class ShipStationApi
     {
         private readonly RestClient _client;
-        private const string ShipStationApiKey = Env.GetString("SHIPSTATION_API_KEY");
-        private const string ShipStationApiSecret = Env.GetString("SHIPSTATION_API_SECRET");
+        private readonly string ShipStationApiKey = Env.GetString("SHIPSTATION_API_KEY");
+        private readonly string ShipStationApiSecret = Env.GetString("SHIPSTATION_API_SECRET");
 
         public ShipStationApi()
         {

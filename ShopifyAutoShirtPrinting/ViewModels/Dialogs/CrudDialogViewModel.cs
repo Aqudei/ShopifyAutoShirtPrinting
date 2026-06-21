@@ -2,7 +2,7 @@
 using Common.Api;
 using Common.Models;
 using Prism.Commands;
-using Prism.Services.Dialogs;
+using Prism.Dialogs;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -63,6 +63,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         private Variant _selectedVariant;
         private string _sku;
         private string _shipping;
+        private DialogCloseListener _requestClose;
 
         public Variant SelectedVariant { get => _selectedVariant; set => SetProperty(ref _selectedVariant, value); }
 
@@ -78,6 +79,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         public int Item { get; set; }
         public string Sku { get => _sku; set => SetProperty(ref _sku, value); }
 
+        DialogCloseListener IDialogAware.RequestClose => _requestClose;
+
         private void OnDialogCommand(string command)
         {
             if (command == "Create")
@@ -90,16 +93,13 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
                 _theLineItem.Shipping = String.IsNullOrWhiteSpace(Shipping) ? _theLineItem.Shipping : Shipping;
 
                 var prams = new DialogParameters { { "MyLineItem", _theLineItem } };
-
-                RequestClose.Invoke(new DialogResult(ButtonResult.OK, prams));
+                _requestClose.Invoke(prams, ButtonResult.OK);
             }
             else
             {
-                RequestClose.Invoke(new DialogResult(ButtonResult.Cancel));
+                _requestClose.Invoke(new DialogResult(ButtonResult.Cancel));
             }
         }
-
-        public event Action<IDialogResult> RequestClose;
 
         public bool CanCloseDialog()
         {

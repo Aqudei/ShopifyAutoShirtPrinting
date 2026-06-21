@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using RestSharp;
 using RestSharp.Authenticators;
 using RestSharp.Serializers.NewtonsoftJson;
+using ShopifyEasyShirtPrinting.Services.ShipStation;
 
 namespace ShopifyEasyShirtPrinting.Api.ShipStation
 {

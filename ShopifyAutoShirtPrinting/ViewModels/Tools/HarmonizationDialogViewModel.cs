@@ -1,7 +1,7 @@
 ﻿using Common.Api;
 using Prism.Commands;
+using Prism.Dialogs;
 using Prism.Mvvm;
-using Prism.Services.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,6 +17,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
         private string _description;
         private string _code;
         private DelegateCommand<string> _dialogCommand;
+        private DialogCloseListener _requestClose;
         private readonly ApiClient _api;
 
         public int Id { get => _id; set => SetProperty(ref _id, value); }
@@ -37,7 +38,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
             if (command == "Save")
             {
                 await _api.SaveHSNAsync(hsn);
-                RequestClose?.Invoke(new DialogResult(ButtonResult.OK));
+                _requestClose.Invoke(new DialogResult(ButtonResult.OK));
             }
             else if (command == "SaveAndAdd")
             {
@@ -48,13 +49,12 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
                 Id = 0;
             }
 
-            RequestClose?.Invoke(new DialogResult(ButtonResult.Cancel));
+            _requestClose.Invoke(new DialogResult(ButtonResult.Cancel));
         }
 
         public string Title => "";
 
-        public event Action<IDialogResult> RequestClose;
-
+        DialogCloseListener IDialogAware.RequestClose => _requestClose;
         public bool CanCloseDialog() => true;
         public void OnDialogClosed()
         {
