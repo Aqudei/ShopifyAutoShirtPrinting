@@ -1,14 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <LangVersion>12.0</LangVersion>
+    <LangVersion>latest</LangVersion>
     <OutputType>Library</OutputType>
-  </PropertyGroup>
-  <PropertyGroup>
-    <!-- Multi-target to preserve compatibility with existing .NET Framework projects while enabling net10.0 build for modern consumers -->
-    <TargetFrameworks>net10.0</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <TargetFrameworks>net10.0</TargetFrameworks>
   </PropertyGroup>
-  <ItemGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='net472'">
+    <FrameworkPathOverride Condition="'$(OS)' != 'Windows_NT'">Fallback path for non-windows build agents if required</FrameworkPathOverride>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net472'">
     <Reference Include="System.Configuration" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Web" />
@@ -16,17 +19,17 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Net.Http" />
   </ItemGroup>
+
   <ItemGroup>
     <Folder Include="ViewModels\" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)'=='net10.0'">
-    <!-- Required for non-string resources when building for modern SDK targets -->
     <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
   </PropertyGroup>
+
   <ItemGroup>
-    <!-- Packages required for net472 target -->
-    <PackageReference Include="PdfiumViewer" Version="2.13.0.0" Condition="'$(TargetFramework)'=='net472'" />
+    <PackageReference Include="PdfiumViewer" Version="2.13.0" Condition="'$(TargetFramework)'=='net472'" />
     <PackageReference Include="PdfiumViewer.Native.x86_64.v8-xfa" Version="2018.4.8.256" Condition="'$(TargetFramework)'=='net472'" />
     <PackageReference Include="System.Buffers" Version="4.5.1" Condition="'$(TargetFramework)'=='net472'" />
     <PackageReference Include="System.Memory" Version="4.5.5" Condition="'$(TargetFramework)'=='net472'" />
@@ -34,24 +37,20 @@
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" Condition="'$(TargetFramework)'=='net472'" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" Condition="'$(TargetFramework)'=='net472'" />
 
-    <!-- Packages required for net10.0 target -->
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.9" Condition="'$(TargetFramework)'=='net10.0'" />
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" Condition="'$(TargetFramework)'=='net10.0'" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" Condition="'$(TargetFramework)'=='net10.0'" />
-    <PackageReference Include="System.Text.Encodings.Web" Version="10.0.9" Condition="'$(TargetFramework)'=='net10.0'" />
-    <PackageReference Include="System.Text.Json" Version="10.0.9" Condition="'$(TargetFramework)'=='net10.0'" />
-    <PackageReference Include="System.Resources.Extensions" Version="6.0.0" Condition="'$(TargetFramework)'=='net10.0'" />
+    <PackageReference Include="System.Resources.Extensions" Version="10.0.9" Condition="'$(TargetFramework)'=='net10.0'" />
 
-    <!-- Packages compatible with both targets -->
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="NLog" Version="5.1.3" />
+    <PackageReference Include="NLog" Version="6.1.3" />
     <PackageReference Include="RestSharp" Version="114.0.0" />
-    <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="112.1.0" />
-    <!-- The following packages are provided by the target framework and can be removed if not explicitly required: System.Buffers, System.Memory, System.Numerics.Vectors, System.Threading.Tasks.Extensions, System.ValueTuple -->
-    <!-- Consider removing System.Threading.Tasks.Extensions and System.ValueTuple if functionality is satisfied by the framework reference -->
+    <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="114.0.0" />
   </ItemGroup>
-  <ItemGroup Label="Compile items now included by globbing that were not in the original project file">
+
+  <ItemGroup>
     <Compile Remove="Models\SEOPage.cs" />
     <Compile Remove="Class1.cs" />
+    <None Include="Models\SEOPage.cs" />
+    <None Include="Class1.cs" />
   </ItemGroup>
+
 </Project>
