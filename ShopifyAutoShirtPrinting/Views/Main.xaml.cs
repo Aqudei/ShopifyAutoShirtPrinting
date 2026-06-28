@@ -44,7 +44,7 @@ namespace ShopifyEasyShirtPrinting.Views
 
                 (DataContext as MainViewModel)?.LoadStores();
 
-                var defaultStore = _sessionVariables.Stores.FirstOrDefault(s => s.IsDefault);
+                var defaultStore = _sessionVariables.Stores?.FirstOrDefault(s => s.IsDefault);
                 if (defaultStore != null)
                 {
                     _sessionVariables.ActiveStore = defaultStore;

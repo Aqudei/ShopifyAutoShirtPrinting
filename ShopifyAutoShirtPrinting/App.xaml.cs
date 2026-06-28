@@ -40,13 +40,12 @@ namespace ShopifyEasyShirtPrinting
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-
             try
             {
-
                 containerRegistry.RegisterInstance(_sessionVariables);
                 // containerRegistry.RegisterDialog<PrintQrView, PrintQrViewModel>();
                 containerRegistry.RegisterDialog<CrudDialog, CrudDialogViewModel>();
+                containerRegistry.RegisterDialog<SEODetailDialog, SEODetailViewModel>();
                 containerRegistry.RegisterDialog<EditTextDialog, EditTextDialogViewModel>();
                 containerRegistry.RegisterDialog<HarmonizationDialog, HarmonizationDialogViewModel>();
                 containerRegistry.RegisterDialog<Views.Dialogs.LoginDialog, LoginDialogViewModel>();
@@ -133,6 +132,8 @@ namespace ShopifyEasyShirtPrinting
 
         protected override void OnStartup(StartupEventArgs e)
         {
+
+
             Env.Load();
 
             ExcelPackage.License.SetNonCommercialPersonal("AE Cortez");
@@ -154,9 +155,6 @@ namespace ShopifyEasyShirtPrinting
             Directory.CreateDirectory(_sessionVariables.ImagesPath);
 
 
-            base.OnStartup(e);
-
-
             if (!string.IsNullOrWhiteSpace(Settings.Default.ThemeName))
             {
                 var selectedTheme = ThemeManager.Current.Themes.FirstOrDefault(t => t.Name == Settings.Default.ThemeName);
@@ -165,6 +163,9 @@ namespace ShopifyEasyShirtPrinting
                     ThemeManager.Current.ChangeTheme(this, selectedTheme);
                 }
             }
+
+            base.OnStartup(e);
+
         }
     }
 }

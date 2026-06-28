@@ -42,6 +42,9 @@ namespace ShopifyEasyShirtPrinting.Mapping
             CreateMap<Common.Models.Seo.SEOPage, Models.Seo.SEOPage>();
             CreateMap<Common.Models.Seo.SEOAudit, Models.Seo.SEOPage>();
             CreateMap<Common.Models.Seo.ScoreBreakdown, ViewModels.Dialogs.ScoreBreakdownViewModel>();
+
+
+            CreateMap<Models.Seo.SEOPage, ViewModels.Dialogs.SEODetailViewModel>().ReverseMap();
         }
     }
 }

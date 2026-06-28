@@ -1556,7 +1556,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private void AddRemoveDataGridColumns()
     {
-        if (_globalVariables.ActiveStore.Name.Contains("Louie"))
+        if (_globalVariables.ActiveStore?.Name.Contains("Louie") == true)
         {
             ColumnVisibility = new Dictionary<string, bool> { { "Sku", false } };
         }

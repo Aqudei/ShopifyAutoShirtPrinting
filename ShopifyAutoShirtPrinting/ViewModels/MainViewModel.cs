@@ -185,6 +185,9 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         public void LoadStores()
         {
+            if (_sessionVariables.Stores == null || !_sessionVariables.Stores.Any())
+                return;
+
             foreach (var store in _sessionVariables.Stores?.OrderBy(s => s.IsDefault))
             {
                 Menu.Insert(0, new MenuItem

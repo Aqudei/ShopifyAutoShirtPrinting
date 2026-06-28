@@ -14,6 +14,7 @@
                   FontSize="16"
                   AlternationCount="2"
                   AutoGenerateColumns="False">
+            
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseDoubleClick">
                     <i:InvokeCommandAction Command="{Binding RowDoubleClickCommand}"
@@ -55,8 +56,36 @@
                 <DataGridTextColumn Header="Page Title" Binding="{Binding PageTitle}" />
                 <DataGridTemplateColumn>
                     <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button Command="{Binding ShowScoreCardCommand}">Score Card</Button>
+                        <DataTemplate xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+
+                                <Button Command="{Binding DataContext.ShowScoreCardCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}" 
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource MahApps.Styles.Button.Chromeless}"
+                                        Width="30"
+                                        Height="30"
+                                        Margin="2,0"
+                                        ToolTip="Score Card">
+                                    <iconPacks:PackIconMaterial Kind="Poll" 
+                                        Width="16" 
+                                        Height="16" 
+                                        Foreground="#4CAF50"/>
+                                </Button>
+
+                                <Button Command="{Binding DataContext.ShowDetailCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}" 
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource MahApps.Styles.Button.Chromeless}"
+                                        Width="30"
+                                        Height="30"
+                                        Margin="2,0"
+                                        ToolTip="Show Details">
+                                    <iconPacks:PackIconMaterial Kind="Eye" 
+                                        Width="16" 
+                                        Height="16" 
+                                        Foreground="#2196F3"/>
+                                </Button>
+
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

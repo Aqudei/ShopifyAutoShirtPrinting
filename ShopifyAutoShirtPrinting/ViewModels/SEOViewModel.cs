@@ -81,6 +81,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         }
 
         private DelegateCommand<Models.Seo.SEOPage> _showScoreCardCommand;
+        private DelegateCommand<Models.Seo.SEOPage> _showDetailCommand;
 
         public DelegateCommand<Models.Seo.SEOPage> ShowScoreCardCommand
         {
@@ -96,9 +97,20 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             });
         }
 
+        public DelegateCommand<Models.Seo.SEOPage> ShowDetailCommand => _showDetailCommand ??= new DelegateCommand<Models.Seo.SEOPage>(OnShowDetail);
+
+        private void OnShowDetail(Models.Seo.SEOPage page)
+        {
+            var p = new DialogParameters { { "page", page } };
+            _dialogService.ShowDialog("SEODetailDialog", p, r =>
+            {
+
+            });
+        }
+
         private void OnRowDoubleClick(Models.Seo.SEOPage seoPage)
         {
-            OnShowScoreCard(seoPage);
+            //OnShowScoreCard(seoPage);
         }
     }
 }
