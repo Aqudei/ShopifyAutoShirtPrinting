@@ -2,6 +2,7 @@
 using Common.Api;
 using Common.Models;
 using Common.Models.Seo;
+using MahApps.Metro.Controls.Dialogs;
 using Prism.Commands;
 using Prism.Dialogs;
 using Prism.Navigation.Regions;
@@ -17,7 +18,7 @@ using System.Windows.Data;
 
 namespace ShopifyEasyShirtPrinting.ViewModels
 {
-    internal class SEOViewModel : PageBase, INavigationAware
+    public class SEOViewModel : PageBase, INavigationAware
     {
         private ObservableCollection<Models.Seo.SEOPage> _seoPages = new();
         public ICollectionView SEOPages { get; set; }
@@ -27,41 +28,69 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         private readonly ApiClient _client;
         private readonly IMapper _mapper;
         private readonly IDialogService _dialogService;
+        private readonly IDialogCoordinator _dialogCoordinator;
 
-        public SEOViewModel(ApiClient client, IMapper mapper, IDialogService dialogService)
+        public SEOViewModel(ApiClient client, IMapper mapper, IDialogService dialogService, IDialogCoordinator dialogCoordinator)
         {
 
             SEOPages = CollectionViewSource.GetDefaultView(_seoPages);
             _client = client;
-            this._mapper = mapper;
-            this._dialogService = dialogService;
+            _mapper = mapper;
+            _dialogService = dialogService;
+            _dialogCoordinator = dialogCoordinator;
         }
 
 
-        public async void FetchSEOPages()
+        public async Task FetchSEOPagesTask()
         {
-            var seoPages = await _client.ListSEOPagesAsync();
-            var audits = await _client.ListSEOAuditAsync();
+            var controller = await _dialogCoordinator.ShowProgressAsync(
+                this,
+                "Loading",
+                "Fetching SEO Pages...");
+            
+            controller.SetIndeterminate();
 
-            await _dispatcher.InvokeAsync(() =>
+            try
             {
-                _seoPages.Clear();
-                var mappedPages = seoPages.Select(page => _mapper.Map<Models.Seo.SEOPage>(page)).ToList();
+                var seoPagesTask = _client.ListSEOPagesAsync();
+                var auditsTask = _client.ListSEOAuditAsync();
+
+                await Task.WhenAll(seoPagesTask, auditsTask);
+
+                var seoPages = await seoPagesTask;
+                var audits = await auditsTask;
+
+                var auditsByPageId = audits
+                    .GroupBy(a => a.PageId)
+                    .ToDictionary(g => g.Key, g => g.First());
+
+                var mappedPages = seoPages
+                    .Select(page => _mapper.Map<Models.Seo.SEOPage>(page))
+                    .ToList();
+
                 foreach (var page in mappedPages)
                 {
-                    var pageAudit = audits.FirstOrDefault(audit => audit.PageId == page.PageId);
-
-                    if (pageAudit != null)
+                    if (auditsByPageId.TryGetValue(page.PageId, out var pageAudit))
+                    {
                         _mapper.Map(pageAudit, page);
+                    }
                 }
 
-                _seoPages.AddRange(mappedPages);
-            });
+                await _dispatcher.InvokeAsync(() =>
+                {
+                    _seoPages.Clear();
+                    
+                    _seoPages.AddRange(mappedPages);
+                });
+            }
+            finally
+            {
+                await controller.CloseAsync();
+            }
         }
 
-        public void OnNavigatedTo(NavigationContext navigationContext)
+        public async void OnNavigatedTo(NavigationContext navigationContext)
         {
-            Task.Run(FetchSEOPages);
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)

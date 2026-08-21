@@ -230,7 +230,8 @@
                     </TextBlock>
                 </StackPanel>
 
-                <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding Notes}" TextWrapping="Wrap" Height="65" VerticalScrollBarVisibility="Auto"
+                <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding Notes}" FontSize="13"
+                         TextWrapping="Wrap" Height="65" VerticalScrollBarVisibility="Auto"
                          mah:TextBoxHelper.Watermark="Append operational notes to currently highlighted batch sequence entries..." Padding="6"/>
                 <Button Grid.Row="1" Grid.Column="1" Command="{Binding ApplyNotesCommand}" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Margin="6,0,0,0" Width="120">
                     <StackPanel Orientation="Horizontal">
@@ -280,7 +281,7 @@
 
             <Border Grid.Row="2" BorderBrush="{DynamicResource MahApps.Brushes.GridLines}" BorderThickness="1" CornerRadius="4">
                 <TabControl Style="{StaticResource MahApps.Styles.TabControl}">
-                    <TabItem Header="Order Parameters">
+                    <TabItem Header="Order Details">
                         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="8">
                             <ItemsControl ItemsSource="{Binding ScanInfo}">
                                 <ItemsControl.ItemTemplate>
@@ -297,7 +298,7 @@
                         </ScrollViewer>
                     </TabItem>
 
-                    <TabItem Header="Audit History Log">
+                    <TabItem Header="Order History Log">
                         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="8">
                             <ItemsControl ItemsSource="{Binding Logs}">
                                 <ItemsControl.ItemTemplate>

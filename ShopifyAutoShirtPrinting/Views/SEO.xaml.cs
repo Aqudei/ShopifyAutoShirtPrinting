@@ -23,6 +23,16 @@ namespace ShopifyEasyShirtPrinting.Views
         public SEO()
         {
             InitializeComponent();
+
+            Loaded += SEO_Loaded;
+        }
+
+        private async void SEO_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is ViewModels.SEOViewModel viewModel)
+            {
+                await viewModel.FetchSEOPagesTask();
+            }
         }
     }
 }

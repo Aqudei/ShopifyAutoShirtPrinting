@@ -2,6 +2,7 @@
 
 using AutoMapper;
 using Common.Models.Seo;
+using Prism.Commands;
 using Prism.Dialogs;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Text;
 
 namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 {
-    public class SEODetailViewModel : PageBase, IDialogAware
+    public sealed class SEODetailViewModel : PageBase, IDialogAware
     {
         public DialogCloseListener RequestClose { get; private set; }
 
@@ -178,7 +179,26 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             }
         }
 
+        private DelegateCommand? _saveAndCloseCommand;
 
+        public DelegateCommand SaveAndCloseCommand =>
+            _saveAndCloseCommand ??= new DelegateCommand(() =>
+            {
+                // Save here if needed
+
+                RequestClose.Invoke();
+            });
+
+
+        private DelegateCommand? _cancelCommand;
+
+        public DelegateCommand CancelCommand =>
+            _cancelCommand ??= new DelegateCommand(() =>
+            {
+                // Cancel here if needed
+
+                RequestClose.Invoke();
+            });
         public SEODetailViewModel(IMapper mapper)
         {
             this.mapper = mapper;

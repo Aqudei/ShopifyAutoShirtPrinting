@@ -136,7 +136,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             }
         }
         public string TotalPendingText => $"CREATE MANIFEST FOR ({TotalPending}) PENDING SHIPMENT/S";
-        private async void FetchPendingShipments()
+
+        public async Task FetchPendingShipmentsTask()
         {
             var progress = await _dialogCoordinator.ShowProgressAsync(this, "Loading", "Fetching Pending Shipments...");
             progress.SetIndeterminate();
@@ -196,16 +197,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             }
         }
 
-        public void Loaded()
-        {
-            //ShippedItems.Clear();
-            //Task.Run(FetchShippedItems);
-        }
-
         public async void OnNavigatedTo(NavigationContext navigationContext)
         {
-            await Task.Run(FetchPendingShipments);
-
             _messageBus.ShipmentsUpdated += _messageBus_ShipmentsUpdated;
             _messageBus.ShipmentsVoided += _messageBus_ShipmentsVoided;
         }
@@ -253,7 +246,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         private async void DoRefresh()
         {
-            await Task.Run(FetchPendingShipments);
+            await Task.Run(FetchPendingShipmentsTask);
         }
 
         private async void OnManifestShipments()
@@ -286,7 +279,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                             break;
                         }
                         else
-                        { 
+                        {
                             delta = DateTime.Now - timeStart;
                             shipmentOrder = await _apiClient.GetShipmentOrderByIdAsync(shipmentOrder.Id);
                         }

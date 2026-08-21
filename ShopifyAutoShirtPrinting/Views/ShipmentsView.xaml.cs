@@ -16,10 +16,10 @@ namespace ShopifyEasyShirtPrinting.Views
             Loaded += ArchivesView_Loaded;
         }
 
-        private void ArchivesView_Loaded(object sender, RoutedEventArgs e)
+        private async void ArchivesView_Loaded(object sender, RoutedEventArgs e)
         {
             if (DataContext is ShipmentsViewModel vm)
-                vm.Loaded();
+                await vm.FetchPendingShipmentsTask();
         }
 
         private void ArchivesDataGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
