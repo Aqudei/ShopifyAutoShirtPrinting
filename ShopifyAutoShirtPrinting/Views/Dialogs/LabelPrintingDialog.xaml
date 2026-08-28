@@ -182,6 +182,36 @@
                         </StackPanel>
 
                         <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                            <Label Content="Package Dimensions"/>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" Margin="2">
+                                    <Label Content="Length (cm)"/>
+                                    <TextBox Text="{Binding PackageLength}"
+                                             HorizontalContentAlignment="Right"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1" Margin="2">
+                                    <Label Content="Width (cm)"/>
+                                    <TextBox Text="{Binding PackageWidth}"
+                                             HorizontalContentAlignment="Right"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2" Margin="2">
+                                    <Label Content="Height (cm)"/>
+                                    <TextBox Text="{Binding PackageHeight}"
+                                             HorizontalContentAlignment="Right"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical" Margin="0,5,0,5">
                             <Label Content="Total Weight (g)"/>
                             <TextBox Text="{Binding TotalWeight}"/>
                         </StackPanel>

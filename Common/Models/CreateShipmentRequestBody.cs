@@ -131,6 +131,17 @@ namespace Common.Models
 
         [JsonPropertyName("Shipping")]
         public string Shipping { get; set; }
+
+
+        [JsonPropertyName("PackageWidth")]
+        public decimal PackageWidth { get; set; }
+
+
+        [JsonPropertyName("PackageHeight")]
+        public decimal PackageHeight { get; set; }
+
+        [JsonPropertyName("PackageLength")]
+        public decimal PackageLength { get; set; }
     }
 
 }
