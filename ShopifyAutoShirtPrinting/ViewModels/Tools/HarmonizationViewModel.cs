@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Common.Api;
 using Common.Models.Harmonisation;
+using MahApps.Metro.Controls.Dialogs;
 using NLog;
 using OfficeOpenXml;
 using Prism.Commands;
@@ -54,6 +55,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
         private readonly ApiClient _api;
         private readonly IMapper _mapper;
         private readonly IDialogService _dialogService;
+        private readonly IDialogCoordinator _dialogCoordinator;
         private DelegateCommand _newItemCommand;
 
         public DelegateCommand NewItemCommand
@@ -143,12 +145,22 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
 
         private async Task FetchItems()
         {
-            var harmonizationItems = await _api.ListHarmonizationsAsync();
-            await _dispatcher.InvokeAsync(() =>
+            var controller = await _dialogCoordinator.ShowProgressAsync(this, "Please wait", "Fetching HSN Codes...");
+            controller.SetIndeterminate();
+
+            try
             {
-                HarmonizationItems.Clear();
-                HarmonizationItems.AddRange(harmonizationItems.Select(h => _mapper.Map<Models.Harmonisation.HSN>(h)));
-            });
+                var harmonizationItems = await _api.ListHarmonizationsAsync();
+                await _dispatcher.InvokeAsync(() =>
+                {
+                    HarmonizationItems.Clear();
+                    HarmonizationItems.AddRange(harmonizationItems.Select(h => _mapper.Map<Models.Harmonisation.HSN>(h)));
+                });
+            }
+            finally
+            {
+                await controller.CloseAsync();
+            }
         }
 
         static IEnumerable<Models.Harmonisation.HSN> ImportExcel(string filePath)
@@ -216,11 +228,12 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
         {
         }
 
-        public HarmonizationViewModel(ApiClient api, IMapper mapper, IDialogService dialogService)
+        public HarmonizationViewModel(ApiClient api, IMapper mapper, IDialogService dialogService, IDialogCoordinator dialogCoordinator)
         {
             _api = api;
             _mapper = mapper;
             _dialogService = dialogService;
+            _dialogCoordinator = dialogCoordinator;
         }
     }
 }

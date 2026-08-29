@@ -335,6 +335,16 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
                     _requestClose.Invoke(new DialogResult(ButtonResult.OK));
                 }
             }
+            catch (Exception ex)
+            {
+                var message = new DisplayMessage
+                {
+                    Message = $"Login Failed. {ex.Message}",
+                    MessageType = DisplayMessage.MESSAGE_TYPE.Error
+                };
+
+                await _dispatcher.InvokeAsync(() => Message = message);
+            }
             finally
             {
                 IsBusy = false;

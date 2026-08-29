@@ -7,7 +7,6 @@
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:Converters="clr-namespace:ShopifyEasyShirtPrinting.Converters" x:Class="ShopifyEasyShirtPrinting.Views.MetroDialogWindow"
         mc:Ignorable="d"
-
         Title="{Binding Title}"
         SizeToContent="WidthAndHeight"
         MinWidth="400"

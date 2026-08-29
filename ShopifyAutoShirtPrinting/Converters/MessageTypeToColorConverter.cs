@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 
@@ -12,28 +13,20 @@ namespace ShopifyEasyShirtPrinting.Converters
 {
     public class MessageTypeToColorConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is not DisplayMessage.MESSAGE_TYPE messageType)
-                return Brushes.Transparent;
-
-            switch (messageType)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) { 
+            if (value is not DisplayMessage.MESSAGE_TYPE messageType) 
+                return Brushes.Transparent; 
+            var resourceKey = messageType switch 
             {
-                case DisplayMessage.MESSAGE_TYPE.Info:
-                    return Brushes.Blue;
-
-                case DisplayMessage.MESSAGE_TYPE.Warning:
-                    return Brushes. DarkOrange;
-
-                case DisplayMessage.MESSAGE_TYPE.Error:
-                    return Brushes.IndianRed;
-
-                case DisplayMessage.MESSAGE_TYPE.Success:
-                    return Brushes.Green;
-
-                default:
-                    return Brushes.Transparent;
-            }
+                DisplayMessage.MESSAGE_TYPE.Info => "Message.InfoBrush", 
+                DisplayMessage.MESSAGE_TYPE.Warning => "Message.WarningBrush", 
+                DisplayMessage.MESSAGE_TYPE.Error => "Message.ErrorBrush", 
+                DisplayMessage.MESSAGE_TYPE.Success => "Message.SuccessBrushs", 
+                _ => null 
+            }; 
+            if (resourceKey is null) 
+                return Brushes.Transparent; 
+            return Application.Current.TryFindResource(resourceKey) as Brush ?? Brushes.Transparent; 
         }
 
 
