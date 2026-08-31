@@ -4,151 +4,239 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using ShopifyEasyShirtPrinting.Models;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Printing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace ShopifyEasyShirtPrinting.Messaging
 {
-    public class MessageBus : IMessageBus
+    public static class MessageTopics
     {
-        private IConnection _connection;
-        private IChannel _channel;
-        private bool disposedValue;
+        public const string ShipmentsUpdated = "shipments.updated";
+        public const string ShipmentsVoided = "shipments.voided";
+        public const string ItemsUpdated = "items.updated";
+        public const string ItemsAdded = "items.added";
+        public const string ItemsArchived = "items.archived";
+        public const string BinsUpdated = "bins.updated";
+        public const string BinsDestroyed = "bins.destroyed";
+        public const string DatabaseReset = "database.reset";
+    }
+    public sealed class MessageBus : IMessageBus
+    {
         private readonly SessionVariables _sessionVariables;
 
-        public event EventHandler<int[]> BinsDestroyed;
-        public event EventHandler<int[]> BinsUpdated;
-        public event EventHandler<int[]> ItemsUpdated;
-        public event EventHandler<int[]> ItemsAdded;
-        public event EventHandler<int[]> ItemsArchived;
-        public event EventHandler<int[]> ShipmentsUpdated;
-        public event EventHandler<int[]> ShipmentsVoided;
+        private IConnection? _connection;
+        private IChannel? _channel;
+        private string? _queueName;
 
-        public event EventHandler DatabaseReset;
+        private bool _disposed;
+
+        private readonly ConcurrentDictionary<
+            string,
+            ConcurrentDictionary<Guid, IMessageSubscription>>
+            _subscriptions = new();
+
+        public bool IsConnected =>
+            _connection is { IsOpen: true } &&
+            _channel is { IsOpen: true };
 
         public MessageBus(SessionVariables sessionVariables)
         {
             _sessionVariables = sessionVariables;
         }
 
-        public async Task StartConnectionAsync()
+        public async Task ConnectAsync(
+            CancellationToken cancellationToken = default)
         {
-            var exchange_name = _sessionVariables.BroadcastExchange;
+            if (IsConnected)
+                return;
 
             var factory = new ConnectionFactory
             {
-                //HostName = Properties.Settings.Default.ServerHost,                
                 HostName = _sessionVariables.BroadcastHost,
                 UserName = _sessionVariables.BroadcastUsername,
-                Password = _sessionVariables.BroadcastPassword,
-                // DispatchConsumersAsync = true
+                Password = _sessionVariables.BroadcastPassword
             };
 
-            _connection = await factory.CreateConnectionAsync();
-            _channel = await _connection.CreateChannelAsync();
+            _connection = await factory.CreateConnectionAsync(
+                cancellationToken);
 
-            await _channel.ExchangeDeclareAsync(exchange_name, ExchangeType.Fanout);
+            _channel = await _connection.CreateChannelAsync(
+                cancellationToken: cancellationToken);
 
-            var queueName = (await _channel.QueueDeclareAsync()).QueueName;
-            await _channel.QueueBindAsync(queue: queueName,
-                              exchange: exchange_name,
-                              routingKey: string.Empty);
+            var exchangeName = _sessionVariables.BroadcastExchange;
+
+            await _channel.ExchangeDeclareAsync(
+                exchange: exchangeName,
+                type: ExchangeType.Fanout,
+                durable: false,
+                autoDelete:false,
+                cancellationToken: cancellationToken);
+
+            // Every desktop client gets its own temporary queue.
+            var queue = await _channel.QueueDeclareAsync(
+                queue: string.Empty,
+                durable: false,
+                exclusive: true,
+                autoDelete: true,
+                cancellationToken: cancellationToken);
+
+            _queueName = queue.QueueName;
+
+            await _channel.QueueBindAsync(
+                queue: _queueName,
+                exchange: exchangeName,
+                routingKey: string.Empty,
+                cancellationToken: cancellationToken);
 
             var consumer = new AsyncEventingBasicConsumer(_channel);
-            consumer.ReceivedAsync += async (channel, eventArg) =>
-            {
-                var body = eventArg.Body.ToArray();
-                var message = Encoding.UTF8.GetString(body);
-                Debug.WriteLine($" [x] Received {eventArg.RoutingKey}: {message}");
 
-                try
-                {
-                    ProcessMessage(eventArg.RoutingKey, message);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Error processing message: {ex.Message}");
-                }
+            consumer.ReceivedAsync += OnMessageReceivedAsync;
 
-                await Task.CompletedTask;
-            };
+            await _channel.BasicConsumeAsync(
+                queue: _queueName,
+                autoAck: true,
+                consumer: consumer,
+                cancellationToken: cancellationToken);
 
-            await _channel.BasicConsumeAsync(queue: queueName,
-                                 autoAck: true,
-                                 consumer: consumer);
+            Debug.WriteLine(
+                $"RabbitMQ connected. Queue: {_queueName}");
         }
 
-        private void ProcessMessage(string routingKey, string message)
+        private Task OnMessageReceivedAsync(object sender,BasicDeliverEventArgs args)
         {
-            switch (routingKey)
+            var topic = args.RoutingKey;
+
+            var json = Encoding.UTF8.GetString(
+                args.Body.ToArray());
+
+            if (_subscriptions.TryGetValue(
+                    topic,
+                    out var subscriptions))
             {
-                case "items.updated":
-                    ItemsUpdated?.Invoke(this, JsonConvert.DeserializeObject<int[]>(message));
-                    break;
-                case "items.added":
-                    ItemsAdded?.Invoke(this, JsonConvert.DeserializeObject<int[]>(message));
-                    break;
-                case "bins.destroyed":
-                    BinsDestroyed?.Invoke(this, JsonConvert.DeserializeObject<int[]>(message));
-                    break;
-                case "bins.updated":
-                    BinsUpdated?.Invoke(this, JsonConvert.DeserializeObject<int[]>(message));
-                    break;
-                case "items.archived":
-                    ItemsArchived?.Invoke(this, JsonConvert.DeserializeObject<int[]>(message));
-                    break;
-                case "database.reset":
-                    DatabaseReset?.Invoke(this, EventArgs.Empty);
-                    break;
-                case "shipments.updated":
-                    ShipmentsUpdated?.Invoke(this, JsonConvert.DeserializeObject<int[]>(message));
-                    break;
-                case "shipments.voided":
-                    ShipmentsVoided?.Invoke(this, JsonConvert.DeserializeObject<int[]>(message));
-                    break;
-                default:
-                    Debug.WriteLine($"Unhandled routing key: {routingKey}");
-                    break;
+                foreach (var subscription in subscriptions.Values)
+                {
+                    try
+                    {
+                        subscription.Invoke(json);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(
+                            $"Error processing '{topic}': {ex}");
+                    }
+                }
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public async Task PublishAsync<T>(
+            string topic,
+            T message,
+            CancellationToken cancellationToken = default)
+        {
+            if (!IsConnected)
+                throw new InvalidOperationException(
+                    "Message bus is not connected.");
+
+            var exchangeName =
+                _sessionVariables.BroadcastExchange;
+
+            var json = JsonConvert.SerializeObject(message);
+
+            var body = Encoding.UTF8.GetBytes(json);
+
+            await _channel!.BasicPublishAsync(
+                exchange: exchangeName,
+                routingKey: topic,
+                body: body,
+                cancellationToken: cancellationToken);
+        }
+
+        public IDisposable Subscribe<T>(string topic, Action<T> handler)
+        {
+            var subscriptions = _subscriptions.GetOrAdd(
+                topic,
+                _ => new ConcurrentDictionary<Guid, IMessageSubscription>());
+
+            var id = Guid.NewGuid();
+
+            subscriptions[id] =
+                new MessageSubscription<T>(handler);
+
+            return new Subscription(() =>
+            {
+                if (_subscriptions.TryGetValue(
+                        topic,
+                        out var topicSubscriptions))
+                {
+                    topicSubscriptions.TryRemove(id, out _);
+
+                    if (topicSubscriptions.IsEmpty)
+                    {
+                        _subscriptions.TryRemove(
+                            topic,
+                            out _);
+                    }
+                }
+            });
+        }
+
+        private static Type GetMessageType(Delegate handler)
+        {
+            return handler.Method
+                .GetParameters()[0]
+                .ParameterType;
+        }
+
+        private sealed class Subscription : IDisposable
+        {
+            private readonly Action _unsubscribe;
+            private int _disposed;
+
+            public Subscription(Action unsubscribe)
+            {
+                _unsubscribe = unsubscribe;
+            }
+
+            public void Dispose()
+            {
+                if (Interlocked.Exchange(
+                        ref _disposed,
+                        1) == 0)
+                {
+                    _unsubscribe();
+                }
             }
         }
-
-
-        protected virtual async void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    // TODO: dispose managed state (managed objects)
-                    await _channel.CloseAsync();
-                    _channel.Dispose();
-                    await _connection.CloseAsync();
-                    _connection.Dispose();
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-                // TODO: set large fields to null
-                disposedValue = true;
-            }
-        }
-
-        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        // ~MessageBus()
-        // {
-        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        //     Dispose(disposing: false);
-        // }
 
         public void Dispose()
         {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
+            if (_disposed)
+                return;
+
+            _disposed = true;
+
+            try
+            {
+                _channel?.Dispose();
+                _connection?.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(
+                    $"Error disposing MessageBus: {ex}");
+            }
+
+            _channel = null;
+            _connection = null;
         }
     }
 }

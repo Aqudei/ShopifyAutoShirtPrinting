@@ -393,6 +393,11 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         set => SetProperty(ref _currentImage, value);
     }
 
+    private IDisposable? _itemsUpdatedSubscription;
+    private IDisposable? _itemsAddedSubscription;
+    private IDisposable? _itemsArchivedSubscription;
+
+
     public OrderProcessingViewModel(IDialogService dialogService,
         SessionVariables globalVariables, IDialogCoordinator dialogCoordinator,
         IEventAggregator eventAggregator, IMapper mapper, MyPrintService myPrintService,
@@ -417,9 +422,14 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         // _dispatcher.Invoke(() => ShippingLines.AddRange(_lineItems.Select(l => l.Shipping).Distinct().ToList()));
         PropertyChanged += OrderProcessingViewModel_PropertyChanged;
 
-        _messageBus.ItemsUpdated += _messageBus_ItemsUpdated;
-        _messageBus.ItemsAdded += _messageBus_ItemsAdded;
-        _messageBus.ItemsArchived += _messageBus_ItemsArchived;
+        
+        _itemsUpdatedSubscription = _messageBus.Subscribe<int[]>(
+                    MessageTopics.ItemsUpdated, _messageBus_ItemsUpdated);
+        _itemsAddedSubscription = _messageBus.Subscribe<int[]>(
+                  MessageTopics.ItemsAdded, _messageBus_ItemsAdded);
+        _itemsArchivedSubscription = _messageBus.Subscribe<int[]>(
+            MessageTopics.ItemsAdded, _messageBus_ItemsArchived);
+
 
         //LineItemsView.CollectionChanged += LineItemsView_CollectionChanged;
     }
@@ -463,7 +473,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
             MasterCheckBoxState = null;
         }
     }
-    private void _messageBus_ItemsArchived(object sender, int[] archivedItemsId)
+    private void _messageBus_ItemsArchived(int[] archivedItemsId)
     {
         _ = HandleOnItemsArchivedTaskAsync(archivedItemsId);
     }
@@ -495,7 +505,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         }
     }
 
-    private void _messageBus_ItemsAdded(object sender, int[] ids)
+    private void _messageBus_ItemsAdded(int[] ids)
     {
         _ = HandleItemsAddedTaskAsync(ids);
     }
@@ -555,7 +565,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         });
     }
 
-    private void _messageBus_ItemsUpdated(object sender, int[] ids)
+    private void _messageBus_ItemsUpdated(int[] ids)
     {
         _ = HandleItemsUpdatedTaskAsync(ids);
     }

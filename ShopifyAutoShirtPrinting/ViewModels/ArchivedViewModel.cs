@@ -235,7 +235,9 @@ public class ArchivedViewModel : PageBase, INavigationAware
         get => _currentImage;
         set => SetProperty(ref _currentImage, value);
     }
-
+    private IDisposable? _itemsUpdatedSubscription;
+    private IDisposable? _itemsAddedSubscription;
+    private IDisposable? _itemsArchivedSubscription;
     public ArchivedViewModel(IDialogService dialogService,
         SessionVariables globalVariables, IDialogCoordinator dialogCoordinator,
         IEventAggregator eventAggregator, IMapper mapper, MyPrintService myPrintService,
@@ -259,15 +261,19 @@ public class ArchivedViewModel : PageBase, INavigationAware
         // _dispatcher.Invoke(() => ShippingLines.AddRange(_lineItems.Select(l => l.Shipping).Distinct().ToList()));
         PropertyChanged += OrderProcessingViewModel_PropertyChanged;
 
-        _messageBus.ItemsUpdated += _messageBus_ItemsUpdated;
-        _messageBus.ItemsAdded += _messageBus_ItemsAdded;
-        _messageBus.ItemsArchived += _messageBus_ItemsArchived;
+        _itemsUpdatedSubscription = _messageBus.Subscribe<int[]>(
+                    MessageTopics.ItemsUpdated, _messageBus_ItemsUpdated);
+        _itemsAddedSubscription = _messageBus.Subscribe<int[]>(
+                  MessageTopics.ItemsAdded, _messageBus_ItemsAdded);
+        _itemsArchivedSubscription = _messageBus.Subscribe<int[]>(
+            MessageTopics.ItemsAdded, _messageBus_ItemsArchived);
+
 
         LineItemsView.CollectionChanged += LineItemsView_CollectionChanged;
 
     }
 
-    private async void _messageBus_ItemsArchived(object sender, int[] archivedItemsId)
+    private async void _messageBus_ItemsArchived(int[] archivedItemsId)
     {
         var array = _lineItems.Where(x => archivedItemsId.Contains(x.Id)).ToArray();
         for (int i = array.Length - 1; i >= 0; i--)
@@ -307,7 +313,7 @@ public class ArchivedViewModel : PageBase, INavigationAware
         }
     }
 
-    private async void _messageBus_ItemsAdded(object sender, int[] ids)
+    private async void _messageBus_ItemsAdded(int[] ids)
     {
         Debug.WriteLine($"@_messageBus_ItemsAdded() -> {ids}");
         var items = await _apiClient.ListLineItemsByIdAsync(ids);
@@ -325,7 +331,7 @@ public class ArchivedViewModel : PageBase, INavigationAware
         }
     }
 
-    private async void _messageBus_ItemsUpdated(object sender, int[] ids)
+    private async void _messageBus_ItemsUpdated(int[] ids)
     {
         Debug.WriteLine($"@_messageBus_ItemsUpdated() -> {ids}");
 

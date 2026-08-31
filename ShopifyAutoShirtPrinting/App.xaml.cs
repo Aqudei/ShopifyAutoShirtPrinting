@@ -79,7 +79,10 @@ namespace ShopifyEasyShirtPrinting
                 containerRegistry.RegisterForNavigation<Harmonization>();
                 containerRegistry.RegisterForNavigation<SEO>();
 
-                containerRegistry.RegisterSingleton<IMessageBus>(() => new DummyMessageBus());
+                containerRegistry.RegisterSingleton<MessageBus>();
+
+                containerRegistry.RegisterSingleton<IMessageBus>(
+                    r => r.Resolve<MessageBus>());
 
                 var mapperConfig = new MapperConfiguration(cfg =>
                 {

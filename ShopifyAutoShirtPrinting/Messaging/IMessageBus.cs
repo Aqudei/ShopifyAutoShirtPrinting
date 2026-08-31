@@ -1,14 +1,22 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ShopifyEasyShirtPrinting.Messaging
 {
     public interface IMessageBus : IDisposable
     {
-        event EventHandler<int[]> BinsDestroyed;
-        event EventHandler<int[]> BinsUpdated;
-        event EventHandler DatabaseReset;
-        event EventHandler<int[]> ItemsAdded;
-        event EventHandler<int[]> ItemsArchived;
-        event EventHandler<int[]> ItemsUpdated;
+        bool IsConnected { get; }
+
+        Task ConnectAsync(CancellationToken cancellationToken = default);
+
+        Task PublishAsync<T>(
+            string topic,
+            T message,
+            CancellationToken cancellationToken = default);
+
+        IDisposable Subscribe<T>(
+            string topic,
+            Action<T> handler);
     }
 }

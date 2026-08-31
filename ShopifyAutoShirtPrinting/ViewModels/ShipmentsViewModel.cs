@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿#nullable enable
+
+using AutoMapper;
 using Common.Api;
 using Common.Models;
 using MahApps.Metro.Controls.Dialogs;
@@ -76,7 +78,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             _dispatcher = Application.Current.Dispatcher;
         }
 
-        private void _messageBus_ShipmentsUpdated(object sender, int[] shipmentIds)
+        private void _messageBus_ShipmentsUpdated(int[] shipmentIds)
         {
             Debug.WriteLine("@_messageBus_ShipmentsUpdated");
 
@@ -208,14 +210,22 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 await progress.CloseAsync();
             }
         }
+        private IDisposable? _shipmentsUpdatedSubscription;
+        private IDisposable? _shipmentsVoidedSubscription;
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
-            _messageBus.ShipmentsUpdated += _messageBus_ShipmentsUpdated;
-            _messageBus.ShipmentsVoided += _messageBus_ShipmentsVoided;
+            _shipmentsUpdatedSubscription =
+                _messageBus.Subscribe<int[]>(
+                    MessageTopics.ShipmentsUpdated, _messageBus_ShipmentsUpdated);
+
+            _shipmentsVoidedSubscription =
+                _messageBus.Subscribe<int[]>(
+                    MessageTopics.ShipmentsVoided,
+                    _messageBus_ShipmentsVoided);
         }
 
-        private void _messageBus_ShipmentsVoided(object sender, int[] shipmentsIds)
+        private void _messageBus_ShipmentsVoided(int[] shipmentsIds)
         {
             Debug.WriteLine("@_messageBus_ShipmentsUpdated");
 
@@ -239,8 +249,11 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         public void OnNavigatedFrom(NavigationContext navigationContext)
         {
-            _messageBus.ShipmentsUpdated -= _messageBus_ShipmentsUpdated;
-            _messageBus.ShipmentsVoided -= _messageBus_ShipmentsVoided;
+            _shipmentsUpdatedSubscription?.Dispose();
+            _shipmentsUpdatedSubscription = null;
+
+            _shipmentsVoidedSubscription?.Dispose();
+            _shipmentsVoidedSubscription = null;
 
         }
 

@@ -400,7 +400,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
                         "Setting up Communication Bus...");
                 });
 
-                SetupMessageBus();
+                await SetupMessageBus();
 
                 _requestClose.Invoke(
                     new DialogResult(ButtonResult.OK));
@@ -423,11 +423,24 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             }
         }
 
-        private void SetupMessageBus()
+        private async Task SetupMessageBus()
         {
-            _container.RegisterSingleton<IMessageBus, MessageBus>();
-            _ = _container.Resolve<MessageBus>().StartConnectionAsync();
-            Debug.WriteLine("Bus Registered!");
+            try
+            {
+                var messageBus = _container.Resolve<MessageBus>();
+
+                await messageBus.ConnectAsync();
+
+                Debug.WriteLine(
+                    $"Message bus connected: {messageBus.IsConnected}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Message bus setup failed: {ex}");
+
+                // Intentionally ignore.
+                // Login/application startup can continue without RabbitMQ.
+            }
         }
     }
 }

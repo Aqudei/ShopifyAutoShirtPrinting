@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿#nullable enable
+
+using AutoMapper;
 using Common.Api;
 using Common.Models;
 using MahApps.Metro.Controls.Dialogs;
@@ -126,6 +128,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             binModel.Notes = "";
             await _apiClient.UpdateBinAsync(binModel);
         }
+        private IDisposable? _binsUpdatedSubscription;
+        private IDisposable? _binsDestroyedSubscription;
 
         public BinsViewModel(IDialogCoordinator dialogCoordinator, BinService binService, IDialogService dialogService,
             IMessageBus messageBus, ApiClient apiClient, IMapper mapper)
@@ -140,8 +144,11 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             Bins = CollectionViewSource.GetDefaultView(_bins);
             Bins.GroupDescriptions.Add(new PropertyGroupDescription("StoreName"));
 
-            _messageBus.BinsDestroyed += _messageBus_BinsDestroyed;
-            _messageBus.BinsUpdated += _messageBus_BinsUpdated;
+            _binsUpdatedSubscription = _messageBus.Subscribe<int[]>(
+                MessageTopics.BinsUpdated, _messageBus_BinsUpdated);
+
+            _binsDestroyedSubscription = _messageBus.Subscribe<int[]>(
+                MessageTopics.BinsDestroyed, _messageBus_BinsDestroyed);
 
             PropertyChanged += (s, e) =>
             {
@@ -171,7 +178,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             };
         }
 
-        private async void _messageBus_BinsUpdated(object sender, int[] binNumbers)
+        private async void _messageBus_BinsUpdated(int[] binNumbers)
         {
             try
             {
@@ -195,7 +202,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             }
         }
 
-        private void _messageBus_BinsDestroyed(object sender, int[] binNumbers)
+        private void _messageBus_BinsDestroyed(int[] binNumbers)
         {
             try
             {
