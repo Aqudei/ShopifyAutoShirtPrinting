@@ -216,7 +216,7 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
         set => SetProperty(ref _shipping, value);
     }
 
-    private decimal _packageLength;
+    private decimal _packageLength = 10.0M;
 
     public decimal PackageLength
     {
@@ -224,7 +224,7 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
         set { SetProperty(ref _packageLength, value); }
     }
 
-    private decimal _packageWidth;
+    private decimal _packageWidth = 10.0M;
 
     public decimal PackageWidth
     {
@@ -233,7 +233,7 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
     }
 
 
-    private decimal _packageHeight;
+    private decimal _packageHeight = 10.0M;
 
     public decimal PackageHeight
     {
