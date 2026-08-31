@@ -78,7 +78,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         private void _messageBus_ShipmentsUpdated(object sender, int[] shipmentIds)
         {
-            Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 var shipments = await _apiClient.GetShipmentsByIdsAsync(shipmentIds);
                 foreach (var shipment in shipments)
