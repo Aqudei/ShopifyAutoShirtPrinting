@@ -139,27 +139,39 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         public async Task FetchPendingShipmentsTask()
         {
-            var progress = await _dialogCoordinator.ShowProgressAsync(this, "Loading", "Fetching Pending Shipments...");
+            var progress = await _dialogCoordinator.ShowProgressAsync(
+                this,
+                "Loading",
+                "Fetching Pending Shipments...");
+
             progress.SetIndeterminate();
+
             try
             {
-                var searchParams = new Dictionary<string, string> {
-                    { "HasLabel", "true" },
-                    { "Manifested", "false" },
+                var searchParams = new Dictionary<string, string>
+                {
+                    ["HasLabel"] = "true",
+                    ["Manifested"] = "false"
                 };
 
-                var shipments = await _apiClient.FetchShipmentsByAsync(getParameters: searchParams);
+                var shipments = await _apiClient.FetchShipmentsByAsync(
+                    getParameters: searchParams);
 
-                _dispatcher.Invoke(() =>
+                var mappedShipments = shipments
+                    .Select(x => _mapper.Map<Models.Shipment>(x))
+                    .ToList();
+
+                await _dispatcher.InvokeAsync(() =>
                 {
-                    TotalPending = shipments.Count();
+                    ShippedItems.Clear();
+
+                    foreach (var shipment in mappedShipments)
+                    {
+                        ShippedItems.Add(shipment);
+                    }
+
+                    TotalPending = mappedShipments.Count;
                 });
-
-                _dispatcher.Invoke(ShippedItems.Clear);
-                foreach (var shipment in shipments)
-                {
-                    _dispatcher.Invoke(() => ShippedItems.Add(_mapper.Map<Models.Shipment>(shipment)));
-                }
             }
             catch (Exception ex)
             {
@@ -362,7 +374,11 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 var labelPath = Path.Combine(_sessionVariables.PdfsPath, nameOnly);
                 if (File.Exists(labelPath))
                 {
-                    Process.Start(labelPath);
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = labelPath,
+                        UseShellExecute = true
+                    });
                 }
                 else
                 {
@@ -392,7 +408,11 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             await client.DownloadFileTaskAsync(shipment.Label, labelPath);
             if (File.Exists(labelPath))
             {
-                Process.Start(labelPath);
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = labelPath,
+                    UseShellExecute = true
+                });
             }
         }
 
@@ -424,7 +444,11 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 var manifestPdfPath = Path.Combine(_sessionVariables.PdfsPath, shipment?.ShipmentOrder?.ManifestFileName);
                 if (File.Exists(manifestPdfPath))
                 {
-                    Process.Start(manifestPdfPath);
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = manifestPdfPath,
+                        UseShellExecute = true
+                    });
                 }
                 else
                 {
@@ -434,7 +458,11 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                     await client.DownloadFileTaskAsync(new Uri(orderSummary), manifestPdfPath);
                     if (File.Exists(manifestPdfPath))
                     {
-                        Process.Start(manifestPdfPath);
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = manifestPdfPath,
+                            UseShellExecute = true
+                        });
                     }
                 }
             }
