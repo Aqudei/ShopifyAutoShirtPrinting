@@ -249,7 +249,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
         private async void OnLogin()
         {
-            await LoginTask();
+            _ = LoginTask();
         }
 
         private async Task LoginTask()
