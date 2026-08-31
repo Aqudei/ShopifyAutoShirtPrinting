@@ -254,100 +254,171 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
         private async Task LoginTask()
         {
+            await _dispatcher.InvokeAsync(() =>
+            {
+                IsBusy = true;
+                Message = null;
+            });
+
             try
             {
-                await _dispatcher.InvokeAsync(() => IsBusy = true);
-                await _dispatcher.InvokeAsync(() => Message = null);
-                await _dispatcher.InvokeAsync(() => Message = null);
-
-
-                if (!Servers.Any(s => s.Url == SelectedServer))
-                {
-                    var newServerUrl = SelectedServer;
-
-                    using (var db = new LiteDatabase(_dbPath))
-                    {
-                        var newServer = new Server
-                        {
-                            Url = newServerUrl
-                        };
-                        db.GetCollection<Server>().Insert(newServer);
-
-                        await _dispatcher.InvokeAsync(() => Servers.Add(newServer));
-                    }
-                }
-
+                var serverUrl = SelectedServer;
+                var username = UserName;
                 var password = ConvertToUnsecureString(Password);
-                if (string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(UserName))
-                {
-                    var message = new DisplayMessage
-                    {
-                        Message = "Login Failed. Please provide username and password.",
-                        MessageType = DisplayMessage.MESSAGE_TYPE.Error
-                    };
 
-                    await _dispatcher.InvokeAsync(() => Message = message);
+                // Validate first
+                if (string.IsNullOrWhiteSpace(serverUrl) ||
+                    string.IsNullOrWhiteSpace(username) ||
+                    string.IsNullOrWhiteSpace(password))
+                {
+                    await _dispatcher.InvokeAsync(() =>
+                    {
+                        Message = new DisplayMessage(
+                            "Login Failed. Please provide server, username and password.",
+                            DisplayMessage.MESSAGE_TYPE.Error);
+                    });
+
                     return;
                 }
 
-                await _dispatcher.InvokeAsync(() => Message = new DisplayMessage("Logging you in..."));
-                using (var db = new LiteDatabase(_dbPath))
+                // Add server if it doesn't already exist
+                var serverExists = await _dispatcher.InvokeAsync(
+                    () => Servers.Any(s => s.Url == serverUrl));
+
+                if (!serverExists)
                 {
-                    var client = new RestClient(SelectedServer);
-
-                    var request = new RestRequest("/api/token/")
-                    .AddParameter("username", UserName)
-                        .AddParameter("password", password);
-                    var authResponse = await client.ExecutePostAsync<LoginResultBody>(request);
-                    if (!authResponse.IsSuccessStatusCode)
+                    var newServer = new Server
                     {
-                        await _dispatcher.InvokeAsync(() => Message = new DisplayMessage($"Login Failed. {authResponse.ErrorMessage ?? authResponse.Content}", DisplayMessage.MESSAGE_TYPE.Error));
-                        return;
+                        Url = serverUrl
+                    };
+
+                    // LiteDB is synchronous, so don't keep it open across awaits
+                    using (var db = new LiteDatabase(_dbPath))
+                    {
+                        db.GetCollection<Server>().Insert(newServer);
                     }
 
-                    await _dispatcher.InvokeAsync(() => Message = new DisplayMessage("Fetching user info from remote server..."));
-
-                    LoginResult = authResponse.Data;
-
-                    request = new RestRequest("/api/accounts/session")
-                        .AddHeader("Authorization", $"Bearer {authResponse.Data.AccessToken}");
-
-                    var sessionResponse = await client.ExecuteGetAsync<SessionInfo>(request);
-                    if (!sessionResponse.IsSuccessStatusCode)
+                    await _dispatcher.InvokeAsync(() =>
                     {
-                        await _dispatcher.InvokeAsync(() => Message = new DisplayMessage($"Login Failed. {authResponse.ErrorMessage ?? authResponse.Content}", DisplayMessage.MESSAGE_TYPE.Error));
-                        return;
-                    }
-
-                    _sessionVariables.ServerUrl = SelectedServer;
-                    _mapper.Map(authResponse.Data, _sessionVariables);
-                    _mapper.Map(sessionResponse.Data, _sessionVariables);
-
-                    SetupEmailErrorLogging(sessionResponse.Data.LoggingEmail, sessionResponse.Data.LoggingPassword);
-
-                    await _dispatcher.InvokeAsync(() => Message = new DisplayMessage("Setting up Communication Bus..."));
-
-                    SetupMessageBus();
-
-                    // await _dispatcher.InvokeAsync(() => Message = "Setting up Browser integration....");
-                    // await SetupShipStationBrowser();
-
-                    _requestClose.Invoke(new DialogResult(ButtonResult.OK));
+                        Servers.Add(newServer);
+                    });
                 }
+
+                await _dispatcher.InvokeAsync(() =>
+                {
+                    Message = new DisplayMessage("Logging you in...");
+                });
+
+                var client = new RestClient(serverUrl);
+
+                var request = new RestRequest("/api/token/")
+                    .AddParameter("username", username)
+                    .AddParameter("password", password);
+
+                var authResponse =
+                    await client.ExecutePostAsync<LoginResultBody>(request);
+
+                if (!authResponse.IsSuccessStatusCode)
+                {
+                    await _dispatcher.InvokeAsync(() =>
+                    {
+                        Message = new DisplayMessage(
+                            $"Login Failed. {authResponse.ErrorMessage ?? authResponse.Content}",
+                            DisplayMessage.MESSAGE_TYPE.Error);
+                    });
+
+                    return;
+                }
+
+                if (authResponse.Data == null ||
+                    string.IsNullOrWhiteSpace(authResponse.Data.AccessToken))
+                {
+                    await _dispatcher.InvokeAsync(() =>
+                    {
+                        Message = new DisplayMessage(
+                            "Login Failed. The server returned an invalid authentication response.",
+                            DisplayMessage.MESSAGE_TYPE.Error);
+                    });
+
+                    return;
+                }
+
+                await _dispatcher.InvokeAsync(() =>
+                {
+                    Message = new DisplayMessage(
+                        "Fetching user info from remote server...");
+                });
+
+                LoginResult = authResponse.Data;
+
+                request = new RestRequest("/api/accounts/session")
+                    .AddHeader(
+                        "Authorization",
+                        $"Bearer {authResponse.Data.AccessToken}");
+
+                var sessionResponse =
+                    await client.ExecuteGetAsync<SessionInfo>(request);
+
+                if (!sessionResponse.IsSuccessStatusCode)
+                {
+                    await _dispatcher.InvokeAsync(() =>
+                    {
+                        Message = new DisplayMessage(
+                            $"Login Failed. {sessionResponse.ErrorMessage ?? sessionResponse.Content}",
+                            DisplayMessage.MESSAGE_TYPE.Error);
+                    });
+
+                    return;
+                }
+
+                if (sessionResponse.Data == null)
+                {
+                    await _dispatcher.InvokeAsync(() =>
+                    {
+                        Message = new DisplayMessage(
+                            "Login Failed. The server returned invalid session information.",
+                            DisplayMessage.MESSAGE_TYPE.Error);
+                    });
+
+                    return;
+                }
+
+                // Update session state
+                _sessionVariables.ServerUrl = serverUrl;
+
+                _mapper.Map(authResponse.Data, _sessionVariables);
+                _mapper.Map(sessionResponse.Data, _sessionVariables);
+
+                SetupEmailErrorLogging(
+                    sessionResponse.Data.LoggingEmail,
+                    sessionResponse.Data.LoggingPassword);
+
+                await _dispatcher.InvokeAsync(() =>
+                {
+                    Message = new DisplayMessage(
+                        "Setting up Communication Bus...");
+                });
+
+                SetupMessageBus();
+
+                _requestClose.Invoke(
+                    new DialogResult(ButtonResult.OK));
             }
             catch (Exception ex)
             {
-                var message = new DisplayMessage
+                await _dispatcher.InvokeAsync(() =>
                 {
-                    Message = $"Login Failed. {ex.Message}",
-                    MessageType = DisplayMessage.MESSAGE_TYPE.Error
-                };
-
-                await _dispatcher.InvokeAsync(() => Message = message);
+                    Message = new DisplayMessage(
+                        $"Login Failed. {ex.Message}",
+                        DisplayMessage.MESSAGE_TYPE.Error);
+                });
             }
             finally
             {
-                IsBusy = false;
+                await _dispatcher.InvokeAsync(() =>
+                {
+                    IsBusy = false;
+                });
             }
         }
 
