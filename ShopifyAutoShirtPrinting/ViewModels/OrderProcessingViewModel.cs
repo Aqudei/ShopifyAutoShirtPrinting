@@ -929,13 +929,21 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
             if (File.Exists(gcrPath))
             {
-                Process.Start(gcrPath);
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = gcrPath,
+                    UseShellExecute = true
+                });
                 return;
             }
 
             if (File.Exists(pngPath))
             {
-                Process.Start(pngPath);
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = pngPath,
+                    UseShellExecute = true
+                });
                 return;
             }
         }

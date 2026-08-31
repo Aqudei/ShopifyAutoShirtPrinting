@@ -8,14 +8,12 @@ using Prism.Events;
 using Prism.Navigation.Regions;
 using ShopifyEasyShirtPrinting.Helpers;
 using ShopifyEasyShirtPrinting.Messaging;
-using ShopifyEasyShirtPrinting.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -402,10 +400,15 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         private async void DownloadLabel(Models.Shipment shipment, string labelPath)
         {
-            using var client = new WebClient();
+            using var client = new System.Net.Http.HttpClient();
 
+            using var response = await client.GetAsync(shipment.Label);
+            response.EnsureSuccessStatusCode();
+            await using var stream = await response.Content.ReadAsStreamAsync();
+            await using var fileStream = File.Create(labelPath);
 
-            await client.DownloadFileTaskAsync(shipment.Label, labelPath);
+            await stream.CopyToAsync(fileStream);
+
             if (File.Exists(labelPath))
             {
                 Process.Start(new ProcessStartInfo
@@ -454,8 +457,16 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 {
                     progress = await _dialogCoordinator.ShowProgressAsync(this, "Opening", $"Opening order summary...");
                     progress.SetIndeterminate();
-                    using var client = new WebClient();
-                    await client.DownloadFileTaskAsync(new Uri(orderSummary), manifestPdfPath);
+
+                    using var httpClient = new System.Net.Http.HttpClient();
+                    using var response = await httpClient.GetAsync(orderSummary);
+                    response.EnsureSuccessStatusCode();
+
+                    await using var stream = await response.Content.ReadAsStreamAsync();
+                    await using var fileStream = File.Create(manifestPdfPath);
+
+                    await stream.CopyToAsync(fileStream);
+
                     if (File.Exists(manifestPdfPath))
                     {
                         Process.Start(new ProcessStartInfo

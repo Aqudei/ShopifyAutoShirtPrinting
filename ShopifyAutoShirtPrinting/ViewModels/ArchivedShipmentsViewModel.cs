@@ -13,9 +13,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using Windows.Web.Http;
 
 namespace ShopifyEasyShirtPrinting.ViewModels
 {
@@ -84,7 +86,11 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 var labelPath = Path.Combine(_sessionVariables.PdfsPath, nameOnly);
                 if (File.Exists(labelPath))
                 {
-                    Process.Start(labelPath);
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = labelPath,
+                        UseShellExecute = true
+                    });
                 }
                 else
                 {
@@ -107,13 +113,21 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         private async void DownloadLabel(Models.Shipment shipment, string labelPath)
         {
-            using var client = new WebClient();
+            using var client = new System.Net.Http.HttpClient();
+            using var response = await client.GetAsync(shipment.Label);
+            response.EnsureSuccessStatusCode();
 
+            await using var stream = await response.Content.ReadAsStreamAsync();
+            await using var fileStream = File.Create(labelPath);
+            await stream.CopyToAsync(fileStream);
 
-            await client.DownloadFileTaskAsync(shipment.Label, labelPath);
             if (File.Exists(labelPath))
             {
-                Process.Start(labelPath);
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = labelPath,
+                    UseShellExecute = true
+                });
             }
         }
 
@@ -142,17 +156,31 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 var manifestPdfPath = Path.Combine(_sessionVariables.PdfsPath, shipment?.ShipmentOrder?.ManifestFileName);
                 if (File.Exists(manifestPdfPath))
                 {
-                    Process.Start(manifestPdfPath);
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = manifestPdfPath,
+                        UseShellExecute = true
+                    });
                 }
                 else
                 {
                     progress = await _dialogCoordinator.ShowProgressAsync(this, "Opening", $"Opening order summary...");
                     progress.SetIndeterminate();
-                    using var client = new WebClient();
-                    await client.DownloadFileTaskAsync(new Uri(orderSummary), manifestPdfPath);
+                    using var client = new System.Net.Http.HttpClient();
+                    using var response = await client.GetAsync(new Uri(orderSummary));
+                    response.EnsureSuccessStatusCode();
+
+                    await using var stream = await response.Content.ReadAsStreamAsync();
+                    await using var fileStream = File.Create(manifestPdfPath);
+                    await stream.CopyToAsync(fileStream);
+
                     if (File.Exists(manifestPdfPath))
                     {
-                        Process.Start(manifestPdfPath);
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = manifestPdfPath,
+                            UseShellExecute = true
+                        });
                     }
                 }
             }
@@ -170,7 +198,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
 
 
-        public ArchivedShipmentsViewModel(ApiClient apiClient, IMapper mapper, IDialogCoordinator dialogCoordinator, 
+        public ArchivedShipmentsViewModel(ApiClient apiClient, IMapper mapper, IDialogCoordinator dialogCoordinator,
             SessionVariables sessionVariables)
         {
             _apiClient = apiClient;

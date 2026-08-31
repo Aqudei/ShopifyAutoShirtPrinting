@@ -23,10 +23,12 @@ using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using Windows.Web.Http;
 using ZXing;
 using ZXing.Common;
 using ZXing.Windows.Compatibility;
@@ -847,8 +849,15 @@ public class ArchivedViewModel : PageBase, INavigationAware
 
     private async Task<string> DownloadImageAsync(string imageSource, string imagePath)
     {
-        using var client = new WebClient();
-        await client.DownloadFileTaskAsync(new Uri(imageSource), imagePath);
+        using var client = new System.Net.Http.HttpClient();
+        using var response = await client.GetAsync(new Uri(imageSource));
+        response.EnsureSuccessStatusCode();
+
+        await using var stream = await response.Content.ReadAsStreamAsync();
+        await using var fileStream = File.Create(imagePath);
+        await stream.CopyToAsync(fileStream);
+
+
         return imagePath;
     }
 

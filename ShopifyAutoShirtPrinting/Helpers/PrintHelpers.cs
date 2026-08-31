@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Web.Http;
 
 namespace ShopifyEasyShirtPrinting.Helpers
 {
@@ -19,9 +21,16 @@ namespace ShopifyEasyShirtPrinting.Helpers
 
         public static async Task<string> DownloadRemoteFileToLocalAsync(Uri source, string destination)
         {
-            using (var client = new WebClient())
+            using (var client = new System.Net.Http.HttpClient())
             {
-                await client.DownloadFileTaskAsync(source, destination);
+
+                using var response = await client.GetAsync(source);
+                response.EnsureSuccessStatusCode();
+
+                await using var stream = await response.Content.ReadAsStreamAsync();
+                await using var fileStream = File.Create(destination);
+
+                await stream.CopyToAsync(fileStream);
             }
 
             return destination;
