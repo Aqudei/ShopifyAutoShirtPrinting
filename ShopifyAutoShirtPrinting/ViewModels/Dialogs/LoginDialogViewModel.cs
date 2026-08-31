@@ -5,6 +5,7 @@ using DryIoc;
 using LiteDB;
 using NLog;
 using Prism.Commands;
+using Prism.Container.DryIoc;
 using Prism.Dialogs;
 using Prism.DryIoc;
 using Prism.Ioc;

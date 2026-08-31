@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ShopifyEasyShirtPrinting.Models
 {
-    internal class Shipment : BindableBase
+    public class Shipment : BindableBase
     {
         private int _id;
         public int Id

@@ -19,7 +19,7 @@ using System.Windows;
 
 namespace ShopifyEasyShirtPrinting.ViewModels
 {
-    internal class ShipmentsViewModel : PageBase, INavigationAware
+    public class ShipmentsViewModel : PageBase, INavigationAware
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
@@ -78,6 +78,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         private void _messageBus_ShipmentsUpdated(object sender, int[] shipmentIds)
         {
+            Debug.WriteLine("@_messageBus_ShipmentsUpdated");
+
             _ = Task.Run(async () =>
             {
                 var shipments = await _apiClient.GetShipmentsByIdsAsync(shipmentIds);
@@ -207,7 +209,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             }
         }
 
-        public async void OnNavigatedTo(NavigationContext navigationContext)
+        public void OnNavigatedTo(NavigationContext navigationContext)
         {
             _messageBus.ShipmentsUpdated += _messageBus_ShipmentsUpdated;
             _messageBus.ShipmentsVoided += _messageBus_ShipmentsVoided;
@@ -215,6 +217,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         private void _messageBus_ShipmentsVoided(object sender, int[] shipmentsIds)
         {
+            Debug.WriteLine("@_messageBus_ShipmentsUpdated");
+
             Task.Run(async () =>
             {
                 foreach (var shipmentId in shipmentsIds)
