@@ -199,6 +199,9 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
                 foreach (var status in statuses)
                 {
+                    if (string.IsNullOrEmpty(status))
+                        continue;
+
                     if (existingColorsDict.TryGetValue(status, out var existingColor))
                     {
                         await _dispatcher.InvokeAsync(() => LineStatuses.Add(new ColorSetting
@@ -228,8 +231,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             }
             catch (Exception ex)
             {
-                Logger.Error("ERROR @ LoadStatuses()");
-                Logger.Error(ex);
+                Logger.Error(ex, "ERROR @ LoadStatuses()");
             }
         }
 
