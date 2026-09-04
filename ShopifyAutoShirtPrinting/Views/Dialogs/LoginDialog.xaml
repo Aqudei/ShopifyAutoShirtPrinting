@@ -1,43 +1,68 @@
 ﻿<UserControl
+    x:Class="ShopifyEasyShirtPrinting.Views.Dialogs.LoginDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:ShopifyEasyShirtPrinting.Views.Dialogs"
     xmlns:prism="http://prismlibrary.com/"
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:ico="http://metro.mahapps.com/winfx/xaml/iconpacks"
-    xmlns:Converters="clr-namespace:ShopifyEasyShirtPrinting.Converters"
-    x:Class="ShopifyEasyShirtPrinting.Views.Dialogs.LoginDialog"
+    xmlns:converters="clr-namespace:ShopifyEasyShirtPrinting.Converters"
     mc:Ignorable="d"
     d:DesignHeight="277.935"
     d:DesignWidth="841.885">
 
     <UserControl.Resources>
-        <Converters:MessageTypeToColorConverter
+        <converters:MessageTypeToColorConverter
             x:Key="MessageTypeToColorConverter" />
 
         <BooleanToVisibilityConverter
             x:Key="BooleanToVisibilityConverter" />
     </UserControl.Resources>
 
-    <!-- Dialog Window Style -->
+    <!-- Prism Dialog Window -->
     <prism:Dialog.WindowStyle>
-        <Style TargetType="{x:Type Window}">
-            <Setter Property="prism:Dialog.WindowStartupLocation"
-                    Value="CenterScreen" />
-            <Setter Property="ResizeMode"
-                    Value="NoResize" />
+        <Style TargetType="{x:Type mah:MetroWindow}">
+
+            <!-- Fixed dialog dimensions -->
             <Setter Property="Width"
                     Value="600" />
+
+            <Setter Property="Height"
+                    Value="278" />
+
+            <Setter Property="MinWidth"
+                    Value="600" />
+
+            <Setter Property="MaxWidth"
+                    Value="600" />
+
+            <Setter Property="MinHeight"
+                    Value="278" />
+
+            <Setter Property="MaxHeight"
+                    Value="278" />
+
+            <!-- Prevent user resizing -->
+            <Setter Property="ResizeMode"
+                    Value="NoResize" />
+
+            <Setter Property="SizeToContent"
+                    Value="Manual" />
+
             <Setter Property="ShowInTaskbar"
                     Value="True" />
+            
             <Setter Property="Title"
                     Value="{Binding Title}" />
+
         </Style>
     </prism:Dialog.WindowStyle>
 
-    <Grid Margin="20">
+    <Grid
+        Margin="20"
+        Width="560"
+        Height="238">
 
         <Grid.ColumnDefinitions>
             <!-- Login image -->
@@ -58,7 +83,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="40" />
         </Grid.RowDefinitions>
 
         <!-- Login Image -->
@@ -76,10 +101,10 @@
         <Label
             Grid.Row="0"
             Grid.Column="1"
-            Content="Server:"
-            FontSize="16"
+            Margin="0,0,8,8"
             VerticalAlignment="Center"
-            Margin="0,0,8,8" />
+            Content="Server:"
+            FontSize="16" />
 
         <Grid
             Grid.Row="0"
@@ -95,12 +120,12 @@
             <ComboBox
                 x:Name="ServerComboBox"
                 Grid.Column="0"
+                Height="31"
                 DisplayMemberPath="Url"
-                ItemsSource="{Binding Servers}"
-                Text="{Binding SelectedServer}"
-                IsEditable="True"
                 FontSize="16"
-                Height="31" />
+                IsEditable="True"
+                ItemsSource="{Binding Servers}"
+                Text="{Binding SelectedServer}" />
 
             <Button
                 Grid.Column="1"
@@ -110,50 +135,51 @@
                 Command="{Binding DeleteServerCommand}"
                 ToolTip="Delete selected server">
 
-                <ico:PackIconFontAwesome
-                    Kind="TrashSolid" />
-            </Button>
+                <ico:PackIconFontAwesome Kind="TrashSolid" />
 
+            </Button>
         </Grid>
 
         <!-- Username -->
         <Label
             Grid.Row="1"
             Grid.Column="1"
-            Content="Username:"
-            FontSize="16"
+            Margin="0,0,8,8"
             VerticalAlignment="Center"
-            Margin="0,0,8,8" />
+            Content="Username:"
+            FontSize="16" />
 
         <TextBox
             x:Name="UserNameTextBox"
             Grid.Row="1"
             Grid.Column="2"
             Grid.ColumnSpan="2"
-            Text="{Binding UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-            TextWrapping="Wrap"
-            FontSize="16"
             Height="31"
-            Margin="0,0,0,8" />
+            Margin="0,0,0,8"
+            Text="{Binding UserName,
+                           Mode=TwoWay,
+                           UpdateSourceTrigger=PropertyChanged}"
+            TextWrapping="Wrap"
+            FontSize="16" />
 
         <!-- Password -->
         <Label
             Grid.Row="2"
             Grid.Column="1"
-            Content="Password:"
-            FontSize="16"
+            Margin="0,0,8,8"
             VerticalAlignment="Center"
-            Margin="0,0,8,8" />
+            Content="Password:"
+            FontSize="16" />
 
         <PasswordBox
             x:Name="MyPasswordBox"
             Grid.Row="2"
             Grid.Column="2"
             Grid.ColumnSpan="2"
-            PasswordChanged="MyPasswordBox_PasswordChanged"
-            FontSize="16"
             Height="31"
-            Margin="0,0,0,8">
+            Margin="0,0,0,8"
+            FontSize="16"
+            PasswordChanged="MyPasswordBox_PasswordChanged">
 
             <PasswordBox.InputBindings>
                 <KeyBinding
@@ -169,14 +195,14 @@
             Grid.Row="3"
             Grid.Column="2"
             Grid.ColumnSpan="2"
+            MinHeight="47"
+            Margin="0,0,0,8"
             Text="{Binding Message.Message}"
             TextWrapping="Wrap"
-            FontWeight="Bold"
             FontSize="14"
+            FontWeight="Bold"
             Foreground="{Binding Message.MessageType,
-                                  Converter={StaticResource MessageTypeToColorConverter}}"
-            MinHeight="47"
-            Margin="0,0,0,8" />
+                                  Converter={StaticResource MessageTypeToColorConverter}}" />
 
         <!-- Bottom Actions -->
         <Grid
