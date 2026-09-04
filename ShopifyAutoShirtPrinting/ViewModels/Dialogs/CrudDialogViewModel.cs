@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Common.Api;
 using Common.Models;
+using MahApps.Metro.Controls;
 using Prism.Commands;
 using Prism.Dialogs;
 using System;
@@ -13,7 +14,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 {
     internal class CrudDialogViewModel : PageBase, IDialogAware
     {
-        public override string Title => _title;
 
         private DelegateCommand<string> _dialogCommand;
         private MyLineItem _theLineItem;
@@ -24,7 +24,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         private string notes;
         private string _name;
         private int _id;
-        private string _title;
         private DelegateCommand _selectNoneCommand;
         public ObservableCollection<string> ShippingTypes { get; set; } = new();
         public string Shipping { get => _shipping; set => SetProperty(ref _shipping, value); }
@@ -184,7 +183,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
             if (parameters != null && parameters.TryGetValue<MyLineItem>("MyLineItem", out var myLineItem))
             {
-                _title = "Edit Item";
+                Title = "Edit Item";
                 _theLineItem = myLineItem;
                 IsEditing = true;
 
@@ -192,7 +191,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             }
             else
             {
-                _title = "New Item";
+                Title = "New Item";
 
                 _theLineItem = new MyLineItem
                 {

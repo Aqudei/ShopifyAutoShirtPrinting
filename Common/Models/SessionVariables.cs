@@ -44,5 +44,6 @@ namespace Common.Models
 
         public IEnumerable<Store> Stores { get; set; }
         public Store ActiveStore { get; set; }
+        public string UserName { get; set; }
     }
 }

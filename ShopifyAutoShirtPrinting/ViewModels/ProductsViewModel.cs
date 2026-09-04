@@ -39,7 +39,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         public ICollectionView Products { get => products; set => SetProperty(ref products, value); }
         public ICollectionView Variants { get => variants; set => SetProperty(ref variants, value); }
         public Product SelectedProduct { get => _selectedProduct; set => SetProperty(ref _selectedProduct, value); }
-        public override string Title => "Products";
 
         public bool IsNavigationTarget(NavigationContext navigationContext)
         {
@@ -124,8 +123,10 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         public ProductsViewModel(ApiClient apiClient, IDialogCoordinator dialogCoordinator)
         {
-            this._apiClient = apiClient;
-            this._dialogCoordinator = dialogCoordinator;
+            Title = "Products";
+
+            _apiClient = apiClient;
+            _dialogCoordinator = dialogCoordinator;
             Products = CollectionViewSource.GetDefaultView(_products);
             Variants = CollectionViewSource.GetDefaultView(_variants);
 

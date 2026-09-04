@@ -380,6 +380,7 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
 
     public LabelPrintingDialogViewModel(ApiClient apiClient, IMapper mapper, SessionVariables globalVariables)
     {
+        Title = "Print Shipment Label";
         _globalVariables = globalVariables;
         _apiClient = apiClient;
         _mapper = mapper;
@@ -507,7 +508,7 @@ public class LabelPrintingDialogViewModel : PageBase, IDialogAware, INotifyDataE
     }
 
 
-    public override string Title => "Print Shipment Label";
+
     private readonly Dictionary<string, List<string>> _errors = new();
 
     public bool HasErrors => _errors.Count > 0;

@@ -31,7 +31,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         private DelegateCommand<BinViewModel> clearBinCommand;
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
-        public override string Title => "Bins";
         private ObservableCollection<BinViewModel> _bins = new();
 
         public ICollectionView Bins { get => bins; set => SetProperty(ref bins, value); }
@@ -134,6 +133,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         public BinsViewModel(IDialogCoordinator dialogCoordinator, BinService binService, IDialogService dialogService,
             IMessageBus messageBus, ApiClient apiClient, IMapper mapper)
         {
+            Title = "Bins";
+
             _mapper = mapper;
             _apiClient = apiClient;
             _messageBus = messageBus;

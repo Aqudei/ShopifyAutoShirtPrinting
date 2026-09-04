@@ -19,8 +19,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
         private DelegateCommand importFilesCommand;
         private readonly IDialogCoordinator _dialogCoordinator;
 
-        public override string Title => "Sizing";
-
         public ObservableCollection<ImageItem> Items { get; set; } = new();
         public string DestinationFolder { get => _destinationFolder; set => SetProperty(ref _destinationFolder, value); }
         public DelegateCommand ImportFilesCommand { get => importFilesCommand ??= new DelegateCommand(HandleImportFile); }
@@ -139,6 +137,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
         public SizingToolViewModel(IDialogCoordinator dialogCoordinator)
         {
             _dialogCoordinator = dialogCoordinator;
+            Title = "Sizing";
         }
         private async void HandleImportFile()
         {

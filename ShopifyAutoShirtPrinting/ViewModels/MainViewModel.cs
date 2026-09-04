@@ -47,19 +47,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             RestartApplication();
         }
 
-        public override string Title
-        {
-            get
-            {
-                if (AppDomain.CurrentDomain.BaseDirectory.ToLower().Contains("staging"))
-                {
-                    return "TLKC Tooling (Staging)";
-                }
-
-                return "TLKC Tooling (Stable)";
-            }
-        }
-
         public ObservableCollection<MenuItem> Menu { get; set; } = new();
         public ObservableCollection<MenuItem> OptionsMenu { get; set; } = new();
 

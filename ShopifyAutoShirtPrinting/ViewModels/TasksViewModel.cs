@@ -14,7 +14,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels
     {
         private readonly SessionVariables _sessionVariables;
 
-        public override string Title => "Tasks";
         public ObservableCollection<IBGTask> Tasks { get; set; } = new();
 
         public bool IsNavigationTarget(NavigationContext navigationContext) => true;
@@ -26,6 +25,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         public TasksViewModel(SessionVariables sessionVariables)
         {
             _sessionVariables = sessionVariables;
+            Title = "Tasks";
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)

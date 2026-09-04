@@ -14,9 +14,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
     {
         public DialogCloseListener RequestClose { get; private set; }
 
-        public override string Title => "SEO Detail";
-
-
         private int _store;
         public int Store
         {
@@ -201,6 +198,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             });
         public SEODetailViewModel(IMapper mapper)
         {
+            Title = "SEO Detail";
             this.mapper = mapper;
         }
     }

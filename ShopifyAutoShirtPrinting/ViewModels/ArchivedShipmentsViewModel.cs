@@ -25,7 +25,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
-        public override string Title => "Archived Shipments";
 
         private ObservableCollection<Models.Shipment> _shipments = new();
 
@@ -201,6 +200,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         public ArchivedShipmentsViewModel(ApiClient apiClient, IMapper mapper, IDialogCoordinator dialogCoordinator,
             SessionVariables sessionVariables)
         {
+            Title = "Archived Shipments";
             _apiClient = apiClient;
             _mapper = mapper;
             _dialogCoordinator = dialogCoordinator;

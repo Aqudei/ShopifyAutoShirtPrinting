@@ -15,7 +15,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
 {
     public class SkuToolViewModel : PageBase
     {
-        public override string Title => "Sku";
 
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
@@ -246,6 +245,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
             BackPrintsFolder = Path.Combine(PrintFilesFolder, "backprints");
 
             EnsureFolder(BackPrintsFolder);
+
+            Title = "Sku";
         }
 
         public DelegateCommand SyncBackPrintsCommand { get => _syncBackprintsCommand ??= new DelegateCommand(OnSyncBackPrints); }

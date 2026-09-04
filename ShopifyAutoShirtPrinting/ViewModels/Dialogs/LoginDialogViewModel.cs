@@ -386,6 +386,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
                 // Update session state
                 _sessionVariables.ServerUrl = serverUrl;
+                _sessionVariables.UserName = username;
 
                 _mapper.Map(authResponse.Data, _sessionVariables);
                 _mapper.Map(sessionResponse.Data, _sessionVariables);

@@ -18,7 +18,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 {
     public class AfterScanDialogViewModel : PageBase, IDialogAware
     {
-        private string _title;
         private string _orderNumber;
         private int? _binNumber;
         private string _customerName;
@@ -47,7 +46,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             }
         }
 
-        public override string Title => _title;
 
         DialogCloseListener IDialogAware.RequestClose => _requestClose;
 
@@ -101,7 +99,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
             if (parameters.TryGetValue<string>("Title", out var title))
             {
-                _title = title;
+                Title = title;
                 RaisePropertyChanged(nameof(Title));
             }
 

@@ -8,7 +8,9 @@ namespace ShopifyEasyShirtPrinting.ViewModels
     public abstract class PageBase : BindableBase
     {
         protected Dispatcher _dispatcher;
-        public abstract string Title { get; }
+        private string _title;
+
+        public string Title { get => _title; set => SetProperty(ref _title , value); }
 
         public PageBase()
         {

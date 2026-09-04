@@ -25,7 +25,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
         public ICollectionView ScoreBreakdowns { get; set; }
 
-        public override string Title => "Score Breakdown";
 
         DialogCloseListener IDialogAware.RequestClose => _requestClose;
 
@@ -52,6 +51,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
 
         public ScoreBreakdownViewModel(IMapper mapper)
         {
+            Title = "Score Breakdown";
             _mapper = mapper;
             ScoreBreakdowns = CollectionViewSource.GetDefaultView(_scores);
         }

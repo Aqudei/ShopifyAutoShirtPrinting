@@ -8,6 +8,9 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 {
     internal class ToolingViewModel : PageBase
     {
-        public override string Title => "Tooling";
+        public ToolingViewModel()
+        {
+            Title = "Tooling";
+        }
     }
 }

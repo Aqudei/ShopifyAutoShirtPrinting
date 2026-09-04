@@ -43,8 +43,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             set => SetProperty(ref _selectedPage, value);
         }
 
-        public override string Title => "Shipped";
-
         public DelegateCommand<string> GotoPageCommand => _changePageCommand ??= new DelegateCommand<string>(DoChangePage);
 
         private async void DoChangePage(string offset)
@@ -69,6 +67,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         public ShipmentsViewModel(IDialogCoordinator dialogCoordinator, IEventAggregator eventAggregator,
             ApiClient apiClient, SessionVariables sessionVariables, IMapper mapper, MessageBus messageBus)
         {
+            Title = "Shipments";
+
             _dialogCoordinator = dialogCoordinator;
             _eventAggregator = eventAggregator;
             _apiClient = apiClient;

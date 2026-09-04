@@ -23,7 +23,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels
         private ObservableCollection<Models.Seo.SEOPage> _seoPages = new();
         public ICollectionView SEOPages { get; set; }
 
-        public override string Title => "SEO";
 
         private readonly ApiClient _client;
         private readonly IMapper _mapper;
@@ -38,6 +37,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             _mapper = mapper;
             _dialogService = dialogService;
             _dialogCoordinator = dialogCoordinator;
+
+            Title = "SEO";
         }
 
 

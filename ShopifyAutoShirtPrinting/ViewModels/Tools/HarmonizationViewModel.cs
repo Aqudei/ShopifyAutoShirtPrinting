@@ -42,7 +42,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
         }
 
         public ObservableCollection<Models.Harmonisation.HSN> HarmonizationItems { get; } = new();
-        public override string Title => "Harmonization";
 
         private DelegateCommand _importCommand;
 
@@ -230,6 +229,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Tools
 
         public HarmonizationViewModel(ApiClient api, IMapper mapper, IDialogService dialogService, IDialogCoordinator dialogCoordinator)
         {
+            Title = "Harmonization";
             _api = api;
             _mapper = mapper;
             _dialogService = dialogService;

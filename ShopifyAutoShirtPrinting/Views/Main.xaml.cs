@@ -4,6 +4,7 @@ using Prism.Dialogs;
 using Prism.Navigation;
 using Prism.Navigation.Regions;
 using ShopifyEasyShirtPrinting.ViewModels;
+using System;
 using System.Linq;
 using System.Windows;
 using MyMenuItem = ShopifyEasyShirtPrinting.ViewModels.MenuItem;
@@ -41,8 +42,9 @@ namespace ShopifyEasyShirtPrinting.Views
                 {
                     Application.Current.Shutdown();
                 }
-
-                (DataContext as MainViewModel)?.LoadStores();
+                var vm = DataContext as MainViewModel;
+                vm?.LoadStores();
+                vm?.Title = GetApplicationTitle();
 
                 var defaultStore = _sessionVariables.Stores?.FirstOrDefault(s => s.IsDefault);
                 if (defaultStore != null)
@@ -63,6 +65,22 @@ namespace ShopifyEasyShirtPrinting.Views
             });
 
             HamburgerMenu.ItemInvoked += HamburgerMenu_ItemInvoked;
+        }
+
+        private string GetApplicationTitle()
+        {
+            var title = "";
+            if (AppDomain.CurrentDomain.BaseDirectory.ToLower().Contains("staging"))
+            {
+                title = "TLKC Tooling (Staging)";
+            }
+            else
+            {
+                title = "TLKC Tooling (Stable)";
+            }
+
+            title = $"{title} - Connected to Server: {_sessionVariables.ServerUrl} as User: {_sessionVariables.UserName}";
+            return title;
         }
 
         private void HamburgerMenu_ItemInvoked(object sender, HamburgerMenuItemInvokedEventArgs args)

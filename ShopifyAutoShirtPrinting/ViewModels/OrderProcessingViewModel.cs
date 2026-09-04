@@ -49,7 +49,6 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
 
     private readonly ObservableCollection<LineItemViewModel> _lineItems = new();
     public ICollectionView LineItemsView { get; }
-    public override string Title => "Order Items";
     private string _currentImage;
     private DelegateCommand _generateQrCommand;
     private LineItemViewModel _selectedLineItem;
@@ -403,6 +402,7 @@ public class OrderProcessingViewModel : PageBase, INavigationAware
         IEventAggregator eventAggregator, IMapper mapper, MyPrintService myPrintService,
         BinService binService, ApiClient apiClient, IMessageBus messageBus)
     {
+        Title = "Order Items";
         _dispatcher = Application.Current.Dispatcher;
 
         _mapper = mapper;

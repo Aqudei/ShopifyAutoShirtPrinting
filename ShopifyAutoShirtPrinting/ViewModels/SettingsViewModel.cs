@@ -148,7 +148,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         public ObservableCollection<Theme> Themes { get; set; } = new();
         public Theme SelectedTheme { get => _selectedTheme; set => SetProperty(ref _selectedTheme, value); }
-        public override string Title => "Settings";
 
         public ObservableCollection<ColorSetting> LineStatuses { get; set; } = new();
 
@@ -237,6 +236,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         public SettingsViewModel(IDialogCoordinator dialogCoordinator, IMapper mapper, ApiClient apiClient, SessionVariables globalVariables)
         {
+            Title = "Settings";
+
             _mapper = mapper;
             _apiClient = apiClient;
             _globalVariables = globalVariables;

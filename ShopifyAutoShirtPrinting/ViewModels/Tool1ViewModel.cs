@@ -65,7 +65,6 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             GCRFile = dialog.FileName;
         }
 
-        public override string Title => "Some Tools";
 
         private async void ApplySearch()
         {
@@ -221,6 +220,8 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
 
             PrintFilesFolder = Properties.Settings.Default.PrintFilesFolder;
+
+            Title = "Some Tools";
         }
     }
 }
