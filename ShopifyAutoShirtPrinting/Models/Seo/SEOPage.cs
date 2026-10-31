@@ -35,6 +35,14 @@ namespace ShopifyEasyShirtPrinting.Models.Seo
             set => SetProperty(ref _handle, value);
         }
 
+        private bool _isSelected;
+
+        public bool IsSelected
+        {
+            get { return _isSelected; }
+            set { SetProperty(ref _isSelected, value); }
+        }
+
         private string? _pageTitle;
         public string? PageTitle
         {

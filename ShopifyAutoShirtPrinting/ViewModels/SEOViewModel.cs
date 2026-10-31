@@ -41,6 +41,35 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             Title = "SEO";
         }
 
+        private DelegateCommand _selectAllCommand;
+
+        public DelegateCommand SelectAllCommand
+        {
+            get { return _selectAllCommand ??= new DelegateCommand(OnSelectAllSEOPages); }
+        }
+
+        private void OnSelectAllSEOPages()
+        {
+            foreach (var seoPage in _seoPages)
+            {
+                seoPage.IsSelected = true;
+            }
+        }
+
+        private DelegateCommand _ClearSelectionCommand;
+
+        public DelegateCommand ClearSelectionCommand
+        {
+            get { return _ClearSelectionCommand ??= new DelegateCommand(OnClearSEOPageSelection); }
+        }
+
+        private void OnClearSEOPageSelection()
+        {
+            foreach (var seoPage in _seoPages)
+            {
+                seoPage.IsSelected = false;
+            }
+        }
 
         public async Task FetchSEOPagesTask()
         {
@@ -48,7 +77,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 this,
                 "Loading",
                 "Fetching SEO Pages...");
-            
+
             controller.SetIndeterminate();
 
             try
@@ -80,7 +109,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels
                 await _dispatcher.InvokeAsync(() =>
                 {
                     _seoPages.Clear();
-                    
+
                     _seoPages.AddRange(mappedPages);
                 });
             }
@@ -125,6 +154,84 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             {
 
             });
+        }
+
+        private DelegateCommand _refreshCommand;
+
+        public DelegateCommand RefreshCommand
+        {
+            get { return _refreshCommand ??= new DelegateCommand(OnRefreshItemsAsync); }
+        }
+
+        private async void OnRefreshItemsAsync()
+        {
+            await FetchSEOPagesTask();
+        }
+
+        private DelegateCommand _runAuditCommand;
+
+        public DelegateCommand RunAuditCommand
+        {
+            get { return _runAuditCommand ??= new DelegateCommand(OnRunAudit); }
+        }
+
+        private async void OnRunAudit()
+        {
+            var selectedPages = _seoPages.Where(p => p.IsSelected).ToList();
+
+            // 1. Guard clause: Prevent the dialog from showing if nothing is selected
+            if (!selectedPages.Any())
+            {
+                await _dialogCoordinator.ShowMessageAsync(this, "No Selection", "Please select at least one page to audit.");
+                return;
+            }
+
+            // 2. Fixed typo: 'progess' -> 'progress'
+            var progress = await _dialogCoordinator.ShowProgressAsync(this, "Running SEO Audit", "Initializing...");
+
+            // 3. UX Improvement: Use determinate progress since we know the total count
+            progress.Maximum = selectedPages.Count;
+            progress.SetProgress(0);
+
+            try
+            {
+                for (int i = 0; i < selectedPages.Count; i++)
+                {
+                    var page = selectedPages[i];
+
+                    // Update the dialog message to show exactly what is happening
+                    progress.SetMessage($"Auditing: {page.PageTitle} ({i + 1} of {selectedPages.Count})");
+
+                    await _client.RunAuditAsync(page.PageId);
+
+                    // Increment the visual progress bar
+                    progress.SetProgress(i + 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                // 4. Error Handling: Inform the user if the API call fails
+                await _dialogCoordinator.ShowMessageAsync(this, "Audit Failed", $"An error occurred during the audit:\n\n{ex.Message}");
+            }
+            finally
+            {
+                // 5. Safety: Guarantee the dialog closes even if an exception is thrown
+                if (progress.IsOpen)
+                {
+                    await progress.CloseAsync();
+                }
+            }
+        }
+
+        private DelegateCommand _generateDraftCommand;
+
+        public DelegateCommand GenerateDraftCommand
+        {
+            get { return _generateDraftCommand ??= new DelegateCommand(OnGenerateDraft); }
+        }
+
+        private void OnGenerateDraft()
+        {
         }
 
         public DelegateCommand<Models.Seo.SEOPage> ShowDetailCommand => _showDetailCommand ??= new DelegateCommand<Models.Seo.SEOPage>(OnShowDetail);

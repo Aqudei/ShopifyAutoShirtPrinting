@@ -888,11 +888,31 @@ namespace Common.Api
             }
         }
 
+
+        public async Task RunAuditAsync(int id)
+        {
+            try
+            {
+                var request = new RestRequest($"/api/seo/seo_pages/{id}/run_audit/");
+                var response = await _client.ExecutePostAsync(request);
+                if (response.IsSuccessful)
+                {
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                throw;
+            }
+        }
+
+
         public async Task<IEnumerable<SEOPage>> ListSEOPagesAsync()
         {
             try
             {
-                var request = new RestRequest("/api/seo/opportunities/");
+                var request = new RestRequest("/api/seo/seo_pages/");
                 var response = await _client.ExecuteGetAsync<IEnumerable<SEOPage>>(request);
                 if (response.IsSuccessful)
                 {
