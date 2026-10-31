@@ -907,7 +907,6 @@ namespace Common.Api
             }
         }
 
-
         public async Task<IEnumerable<SEOPage>> ListSEOPagesAsync()
         {
             try
@@ -947,6 +946,24 @@ namespace Common.Api
             {
                 Logger.Error(ex);
                 return Enumerable.Empty<SEOAudit>();
+            }
+        }
+
+        public async Task GenerateDraftAsync(int pageId)
+        {
+            try
+            {
+                var request = new RestRequest($"/api/seo/seo_pages/{pageId}/generate_draft/");
+                var response = await _client.ExecutePostAsync(request);
+                if (response.IsSuccessful)
+                {
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                throw;
             }
         }
 

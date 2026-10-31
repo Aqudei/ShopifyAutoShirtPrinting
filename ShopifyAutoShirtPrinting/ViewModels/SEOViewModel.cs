@@ -230,8 +230,13 @@ namespace ShopifyEasyShirtPrinting.ViewModels
             get { return _generateDraftCommand ??= new DelegateCommand(OnGenerateDraft); }
         }
 
-        private void OnGenerateDraft()
+        private async void OnGenerateDraft()
         {
+            var selected = _seoPages.Where(p => p.IsSelected).ToList();
+            foreach (var page in selected)
+            {
+                await _client.GenerateDraftAsync(page.PageId);
+            }
         }
 
         public DelegateCommand<Models.Seo.SEOPage> ShowDetailCommand => _showDetailCommand ??= new DelegateCommand<Models.Seo.SEOPage>(OnShowDetail);
