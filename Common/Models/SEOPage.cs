@@ -30,7 +30,6 @@ namespace Common.Models
         public string DescriptionHtml { get; set; }
 
 
-
         [JsonPropertyName("url")]
         public Uri Url { get; set; }
 

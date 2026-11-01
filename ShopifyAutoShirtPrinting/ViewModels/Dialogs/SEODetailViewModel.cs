@@ -163,8 +163,7 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
         }
 
         public void OnDialogClosed()
-        {
-        }
+        { }
 
 
         public void OnDialogOpened(IDialogParameters parameters)
@@ -173,6 +172,15 @@ namespace ShopifyEasyShirtPrinting.ViewModels.Dialogs
             {
                 // Do something with the page
                 mapper.Map(page, this);
+                Title = $"SEO Detail - {page.PageTitle} (Original Page)";
+            }
+
+            if (parameters.TryGetValue<Models.Seo.SEODraft>("draft", out var draft))
+            {
+                // Do something with the draft
+                mapper.Map(draft, this);
+                Title = $"SEO Detail - {draft.PageTitle} (Draft)";
+
             }
         }
 

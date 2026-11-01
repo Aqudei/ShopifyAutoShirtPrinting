@@ -48,8 +48,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Models\SEODraft.cs" />
     <Compile Remove="Models\SEOPage.cs" />
     <Compile Remove="Class1.cs" />
+    <None Include="Models\Seo\SEODraft.cs" />
     <None Include="Models\SEOPage.cs" />
     <None Include="Class1.cs" />
   </ItemGroup>

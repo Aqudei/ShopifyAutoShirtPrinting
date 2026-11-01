@@ -232,10 +232,76 @@ namespace ShopifyEasyShirtPrinting.ViewModels
 
         private async void OnGenerateDraft()
         {
-            var selected = _seoPages.Where(p => p.IsSelected).ToList();
-            foreach (var page in selected)
+            var progress = await _dialogCoordinator.ShowProgressAsync(this, "Generating Drafts", "Initializing...");
+
+            try
             {
-                await _client.GenerateDraftAsync(page.PageId);
+                var selectedPages = _seoPages.Where(p => p.IsSelected).ToArray();
+
+                for (int i = 0; i < selectedPages.Length; i++)
+                {
+                    var page = selectedPages[i];
+                    progress.SetProgress((double)(i + 1) / selectedPages.Length);
+                    progress.SetMessage($"Generating draft for: {page.PageTitle} ({i + 1} of {selectedPages.Length})");
+                    await _client.GenerateDraftAsync(page.PageId);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Close the progress overlay first so the error dialog isn't hidden behind it
+                if (progress.IsOpen)
+                {
+                    await progress.CloseAsync();
+                }
+
+                await _dialogCoordinator.ShowMessageAsync(this, "Generation Failed", $"An error occurred while generating drafts:\n\n{ex.Message}");
+            }
+            finally
+            {
+                // Fallback to ensure the progress dialog is always closed on success
+                if (progress.IsOpen)
+                {
+                    await progress.CloseAsync();
+                }
+            }
+        }
+
+
+        private DelegateCommand<Models.Seo.SEOPage> _showDraftCommand;
+
+        public DelegateCommand<Models.Seo.SEOPage> ShowDraftCommand
+        {
+            get { return _showDraftCommand ??= new DelegateCommand<Models.Seo.SEOPage>(OnShowDraft); }
+        }
+
+        private async void OnShowDraft(Models.Seo.SEOPage page)
+        {
+            if (page == null)
+            {
+                return;
+            }
+
+            try
+            {
+                var draft = await _client.GetSEOPageDraftAsync(page.PageId);
+
+                if (draft == null)
+                {
+                    await _dialogCoordinator.ShowMessageAsync(this, "Draft Not Found", $"No draft was found for the page: {page.PageTitle}");
+                    return;
+                }
+
+                var parameters = new DialogParameters { { "draft", _mapper.Map<Models.Seo.SEODraft>(draft) } };
+
+                _dialogService.ShowDialog("SEODetailDialog", parameters, result =>
+                {
+                    // Intentional empty callback; handle dialog result here if required in the future.
+                });
+            }
+            catch (Exception ex)
+            {
+                // Note: It is highly recommended to log the exception (ex) here for diagnostic purposes.
+                await _dialogCoordinator.ShowMessageAsync(this, "Error Fetching Draft", $"An unexpected error occurred while retrieving the draft for the page: {page.PageTitle}");
             }
         }
 

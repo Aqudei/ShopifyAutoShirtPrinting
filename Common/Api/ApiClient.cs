@@ -18,7 +18,6 @@ using System.Threading.Tasks;
 
 namespace Common.Api
 {
-
     public class PaginatedResult<T>
     {
         [JsonPropertyName("count")]
@@ -725,6 +724,61 @@ namespace Common.Api
             }
 
             return null;
+        }
+
+
+        public async Task<Common.Models.Seo.SEOPage> ApplyDraftAsync(int pageId)
+        {
+            var request = new RestRequest($"/api/seo/seo_pages/{pageId}/apply_draft/");
+            var response = await _client.ExecutePostAsync<Common.Models.Seo.SEOPage>(request);
+
+            if (response.IsSuccessful && response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                return response.Data;
+            }
+            else
+            {
+                // If RestSharp encountered a network or transport-level error, throw the inner exception.
+                if (response.ErrorException != null)
+                {
+                    throw response.ErrorException;
+                }
+
+                // Extract the API response content or fallback to the status description.
+                var errorDetails = !string.IsNullOrWhiteSpace(response.Content)
+                    ? response.Content
+                    : response.ErrorMessage ?? response.StatusDescription;
+
+                throw new System.Net.Http.HttpRequestException(
+                    $"Failed to retrieve SEO draft for Page ID {pageId}. Status: {response.StatusCode}. Details: {errorDetails}");
+            }
+        }
+
+        public async Task<Common.Models.Seo.SEODraft> GetSEOPageDraftAsync(int pageId)
+        {
+            var request = new RestRequest($"/api/seo/seo_pages/{pageId}/draft/");
+            var response = await _client.ExecuteGetAsync<Common.Models.Seo.SEODraft>(request);
+
+            if (response.IsSuccessful && response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                return response.Data;
+            }
+            else
+            {
+                // If RestSharp encountered a network or transport-level error, throw the inner exception.
+                if (response.ErrorException != null)
+                {
+                    throw response.ErrorException;
+                }
+
+                // Extract the API response content or fallback to the status description.
+                var errorDetails = !string.IsNullOrWhiteSpace(response.Content)
+                    ? response.Content
+                    : response.ErrorMessage ?? response.StatusDescription;
+
+                throw new System.Net.Http.HttpRequestException(
+                    $"Failed to retrieve SEO draft for Page ID {pageId}. Status: {response.StatusCode}. Details: {errorDetails}");
+            }
         }
 
         public async Task<IEnumerable<Shipment>> GetShipmentsByIdsAsync(int[] shipmentDbIds)

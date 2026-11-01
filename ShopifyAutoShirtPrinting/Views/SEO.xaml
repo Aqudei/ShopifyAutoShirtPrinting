@@ -130,8 +130,18 @@
                                         Width="30"
                                         Height="30"
                                         Margin="2,0"
-                                        ToolTip="Show Details">
+                                        ToolTip="Show Original">
                                     <iconPacks:PackIconMaterial Kind="Eye" Width="16" Height="16" Foreground="#2196F3"/>
+                                </Button>
+
+                                <Button Command="{Binding DataContext.ShowDraftCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}" 
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource MahApps.Styles.Button.Chromeless}"
+                                        Width="30"
+                                        Height="30"
+                                        Margin="2,0"
+                                        ToolTip="Show Draft">
+                                    <iconPacks:FontAwesome Kind="FirstdraftBrands"  Width="16" Height="16"/>
                                 </Button>
                             </StackPanel>
                         </DataTemplate>
